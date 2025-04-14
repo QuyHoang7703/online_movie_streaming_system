@@ -1,6 +1,7 @@
 package com.example.OnlineMovieStreamingSystem.service.impl;
 
 import com.example.OnlineMovieStreamingSystem.domain.user.User;
+import com.example.OnlineMovieStreamingSystem.domain.user.UserDetail;
 import com.example.OnlineMovieStreamingSystem.dto.UserInfoDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.AuthResponseDTO;
 import com.example.OnlineMovieStreamingSystem.repository.UserRepository;
@@ -25,15 +26,26 @@ public class UserServiceImpl implements UserService {
     @Override
     public AuthResponseDTO convertToLoginResponseDTO(String email) {
         User user = this.findUserByEmail(email);
-        UserInfoDTO userInfo = UserInfoDTO.builder()
-                .email(user.getEmail())
-                .name(user.getUserDetail().getName())
-                .avatarUrl(user.getUserDetail().getAvatarUrl())
-                .role(user.getRole().getName())
-                .build();
-        return AuthResponseDTO.builder()
-                .userInfo(userInfo)
-                .build();
+        AuthResponseDTO authResponseDTO = new AuthResponseDTO();
+
+        UserInfoDTO userInfo = new UserInfoDTO();
+        userInfo.setEmail(user.getEmail());
+        userInfo.setRole(user.getRole().getName());
+
+        UserDetail userDetail = user.getUserDetail();
+        if(userDetail != null){
+            userInfo.setName(userDetail.getName());
+            userInfo.setAvatarUrl(userDetail.getAvatarUrl());
+        }
+
+        authResponseDTO.setUserInfo(userInfo);
+
+        return authResponseDTO;
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return this.userRepository.existsByEmail(email);
     }
 
 

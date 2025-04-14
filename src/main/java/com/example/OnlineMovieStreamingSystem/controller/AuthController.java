@@ -1,11 +1,14 @@
 package com.example.OnlineMovieStreamingSystem.controller;
 
 import com.example.OnlineMovieStreamingSystem.dto.request.LoginRequestDTO;
+import com.example.OnlineMovieStreamingSystem.dto.request.RegisterRequestDTO;
+import com.example.OnlineMovieStreamingSystem.dto.request.VerifyOTPRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.AuthResponseDTO;
 import com.example.OnlineMovieStreamingSystem.service.AuthService;
 import com.example.OnlineMovieStreamingSystem.service.TokenService;
 import com.example.OnlineMovieStreamingSystem.service.UserService;
 import com.example.OnlineMovieStreamingSystem.util.SecurityUtil;
+import com.example.OnlineMovieStreamingSystem.util.annotation.ApiMessage;
 import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -76,5 +79,21 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookies.toString())
                 .body(null);
     }
+
+    @PostMapping("/register")
+    @ApiMessage("Check email")
+    public ResponseEntity<Void> registerUser(@Valid @RequestBody RegisterRequestDTO registerRequestDTO) {
+        this.authService.handleRegisterUser(registerRequestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+    }
+
+    @PostMapping("/verify")
+    @ApiMessage("Verify successfully")
+    public ResponseEntity<Void> verifyOTP(@Valid @RequestBody VerifyOTPRequestDTO verifyOTPRequestDTO) {
+        this.authService.handleVerifyOTP(verifyOTPRequestDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+
 
 }

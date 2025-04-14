@@ -35,8 +35,8 @@ public class GlobalException {
     public ResponseEntity<RestResponse<Object>> handleException(Exception ex) {
         RestResponse<Object> restResponse = new RestResponse<>();
         restResponse.setStatusCode(HttpStatus.BAD_REQUEST.value());
-        restResponse.setError(ex.getMessage());
-        restResponse.setMessage("Exception occur...");
+        restResponse.setError("Exception occur...");
+        restResponse.setMessage(ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(restResponse);
 
     }
