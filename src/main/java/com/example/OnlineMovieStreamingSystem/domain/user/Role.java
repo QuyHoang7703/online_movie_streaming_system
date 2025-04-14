@@ -1,10 +1,7 @@
 package com.example.OnlineMovieStreamingSystem.domain.user;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -13,6 +10,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,4 +19,8 @@ public class Role {
 
     @OneToMany(mappedBy = "role")
     private List<User> users;
+
+    public Role(String name) {
+        this.name = name;
+    }
 }
