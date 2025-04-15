@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác Nhận OTP</title>
+    <style>
+        .container {
+            background-color: #ffffff;
+            max-width: 600px;
+            margin: 0 auto;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background-color: #ECE000; /* Màu tiêu đề VieON */
+            color: #000000;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .body {
+            padding: 30px 20px;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+
+        .body p {
+            font-size: 16px;
+            margin: 0 0 15px;
+            line-height: 1.5;
+        }
+
+        .body .otp-code {
+            font-size: 22px;
+            font-weight: bold;
+            color: #ECE000;
+            text-align: center;
+            margin: 8px 0 8px;
+        }
+
+        .footer {
+            background-color: #f7f7f7;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #999999;
+            font-family: Arial, sans-serif;
+        }
+
+        .footer p {
+            margin: 0;
+        }
+
+        .footer a {
+            color: #ECE000;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Xác Minh Email Của Bạn</h1>
+    </div>
+    <div class="body">
+        <p>Để hoàn tất việc thiết lập tài khoản <strong>EMovie</strong> của bạn, chúng tôi chỉ cần đảm bảo rằng địa chỉ email này là của bạn.</p>
+        <p>Để xác minh địa chỉ email của bạn, hãy sử dụng mã bảo mật này:</p>
+        <p class="otp-code" th:text="${otp}">3786</p>
+        <p>Nếu bạn không yêu cầu mã này, bạn có thể yên tâm bỏ qua email này. Ai đó có thể đã nhập nhầm địa chỉ email của bạn.</p>
+        <p>Cảm ơn,<br><strong>EMovie</strong></p>
+    </div>
+    <div class="footer">
+        <p>Cần giúp đỡ? <a href="mailto:support@vieon.vn">Liên hệ với đội hỗ trợ của chúng tôi</a></p>
+    </div>
+</div>
+</body>
+</html>
