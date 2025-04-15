@@ -20,6 +20,8 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("api/v1/auth")
 @RequiredArgsConstructor
@@ -82,15 +84,22 @@ public class AuthController {
 
     @PostMapping("/register")
     @ApiMessage("Check email")
-    public ResponseEntity<Void> registerUser(@Valid @RequestBody RegisterRequestDTO registerRequestDTO) {
+    public ResponseEntity<Void> registerUser(@Valid @RequestBody RegisterRequestDTO registerRequestDTO) throws IOException {
         this.authService.handleRegisterUser(registerRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(null);
     }
 
-    @PostMapping("/verify")
+    @PostMapping("/verify-register")
     @ApiMessage("Verify successfully")
     public ResponseEntity<Void> verifyOTP(@Valid @RequestBody VerifyOTPRequestDTO verifyOTPRequestDTO) {
         this.authService.handleVerifyOTP(verifyOTPRequestDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    @PostMapping("/resend-otp")
+    @ApiMessage("Resent new OTP")
+    public ResponseEntity<Void> resendOTP(@RequestParam String email) throws IOException {
+        this.authService.handleResendOtp(email);
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 

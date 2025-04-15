@@ -9,6 +9,7 @@ import com.example.OnlineMovieStreamingSystem.dto.response.AuthResponseDTO;
 import com.example.OnlineMovieStreamingSystem.repository.RoleRepository;
 import com.example.OnlineMovieStreamingSystem.repository.UserRepository;
 import com.example.OnlineMovieStreamingSystem.service.AuthService;
+import com.example.OnlineMovieStreamingSystem.service.EmailService;
 import com.example.OnlineMovieStreamingSystem.service.TokenService;
 import com.example.OnlineMovieStreamingSystem.service.UserService;
 import com.example.OnlineMovieStreamingSystem.util.SecurityUtil;
@@ -25,7 +26,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Random;
@@ -50,6 +53,7 @@ public class AuthServiceImpl implements AuthService {
     private final String REGISTER_PREFIX = "register:";
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final EmailService emailService;
 
 
     @Override
@@ -129,8 +133,9 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void handleRegisterUser(RegisterRequestDTO registerRequestDTO) {
-        boolean isAvailableEmail = this.userService.existsByEmail(registerRequestDTO.getEmail());
+    public void handleRegisterUser(RegisterRequestDTO registerRequestDTO) throws IOException {
+        String email = registerRequestDTO.getEmail();
+        boolean isAvailableEmail = this.userService.existsByEmail(email);
         if(isAvailableEmail) {
             throw new ApplicationException("Email already in use");
         }
@@ -138,14 +143,19 @@ public class AuthServiceImpl implements AuthService {
             throw new ApplicationException("Passwords do not match");
         }
 
-        String key = REGISTER_PREFIX + registerRequestDTO.getEmail();
+        String key = REGISTER_PREFIX + email;
         String encodedPassword = this.passwordEncoder.encode(registerRequestDTO.getPassword());
 
         HashOperations<String, String , String> hashOperations = redisTemplate.opsForHash();
-        hashOperations.put(key, "email", registerRequestDTO.getEmail());
+        hashOperations.put(key, "email",email);
         hashOperations.put(key, "password", encodedPassword);
-        hashOperations.put(key, "otp", this.generateOTP());
+        String otp = this.generateOTP();
+        hashOperations.put(key, "otp", otp);
+        hashOperations.put(key, "createTime", Instant.now().toString());
         redisTemplate.expire(key, Duration.ofMinutes(5));
+
+        // Send otp through email
+        this.sendVerificationEmail(email, otp);
 
     }
 
@@ -165,7 +175,6 @@ public class AuthServiceImpl implements AuthService {
         }
 
         String password = hashOperations.get(key, "password");
-
         redisTemplate.delete(key);
 
         Role role = this.roleRepository.findByName("USER");
@@ -177,6 +186,33 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         this.userRepository.save(user);
+
+    }
+
+    @Override
+    public void handleResendOtp(String email) throws IOException {
+        String key = REGISTER_PREFIX + email;
+        HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
+
+        String createTimeStr = hashOperations.get(key, "createTime");
+        if(createTimeStr == null) {
+            throw new ApplicationException("OTP is expired");
+        }
+
+        Instant createTime = Instant.parse(createTimeStr);
+        Instant now = Instant.now();
+        if(Duration.between(createTime, now).toMinutes() <= 3) {
+            throw new ApplicationException("Just resend new OTP after 3 minutes");
+        }
+
+        String otp = this.generateOTP();
+        hashOperations.put(key, "otp", otp);
+        hashOperations.put(key, "createTime", now.toString());
+        redisTemplate.expire(key, Duration.ofMinutes(5));
+
+        // Send otp through email
+        this.sendVerificationEmail(email, otp);
+
     }
 
     private String generateOTP() {
@@ -184,5 +220,12 @@ public class AuthServiceImpl implements AuthService {
         int otpValue = 100000 + random.nextInt(900000);
 
         return String.valueOf(otpValue);
+    }
+
+    public void sendVerificationEmail(String email, String otp) throws IOException {
+        String subject = "EMovie - Xác nhận email";
+        Context context = new Context();
+        context.setVariable("otp", otp);
+        this.emailService.sendEmail(email, subject, "otp-email", context);
     }
 }
