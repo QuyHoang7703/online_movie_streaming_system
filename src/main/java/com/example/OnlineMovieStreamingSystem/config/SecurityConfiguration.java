@@ -21,7 +21,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -51,7 +53,8 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    JwtDecoder jwtDecoder,
                                                    JwtAuthenticationConverter jwtAuthenticationConverter,
-                                                   CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
+                                                   CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
+                                                   CookieToHeaderFilter cookieToHeaderFilter) throws Exception {
         http
                 .csrf(c->c.disable())
                 .cors(Customizer.withDefaults())
@@ -66,6 +69,7 @@ public class SecurityConfiguration {
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter))
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                 )
+                .addFilterBefore(cookieToHeaderFilter, BearerTokenAuthenticationFilter.class)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
     }

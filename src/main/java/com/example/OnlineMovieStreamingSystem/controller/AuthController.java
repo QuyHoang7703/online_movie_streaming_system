@@ -1,5 +1,6 @@
 package com.example.OnlineMovieStreamingSystem.controller;
 
+import com.example.OnlineMovieStreamingSystem.dto.UserInfoDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.LoginRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.RegisterRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.VerifyOTPRequestDTO;
@@ -89,7 +90,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(null);
     }
 
-    @PostMapping("/verify-register")
+    @PostMapping("/verify-otp")
     @ApiMessage("Verify successfully")
     public ResponseEntity<Void> verifyOTP(@Valid @RequestBody VerifyOTPRequestDTO verifyOTPRequestDTO) {
         this.authService.handleVerifyOTP(verifyOTPRequestDTO);
@@ -101,6 +102,13 @@ public class AuthController {
     public ResponseEntity<Void> resendOTP(@RequestParam String email) throws IOException {
         this.authService.handleResendOtp(email);
         return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    @GetMapping("/get-auth-user")
+    public ResponseEntity<UserInfoDTO> getUserInfo(@CookieValue(name="access_token", defaultValue = "noRefreshTokenInCookie") String accessToken) {
+        System.out.println(">>>>>>>> Access token from cookie: " + accessToken);
+        UserInfoDTO userInfoDTO = this.userService.getUserInfo();
+        return ResponseEntity.status(HttpStatus.OK).body(userInfoDTO);
     }
 
 

@@ -201,8 +201,9 @@ public class AuthServiceImpl implements AuthService {
 
         Instant createTime = Instant.parse(createTimeStr);
         Instant now = Instant.now();
-        if(Duration.between(createTime, now).toMinutes() <= 3) {
-            throw new ApplicationException("Just resend new OTP after 3 minutes");
+
+        if(Duration.between(createTime, now).getSeconds() < 60) {
+            throw new ApplicationException("Just resend new OTP after 1 minutes");
         }
 
         String otp = this.generateOTP();

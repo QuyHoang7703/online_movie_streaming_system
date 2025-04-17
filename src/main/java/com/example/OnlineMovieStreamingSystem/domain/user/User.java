@@ -23,7 +23,7 @@ public class User {
     @JoinColumn(name="role_id")
     private Role role;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserDetail userDetail;
 
 }

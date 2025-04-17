@@ -97,7 +97,9 @@ public class SecurityUtil {
                 .httpOnly(true)   // HTTP-only for security
                 .secure(true)     // Secure flag
                 .path("/")        // Cookie valid for entire site
-                .maxAge(maxAge)   // Expiration time
+                .maxAge(maxAge)   // Expiration time\
+//                .domain("localhost")
+                .sameSite("None")
                 .build();
     }
 
