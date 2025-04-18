@@ -21,7 +21,7 @@ public class HelloController {
 
     @PostMapping("/images")
     public ResponseEntity<String> uploadImage(@RequestParam MultipartFile file) throws IOException {
-        String urlImage = this.imageStorageService.uploadImage("artifact-image-container", file.getOriginalFilename(), file.getInputStream(), file.getSize());
+        String urlImage = this.imageStorageService.uploadImage("artifact-image-container", file.getOriginalFilename(), file.getInputStream());
         return ResponseEntity.ok().body(urlImage);
     }
 
