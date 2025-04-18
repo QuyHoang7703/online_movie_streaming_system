@@ -104,6 +104,12 @@
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>com.azure.spring</groupId>
+			<artifactId>spring-cloud-azure-starter-storage-blob</artifactId>
+			<version>5.22.0</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
