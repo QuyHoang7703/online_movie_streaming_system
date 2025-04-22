@@ -44,6 +44,11 @@ public class Movie {
     @OneToMany(mappedBy = "movie")
     private List<MovieActor> movieActors;
 
+    @ManyToMany
+    @JoinTable(name="movie_subscription_plan",
+            joinColumns = @JoinColumn(name="movie_id"),
+            inverseJoinColumns = @JoinColumn(name="subscription_plan_id"))
+    private List<SubscriptionPlan> subscriptionPlans;
 
     @PrePersist
     protected void prePersist() {
