@@ -1,5 +1,6 @@
 package com.example.OnlineMovieStreamingSystem.domain;
 
+import com.example.OnlineMovieStreamingSystem.util.constant.MovieType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -16,20 +18,23 @@ import java.util.List;
 @NoArgsConstructor
 public class Movie {
     @Id
-    private int id;
-    private String name;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
     private String title;
     @Column(columnDefinition = "MEDIUMTEXT")
     private String description;
     private String director;
-    private String posterPath;
-    private String backdropPath;
+    private String posterUrl;
+    private String backdropUrl;
     private String country;
-    private Instant releaseDate;
-    private boolean isPaid;
-    private double price;
+    private LocalDate releaseDate;
+    private boolean isFree;
+    private String trailerUrl;
+    @Enumerated(EnumType.STRING)
+    private MovieType movieType;
     private Instant createAt;
     private Instant updateAt;
+
 
     @OneToOne(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private StandaloneMovie standaloneMovie;

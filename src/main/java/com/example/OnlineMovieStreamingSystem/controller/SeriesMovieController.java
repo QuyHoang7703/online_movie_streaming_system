@@ -1,0 +1,26 @@
+package com.example.OnlineMovieStreamingSystem.controller;
+
+import com.example.OnlineMovieStreamingSystem.dto.request.movie.SeriesMovieRequestDTO;
+import com.example.OnlineMovieStreamingSystem.dto.response.movie.SeriesMovieResponseDTO;
+import com.example.OnlineMovieStreamingSystem.service.SeriesMovieService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("api/v1/series-movie")
+public class SeriesMovieController {
+    private final SeriesMovieService seriesMovieService;
+
+    @PostMapping
+    public ResponseEntity<SeriesMovieResponseDTO> createStandaloneMovie(@RequestPart(name="movieInfo") SeriesMovieRequestDTO seriesMovieRequestDTO,
+                                                                            @RequestParam("poster") MultipartFile poster,
+                                                                            @RequestParam("backdrop") MultipartFile backdrop) throws IOException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.seriesMovieService.createSeriesMovie(seriesMovieRequestDTO, poster, backdrop));
+    }
+}

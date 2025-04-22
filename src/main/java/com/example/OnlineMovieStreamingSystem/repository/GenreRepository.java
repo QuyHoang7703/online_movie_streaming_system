@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 
 @Repository
 public interface GenreRepository extends JpaRepository<Genre, Long> {
@@ -17,4 +19,6 @@ public interface GenreRepository extends JpaRepository<Genre, Long> {
             "WHERE (:genreName IS NULL OR :genreName = '') " +
             "OR LOWER(g.name) LIKE LOWER(CONCAT('%', :genreName, '%'))")
     Page<Genre> findAll(@Param("genreName") String genreName, Pageable pageable);
+
+    List<Genre> findByIdIn (List<Long> genreIds);
 }

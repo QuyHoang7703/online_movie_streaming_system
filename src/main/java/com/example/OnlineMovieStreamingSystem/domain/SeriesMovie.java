@@ -14,8 +14,8 @@ import lombok.Setter;
 public class SeriesMovie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    private int seasonNumber;
+    private long id;
+    private int season;
     private int episodeNumber;
 
     @OneToOne

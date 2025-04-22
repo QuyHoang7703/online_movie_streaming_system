@@ -14,7 +14,7 @@ import lombok.Setter;
 public class MovieActor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
     private String characterName;
 
     @ManyToOne
