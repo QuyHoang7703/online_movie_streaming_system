@@ -11,7 +11,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface GenreRepository extends JpaRepository<Genre, Long> {
+    boolean existsByName(String name);
+
     @Query("SELECT g FROM Genre g " +
-            "WHERE LOWER(g.name) LIKE LOWER(CONCAT('%', :genreName, '%'))")
+            "WHERE (:genreName IS NULL OR :genreName = '') " +
+            "OR LOWER(g.name) LIKE LOWER(CONCAT('%', :genreName, '%'))")
     Page<Genre> findAll(@Param("genreName") String genreName, Pageable pageable);
 }

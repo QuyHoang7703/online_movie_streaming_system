@@ -6,6 +6,7 @@ import com.example.OnlineMovieStreamingSystem.dto.response.genre.GenreResponseDT
 import com.example.OnlineMovieStreamingSystem.service.GenreService;
 import com.example.OnlineMovieStreamingSystem.util.annotation.ApiMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("api/v1/genres")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
+@Slf4j
 public class GenreController {
     private final GenreService genreService;
 
@@ -25,7 +27,7 @@ public class GenreController {
     }
 
     @GetMapping
-    public ResponseEntity<ResultPaginationDTO> getGenreByName(@RequestParam String genreName,
+    public ResponseEntity<ResultPaginationDTO> getGenreByName(@RequestParam(name="genreName", required = false) String genreName,
                                                               @RequestParam(name="page", defaultValue = "1") int page,
                                                               @RequestParam(name="size", defaultValue = "5") int size) {
         return ResponseEntity.status(HttpStatus.OK).body(this.genreService.getAllGenres(genreName, page, size));
@@ -45,4 +47,8 @@ public class GenreController {
         return ResponseEntity.status(HttpStatus.OK).body(this.genreService.updateGenre(genreId, genreRequestDTO));
     }
 
+    @GetMapping("{genreId}")
+    public ResponseEntity<GenreResponseDTO> getGenreById(@PathVariable("genreId") Long genreId) {
+        return ResponseEntity.status(HttpStatus.OK).body(this.genreService.getGenreById(genreId));
+    }
 }

@@ -11,4 +11,5 @@ public interface GenreService {
     GenreResponseDTO updateGenre(long id, GenreRequestDTO genreRequestDTO);
     ResultPaginationDTO getAllGenres(String genre, int pageNumber, int pageSize);
     void deleteGenre(long id);
+    GenreResponseDTO getGenreById(long id);
 }
