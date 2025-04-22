@@ -25,6 +25,7 @@ public class Actor {
     private String biography;
     private LocalDate birthDate;
     private String otherName;
+    private String placeOfBirth;
     @Enumerated(EnumType.STRING)
     private GenderEnum gender;
 

@@ -19,6 +19,7 @@ public class ActorRequestDTO {
     private LocalDate birthDate;
     private String biography;
     private String otherName;
+    private String placeOfBirth;
     private GenderEnum gender;
 
 }

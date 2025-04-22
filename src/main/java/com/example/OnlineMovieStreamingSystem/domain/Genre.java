@@ -14,6 +14,7 @@ public class Genre {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @Column(unique = true, nullable = false)
     private String name;
     @Column(columnDefinition = "MEDIUMTEXT")
     private String description;

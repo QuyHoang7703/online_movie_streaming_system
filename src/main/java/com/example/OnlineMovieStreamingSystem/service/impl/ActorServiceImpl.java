@@ -1,17 +1,24 @@
 package com.example.OnlineMovieStreamingSystem.service.impl;
 
 import com.example.OnlineMovieStreamingSystem.domain.Actor;
+import com.example.OnlineMovieStreamingSystem.dto.Meta;
+import com.example.OnlineMovieStreamingSystem.dto.ResultPaginationDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.actor.ActorRequestDTO;
+import com.example.OnlineMovieStreamingSystem.dto.response.actor.ActorDetailResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.actor.ActorResponseDTO;
 import com.example.OnlineMovieStreamingSystem.repository.ActorRepository;
 import com.example.OnlineMovieStreamingSystem.service.ActorService;
 import com.example.OnlineMovieStreamingSystem.service.ImageStorageService;
 import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -22,7 +29,7 @@ public class ActorServiceImpl implements ActorService {
     private final String CONTAINER_NAME = "actor-image-container";
 
     @Override
-    public ActorResponseDTO createActor(ActorRequestDTO actorRequestDTO, MultipartFile avatar) throws IOException {
+    public ActorDetailResponseDTO createActor(ActorRequestDTO actorRequestDTO, MultipartFile avatar) throws IOException {
         Actor actor = new Actor();
         actor.setName(actorRequestDTO.getName());
         actor.setBirthDate(actorRequestDTO.getBirthDate());
@@ -35,11 +42,11 @@ public class ActorServiceImpl implements ActorService {
 
         Actor savedActor = actorRepository.save(actor);
 
-        return this.convertToActorResponseDTO(savedActor);
+        return this.convertToActorDetailResponseDTO(savedActor);
     }
 
     @Override
-    public ActorResponseDTO updateActor(long actorId, ActorRequestDTO actorRequestDTO, MultipartFile avatar) throws IOException {
+    public ActorDetailResponseDTO updateActor(long actorId, ActorRequestDTO actorRequestDTO, MultipartFile avatar) throws IOException {
         Actor actorDB = this.actorRepository.findById(actorId)
                 .orElseThrow(() ->  new ApplicationException("Actor not found"));
 
@@ -70,7 +77,7 @@ public class ActorServiceImpl implements ActorService {
         }
         Actor updatedActor = this.actorRepository.save(actorDB);
 
-        return this.convertToActorResponseDTO(updatedActor);
+        return this.convertToActorDetailResponseDTO(updatedActor);
     }
 
     @Override
@@ -86,22 +93,57 @@ public class ActorServiceImpl implements ActorService {
     }
 
     @Override
-    public ActorResponseDTO getDetailActor(long actorId) {
+    public ActorDetailResponseDTO getDetailActor(long actorId) {
         Actor actor = this.actorRepository.findById(actorId)
                 .orElseThrow(() ->  new ApplicationException("Actor not found"));
 
-        return this.convertToActorResponseDTO(actor);
+        return this.convertToActorDetailResponseDTO(actor);
+    }
+
+    @Override
+    public ResultPaginationDTO getAllActor(String actorName, int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+        Page<Actor> actorPage = this.actorRepository.findAll(actorName, pageable);
+
+        Meta meta = new Meta();
+        meta.setCurrentPage(pageable.getPageNumber() + 1);
+        meta.setPageSize(pageable.getPageSize());
+        meta.setTotalPages(actorPage.getTotalPages());
+        meta.setTotalElements(actorPage.getTotalElements());
+
+        ResultPaginationDTO resultPaginationDTO = new ResultPaginationDTO();
+        resultPaginationDTO.setMeta(meta);
+
+        List<ActorResponseDTO> actorResponseDTOS = actorPage.getContent().stream()
+                .map(this::convertToActorResponseDTO)
+                .toList();
+
+        resultPaginationDTO.setResult(actorResponseDTOS);
+
+        return resultPaginationDTO;
+    }
+
+    private ActorDetailResponseDTO convertToActorDetailResponseDTO(Actor actor) {
+        ActorDetailResponseDTO actorDetailResponseDTO = new ActorDetailResponseDTO();
+        actorDetailResponseDTO.setId(actor.getId());
+        actorDetailResponseDTO.setName(actor.getName());
+        actorDetailResponseDTO.setBirthDate(actor.getBirthDate());
+        actorDetailResponseDTO.setAvatarUrl(actor.getAvatarUrl());
+        actorDetailResponseDTO.setBiography(actor.getBiography());
+        actorDetailResponseDTO.setOtherName(actor.getOtherName());
+        actorDetailResponseDTO.setGender(actor.getGender());
+
+        return actorDetailResponseDTO;
     }
 
     private ActorResponseDTO convertToActorResponseDTO(Actor actor) {
-        ActorResponseDTO actorResponseDTO = new ActorResponseDTO();
-        actorResponseDTO.setId(actor.getId());
-        actorResponseDTO.setName(actor.getName());
-        actorResponseDTO.setBirthDate(actor.getBirthDate());
-        actorResponseDTO.setAvatarUrl(actor.getAvatarUrl());
-        actorResponseDTO.setBiography(actor.getBiography());
-        actorResponseDTO.setOtherName(actor.getOtherName());
-        actorResponseDTO.setGender(actor.getGender());
+        ActorResponseDTO actorResponseDTO = ActorResponseDTO.builder()
+                .id(actor.getId())
+                .name(actor.getName())
+                .birthDate(actor.getBirthDate())
+                .placeOfBirth(actor.getPlaceOfBirth())
+                .avatarUrl(actor.getAvatarUrl())
+                .build();
 
         return actorResponseDTO;
     }

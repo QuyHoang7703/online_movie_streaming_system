@@ -23,6 +23,10 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     public GenreResponseDTO createGenre(GenreRequestDTO genreRequestDTO) {
+        boolean isExistedGenre = this.genreRepository.existsByName(genreRequestDTO.getName());
+        if(isExistedGenre) {
+            throw new ApplicationException("Genre name is existed");
+        }
         Genre genre = new Genre();
         genre.setName(genreRequestDTO.getName());
         genre.setDescription(genreRequestDTO.getDescription());
@@ -35,6 +39,10 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     public GenreResponseDTO updateGenre(long id, GenreRequestDTO genreRequestDTO) {
+//        boolean isExistedGenre = this.genreRepository.existsByName(genreRequestDTO.getName());
+//        if(isExistedGenre) {
+//            throw new ApplicationException("Genre name is existed");
+//        }
         Genre genre = this.findGenreById(id);
         genre.setName(genreRequestDTO.getName());
         genre.setDescription(genreRequestDTO.getDescription());
@@ -70,6 +78,12 @@ public class GenreServiceImpl implements GenreService {
     public void deleteGenre(long id) {
         Genre genre = this.findGenreById(id);
         this.genreRepository.delete(genre);
+    }
+
+    @Override
+    public GenreResponseDTO getGenreById(long id) {
+        Genre genre = this.findGenreById(id);
+        return this.convertGenreToGenreDTO(genre);
     }
 
     private GenreResponseDTO convertGenreToGenreDTO(Genre genre) {
