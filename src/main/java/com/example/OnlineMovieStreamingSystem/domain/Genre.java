@@ -13,7 +13,7 @@ import java.util.List;
 public class Genre {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
     @Column(unique = true, nullable = false)
     private String name;
     @Column(columnDefinition = "MEDIUMTEXT")

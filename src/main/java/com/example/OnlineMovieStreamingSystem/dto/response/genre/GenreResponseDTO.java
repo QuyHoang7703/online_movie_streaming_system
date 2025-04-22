@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GenreResponseDTO {
-    private int id;
+    private long id;
     private String name;
     private String description;
 

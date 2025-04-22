@@ -14,9 +14,9 @@ import lombok.Setter;
 public class StandaloneMovie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
     private int duration;
-    private String videoPath;
+    private String videoUrl;
 
     @OneToOne
     @MapsId
