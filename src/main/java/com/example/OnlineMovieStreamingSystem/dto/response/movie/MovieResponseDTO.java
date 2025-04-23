@@ -7,6 +7,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @SuperBuilder
@@ -24,6 +25,7 @@ public class MovieResponseDTO {
     private boolean isFree;
     private String trailerUrl;
     private MovieType movieType;
+    private List<MovieActorResponseDTO> movieActors;
     private Instant createAt;
     private Instant updateAt;
 }

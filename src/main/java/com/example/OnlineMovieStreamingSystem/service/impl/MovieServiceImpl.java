@@ -1,10 +1,11 @@
 package com.example.OnlineMovieStreamingSystem.service.impl;
 
-import com.example.OnlineMovieStreamingSystem.domain.Genre;
-import com.example.OnlineMovieStreamingSystem.domain.Movie;
-import com.example.OnlineMovieStreamingSystem.domain.SubscriptionPlan;
+import com.example.OnlineMovieStreamingSystem.domain.*;
+import com.example.OnlineMovieStreamingSystem.dto.request.movie.MovieActorRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.movie.MovieRequestDTO;
+import com.example.OnlineMovieStreamingSystem.dto.response.movie.MovieActorResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.movie.MovieResponseDTO;
+import com.example.OnlineMovieStreamingSystem.repository.ActorRepository;
 import com.example.OnlineMovieStreamingSystem.repository.GenreRepository;
 import com.example.OnlineMovieStreamingSystem.repository.MovieRepository;
 import com.example.OnlineMovieStreamingSystem.repository.SubscriptionPlanRepository;
@@ -17,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class MovieServiceImpl implements MovieService {
     private final GenreRepository genreRepository;
     private final SubscriptionPlanRepository subscriptionPlanRepository;
     private final String CONTAINER_NAME= "movie-image-container";
+    private final ActorRepository actorRepository;
 
     @Override
     public Movie createMovieFromDTO(MovieRequestDTO movieRequestDTO, MultipartFile poster, MultipartFile backdrop) throws IOException {
@@ -60,6 +64,23 @@ public class MovieServiceImpl implements MovieService {
             List<SubscriptionPlan> subscriptionPlans = this.subscriptionPlanRepository.findByIdIn(subscriptionPlanIds);
             movie.setSubscriptionPlans(subscriptionPlans);
         }
+
+        // Set actors for movie
+        List<MovieActorRequestDTO> movieActorDTOS = movieRequestDTO.getMovieActors();
+        if(movieActorDTOS != null && !movieActorDTOS.isEmpty()) {
+            List<Long> actorIds = movieActorDTOS.stream().map(MovieActorRequestDTO::getActorId).toList();
+            List<Actor> actors = this.actorRepository.findByIdIn(actorIds);
+            Map<Long, Actor> actorMap = actors.stream().collect(Collectors.toMap(Actor::getId, actor -> actor));
+            List<MovieActor> movieActors = movieActorDTOS.stream()
+                    .map(movieActorDTO -> {
+                        MovieActor movieActor = new MovieActor();
+                        movieActor.setMovie(movie);
+                        movieActor.setActor(actorMap.get(movieActorDTO.getActorId()));
+                        movieActor.setCharacterName(movieActorDTO.getCharacterName());
+                        return movieActor;
+                    }).toList();
+            movie.setMovieActors(movieActors);
+        }
         return movie;
     }
 
@@ -81,10 +102,30 @@ public class MovieServiceImpl implements MovieService {
             dto.setMovieType(movie.getMovieType());
             dto.setCreateAt(movie.getCreateAt());
             dto.setUpdateAt(movie.getUpdateAt());
+
+            List<MovieActorResponseDTO> movieActorResponseDTOS = movie.getMovieActors().stream()
+                    .map(this::convertToMovieActorDTO)
+                    .toList();
+
+            dto.setMovieActors(movieActorResponseDTOS);
+
             return dto;
         } catch (Exception e) {
             throw new RuntimeException("Failed to convert DTO", e);
         }
+    }
+
+    private MovieActorResponseDTO convertToMovieActorDTO(MovieActor movieActor) {
+        Actor actor = movieActor.getActor();
+        MovieActorResponseDTO movieActorResponseDTO = MovieActorResponseDTO.builder()
+                .actorId(actor.getId())
+                .actorName(actor.getName())
+                .avatarUrl(actor.getAvatarUrl())
+                .characterName(movieActor.getCharacterName())
+                .build();
+
+        return movieActorResponseDTO;
+
     }
 
 }
