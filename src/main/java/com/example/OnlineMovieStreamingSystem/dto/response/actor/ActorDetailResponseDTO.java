@@ -19,6 +19,7 @@ public class ActorDetailResponseDTO {
     private String avatarUrl;
     private String biography;
     private String otherName;
+    private String placeOfBirth;
     private GenderEnum gender;
 
     // Có thêm movie dto ở đây
