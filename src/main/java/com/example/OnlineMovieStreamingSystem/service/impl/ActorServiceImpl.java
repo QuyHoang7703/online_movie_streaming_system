@@ -36,6 +36,7 @@ public class ActorServiceImpl implements ActorService {
         actor.setBiography(actorRequestDTO.getBiography());
         actor.setOtherName(actorRequestDTO.getOtherName());
         actor.setGender(actorRequestDTO.getGender());
+        actor.setPlaceOfBirth(actorRequestDTO.getPlaceOfBirth());
 
         String avatarUrl = this.imageStorageService.uploadImage(CONTAINER_NAME, avatar.getOriginalFilename(), avatar.getInputStream());
         actor.setAvatarUrl(avatarUrl);
@@ -65,6 +66,10 @@ public class ActorServiceImpl implements ActorService {
         }
         if(!Objects.equals(actorRequestDTO.getGender(), actorDB.getGender())) {
             actorDB.setGender(actorRequestDTO.getGender());
+        }
+
+        if(!Objects.equals(actorRequestDTO.getPlaceOfBirth(), actorDB.getPlaceOfBirth())) {
+            actorDB.setPlaceOfBirth(actorRequestDTO.getPlaceOfBirth());
         }
 
         String avatarUrl = actorDB.getAvatarUrl();
@@ -131,6 +136,7 @@ public class ActorServiceImpl implements ActorService {
         actorDetailResponseDTO.setAvatarUrl(actor.getAvatarUrl());
         actorDetailResponseDTO.setBiography(actor.getBiography());
         actorDetailResponseDTO.setOtherName(actor.getOtherName());
+        actorDetailResponseDTO.setPlaceOfBirth(actor.getPlaceOfBirth());
         actorDetailResponseDTO.setGender(actor.getGender());
 
         return actorDetailResponseDTO;
