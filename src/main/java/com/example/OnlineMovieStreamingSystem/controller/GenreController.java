@@ -3,6 +3,7 @@ package com.example.OnlineMovieStreamingSystem.controller;
 import com.example.OnlineMovieStreamingSystem.dto.ResultPaginationDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.genre.GenreRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.genre.GenreResponseDTO;
+import com.example.OnlineMovieStreamingSystem.dto.response.genre.GenreSummaryDTO;
 import com.example.OnlineMovieStreamingSystem.service.GenreService;
 import com.example.OnlineMovieStreamingSystem.util.annotation.ApiMessage;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/genres")
@@ -51,4 +54,10 @@ public class GenreController {
     public ResponseEntity<GenreResponseDTO> getGenreById(@PathVariable("genreId") Long genreId) {
         return ResponseEntity.status(HttpStatus.OK).body(this.genreService.getGenreById(genreId));
     }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<GenreSummaryDTO>> getAllGenres() {
+        return ResponseEntity.status(HttpStatus.OK).body(this.genreService.getGenreSummaryDTOs());
+    }
+
 }

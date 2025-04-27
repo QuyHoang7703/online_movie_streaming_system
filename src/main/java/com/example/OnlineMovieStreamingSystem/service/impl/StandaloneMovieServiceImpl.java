@@ -7,12 +7,15 @@ import com.example.OnlineMovieStreamingSystem.dto.response.movie.StandaloneMovie
 import com.example.OnlineMovieStreamingSystem.repository.MovieRepository;
 import com.example.OnlineMovieStreamingSystem.service.MovieService;
 import com.example.OnlineMovieStreamingSystem.service.StandaloneMovieService;
-import jakarta.transaction.Transactional;
+import com.example.OnlineMovieStreamingSystem.util.constant.MovieType;
+import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -20,8 +23,9 @@ public class StandaloneMovieServiceImpl implements StandaloneMovieService {
     private final MovieRepository movieRepository;
     private final MovieService movieService;
 
-    @Override
     @Transactional
+    @Override
+
     public StandaloneMovieResponseDTO createStandaloneMovie(StandaloneMovieRequestDTO standaloneMovieRequestDTO, MultipartFile poster, MultipartFile backdrop) throws IOException {
 
         Movie movie = this.movieService.createMovieFromDTO(standaloneMovieRequestDTO, poster, backdrop);
@@ -36,6 +40,40 @@ public class StandaloneMovieServiceImpl implements StandaloneMovieService {
         Movie savedMovie = this.movieRepository.save(movie);
 
         return this.convertToStandaloneMovieResponseDTO(savedMovie);
+    }
+
+    @Transactional
+    @Override
+    public StandaloneMovieResponseDTO updateStandaloneMovie(long movieId,
+                                                            StandaloneMovieRequestDTO standaloneMovieRequestDTO,
+                                                            MultipartFile poster,
+                                                            MultipartFile backdrop) throws IOException {
+        Movie updateMovie = this.movieService.updateMovieFromDTO(movieId, standaloneMovieRequestDTO, poster, backdrop);
+        StandaloneMovie standaloneMovie = updateMovie.getStandaloneMovie();
+        if(!Objects.equals(standaloneMovie.getDuration(), standaloneMovieRequestDTO.getDuration())) {
+           standaloneMovie.setDuration(standaloneMovieRequestDTO.getDuration());
+        }
+        if(!Objects.equals(standaloneMovie.getVideoUrl(), standaloneMovieRequestDTO.getVideoUrl())) {
+            standaloneMovie.setVideoUrl(standaloneMovieRequestDTO.getVideoUrl());
+        }
+        updateMovie.setStandaloneMovie(standaloneMovie);
+        Movie updatedMovie = this.movieRepository.save(updateMovie);
+
+
+
+        return this.convertToStandaloneMovieResponseDTO(updatedMovie);
+    }
+
+    @Override
+    public StandaloneMovieResponseDTO getStandaloneMovie(long movieId) {
+        Movie movie = this.movieRepository.findById(movieId)
+                .orElseThrow(() -> new ApplicationException("Không tìm thấy phim"));
+        if(movie.getMovieType() != MovieType.STANDALONE){
+            throw new ApplicationException("Phim này không phải là phim lẻ");
+        }
+        StandaloneMovieResponseDTO standaloneMovieResponseDTO = this.convertToStandaloneMovieResponseDTO(movie);
+
+        return standaloneMovieResponseDTO;
     }
 
     private StandaloneMovieResponseDTO convertToStandaloneMovieResponseDTO(Movie movie){
