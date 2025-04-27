@@ -9,11 +9,14 @@ import com.example.OnlineMovieStreamingSystem.dto.response.movie.StandaloneMovie
 import com.example.OnlineMovieStreamingSystem.repository.MovieRepository;
 import com.example.OnlineMovieStreamingSystem.service.MovieService;
 import com.example.OnlineMovieStreamingSystem.service.SeriesMovieService;
+import com.example.OnlineMovieStreamingSystem.util.constant.MovieType;
+import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +37,34 @@ public class SeriesMovieServiceImpl implements SeriesMovieService {
         Movie savedMovie = this.movieRepository.save(movie);
 
         return this.convertToSeriesResponseDTO(savedMovie);
+    }
+
+    @Override
+    public SeriesMovieResponseDTO updateStandaloneMovie(long movieId, SeriesMovieRequestDTO seriesMovieRequestDTO, MultipartFile poster, MultipartFile backdrop) throws IOException {
+        Movie updateMovie = this.movieService.updateMovieFromDTO(movieId, seriesMovieRequestDTO, poster, backdrop);
+        SeriesMovie seriesMovie = updateMovie.getSeriesMovie();
+        if(!Objects.equals(seriesMovie.getSeason(), seriesMovieRequestDTO.getSeason())){
+            seriesMovie.setSeason(seriesMovieRequestDTO.getSeason());
+        }
+        if(!Objects.equals(seriesMovie.getEpisodeNumber(), seriesMovieRequestDTO.getEpisodeNumber())){
+            seriesMovie.setEpisodeNumber(seriesMovieRequestDTO.getEpisodeNumber());
+        }
+        updateMovie.setSeriesMovie(seriesMovie);
+        Movie updatedMovie = this.movieRepository.save(updateMovie);
+
+        return this.convertToSeriesResponseDTO(updatedMovie);
+    }
+
+    @Override
+    public SeriesMovieResponseDTO getSeriesMovie(long movieId) {
+        Movie movie = this.movieRepository.findById(movieId)
+                .orElseThrow(() -> new ApplicationException("Không tìm thấy phim"));
+        if(movie.getMovieType() != MovieType.SERIES){
+            throw new ApplicationException("Phim này không phải là phim bộ");
+        }
+        SeriesMovieResponseDTO seriesMovieResponseDTO = this.convertToSeriesResponseDTO(movie);
+
+        return seriesMovieResponseDTO;
     }
 
     private SeriesMovieResponseDTO convertToSeriesResponseDTO(Movie movie){

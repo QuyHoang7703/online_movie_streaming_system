@@ -23,4 +23,19 @@ public class SeriesMovieController {
                                                                             @RequestParam("backdrop") MultipartFile backdrop) throws IOException {
         return ResponseEntity.status(HttpStatus.CREATED).body(this.seriesMovieService.createSeriesMovie(seriesMovieRequestDTO, poster, backdrop));
     }
+
+    @PatchMapping("{movieId}")
+    public ResponseEntity<SeriesMovieResponseDTO> updateStandaloneMovie(@PathVariable long movieId,
+                                                                        @RequestPart(name="movieInfo") SeriesMovieRequestDTO seriesMovieRequestDTO,
+                                                                        @RequestParam(name="poster", required = false)MultipartFile poster,
+                                                                        @RequestParam(name="backdrop", required = false) MultipartFile backdrop) throws IOException {
+
+        return ResponseEntity.status(HttpStatus.OK).body(this.seriesMovieService.updateStandaloneMovie(movieId, seriesMovieRequestDTO, poster, backdrop));
+    }
+
+    @GetMapping("{movieId}")
+    public ResponseEntity<SeriesMovieResponseDTO> getStandaloneMovie(@PathVariable long movieId) {
+
+        return ResponseEntity.status(HttpStatus.OK).body(this.seriesMovieService.getSeriesMovie(movieId));
+    }
 }

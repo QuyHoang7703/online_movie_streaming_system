@@ -17,6 +17,10 @@ public interface MovieService {
     ResultPaginationDTO getMovies(String title,
                                   List<String> genreNames,
                                   String movieType,
+                                  List<String> countries,
                                   int page,
                                   int size) throws BadRequestException;
+    List<String> getAllCountriesOfMovie();
+    Movie updateMovieFromDTO(long movieId, MovieRequestDTO movieRequestDTO, MultipartFile poster, MultipartFile backdrop) throws IOException;
+    void deleteMovie(long movieId);
 }

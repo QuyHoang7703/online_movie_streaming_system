@@ -8,5 +8,6 @@ import java.io.IOException;
 
 public interface StandaloneMovieService {
     StandaloneMovieResponseDTO createStandaloneMovie(StandaloneMovieRequestDTO standaloneMovieRequestDTO, MultipartFile poster, MultipartFile backdrop) throws IOException;
-
+    StandaloneMovieResponseDTO updateStandaloneMovie(long movieId, StandaloneMovieRequestDTO standaloneMovieRequestDTO, MultipartFile poster, MultipartFile backdrop) throws IOException;
+    StandaloneMovieResponseDTO getStandaloneMovie(long movieId);
 }

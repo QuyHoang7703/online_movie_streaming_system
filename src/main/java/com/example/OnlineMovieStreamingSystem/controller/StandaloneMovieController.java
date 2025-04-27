@@ -24,6 +24,25 @@ public class StandaloneMovieController {
         return ResponseEntity.status(HttpStatus.CREATED).body(this.standaloneMovieService.createStandaloneMovie(standaloneMovieRequestDTO, poster, backdrop));
     }
 
+    @PatchMapping("{movieId}")
+    public ResponseEntity<StandaloneMovieResponseDTO> updateStandaloneMovie(@PathVariable long movieId,
+                                                                            @RequestPart(name="movieInfo") StandaloneMovieRequestDTO standaloneMovieRequestDTO,
+                                                                            @RequestParam(name="poster", required = false)MultipartFile poster,
+                                                                            @RequestParam(name="backdrop", required = false) MultipartFile backdrop) throws IOException {
+
+        return ResponseEntity.status(HttpStatus.OK).body(this.standaloneMovieService.updateStandaloneMovie(movieId, standaloneMovieRequestDTO, poster, backdrop));
+    }
+
+    @GetMapping("{movieId}")
+    public ResponseEntity<StandaloneMovieResponseDTO> getStandaloneMovie(@PathVariable long movieId) {
+
+        return ResponseEntity.status(HttpStatus.OK).body(this.standaloneMovieService.getStandaloneMovie(movieId));
+    }
+
+
+
+
+
 
 
 }

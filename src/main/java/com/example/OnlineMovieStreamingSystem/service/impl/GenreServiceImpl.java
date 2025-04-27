@@ -5,6 +5,7 @@ import com.example.OnlineMovieStreamingSystem.dto.Meta;
 import com.example.OnlineMovieStreamingSystem.dto.ResultPaginationDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.genre.GenreRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.genre.GenreResponseDTO;
+import com.example.OnlineMovieStreamingSystem.dto.response.genre.GenreSummaryDTO;
 import com.example.OnlineMovieStreamingSystem.repository.GenreRepository;
 import com.example.OnlineMovieStreamingSystem.service.GenreService;
 import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
@@ -33,7 +34,7 @@ public class GenreServiceImpl implements GenreService {
 
         Genre savedGenre = this.genreRepository.save(genre);
 
-        return this.convertGenreToGenreDTO(savedGenre);
+        return this.convertToGenreDTO(savedGenre);
 
     }
 
@@ -48,7 +49,7 @@ public class GenreServiceImpl implements GenreService {
         genre.setDescription(genreRequestDTO.getDescription());
         Genre updatedGenre = this.genreRepository.save(genre);
 
-        return this.convertGenreToGenreDTO(updatedGenre);
+        return this.convertToGenreDTO(updatedGenre);
     }
 
     @Override
@@ -67,7 +68,7 @@ public class GenreServiceImpl implements GenreService {
         resultPaginationDTO.setMeta(meta);
 
         List<GenreResponseDTO> genreResponseDTOS = genrePage.getContent().stream()
-                .map(this::convertGenreToGenreDTO)
+                .map(this::convertToGenreDTO)
                 .toList();
         resultPaginationDTO.setResult(genreResponseDTOS);
 
@@ -83,10 +84,21 @@ public class GenreServiceImpl implements GenreService {
     @Override
     public GenreResponseDTO getGenreById(long id) {
         Genre genre = this.findGenreById(id);
-        return this.convertGenreToGenreDTO(genre);
+        return this.convertToGenreDTO(genre);
     }
 
-    private GenreResponseDTO convertGenreToGenreDTO(Genre genre) {
+    @Override
+    public List<GenreSummaryDTO> getGenreSummaryDTOs() {
+        List<Genre> genres = this.genreRepository.findAll();
+
+        List<GenreSummaryDTO> genreSummaryDTOS = genres.stream()
+                .map(this::convertToGenreSummaryDTO)
+                .toList();
+
+        return genreSummaryDTOS;
+    }
+
+    private GenreResponseDTO convertToGenreDTO(Genre genre) {
         GenreResponseDTO genreResponseDTO = GenreResponseDTO.builder()
                 .id(genre.getId())
                 .name(genre.getName())
@@ -96,10 +108,21 @@ public class GenreServiceImpl implements GenreService {
         return genreResponseDTO;
     }
 
+    public GenreSummaryDTO convertToGenreSummaryDTO(Genre genre) {
+        GenreSummaryDTO genreSummaryDTO = GenreSummaryDTO.builder()
+                .id(genre.getId())
+                .name(genre.getName())
+                .build();
+
+        return genreSummaryDTO;
+    }
+
     private Genre findGenreById(long id) {
         return this.genreRepository.findById(id)
                 .orElseThrow(() -> new ApplicationException("Genre not found"));
     }
+
+
 
 
 }
