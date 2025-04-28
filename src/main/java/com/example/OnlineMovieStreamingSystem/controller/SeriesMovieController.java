@@ -3,6 +3,7 @@ package com.example.OnlineMovieStreamingSystem.controller;
 import com.example.OnlineMovieStreamingSystem.dto.request.movie.SeriesMovieRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.movie.SeriesMovieResponseDTO;
 import com.example.OnlineMovieStreamingSystem.service.SeriesMovieService;
+import com.example.OnlineMovieStreamingSystem.util.annotation.ApiMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ public class SeriesMovieController {
     private final SeriesMovieService seriesMovieService;
 
     @PostMapping
+    @ApiMessage("Thêm phim thành công")
     public ResponseEntity<SeriesMovieResponseDTO> createStandaloneMovie(@RequestPart(name="movieInfo") SeriesMovieRequestDTO seriesMovieRequestDTO,
                                                                             @RequestParam("poster") MultipartFile poster,
                                                                             @RequestParam("backdrop") MultipartFile backdrop) throws IOException {
@@ -25,6 +27,7 @@ public class SeriesMovieController {
     }
 
     @PatchMapping("{movieId}")
+    @ApiMessage("Cập nhập phim thành công")
     public ResponseEntity<SeriesMovieResponseDTO> updateStandaloneMovie(@PathVariable long movieId,
                                                                         @RequestPart(name="movieInfo") SeriesMovieRequestDTO seriesMovieRequestDTO,
                                                                         @RequestParam(name="poster", required = false)MultipartFile poster,
