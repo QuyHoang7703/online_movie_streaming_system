@@ -1,6 +1,7 @@
 package com.example.OnlineMovieStreamingSystem.service.impl;
 
 import com.example.OnlineMovieStreamingSystem.domain.Genre;
+import com.example.OnlineMovieStreamingSystem.domain.Movie;
 import com.example.OnlineMovieStreamingSystem.dto.Meta;
 import com.example.OnlineMovieStreamingSystem.dto.ResultPaginationDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.genre.GenreRequestDTO;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -75,9 +77,14 @@ public class GenreServiceImpl implements GenreService {
         return resultPaginationDTO;
     }
 
+    @Transactional
     @Override
     public void deleteGenre(long id) {
         Genre genre = this.findGenreById(id);
+        for(Movie movie : genre.getMovies()) {
+            movie.getGenres().remove(genre);
+        }
+        // Khi xóa genre thì tự động jpa xóa luôn record của movie_genre luôn
         this.genreRepository.delete(genre);
     }
 

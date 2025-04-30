@@ -19,17 +19,29 @@ public class SubscriptionPlan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String name;
-    @Column(columnDefinition = "MEDIUMTEXT")
     private String description;
+    @Column(columnDefinition = "MEDIUMTEXT")
+    private String features;
+    private boolean isActive;
     private Instant createAt;
     private Instant updateAt;
 
-    @OneToMany(mappedBy = "parentSubscriptionPlan", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SubscriptionPlan> childSubscriptionPlans;
+//    @OneToMany(mappedBy = "parentSubscriptionPlan", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<SubscriptionPlan> childSubscriptionPlans;
+//
+//    @ManyToOne
+//    @JoinColumn(name="parent_subscription_plan_id")
+//    private SubscriptionPlan parentSubscriptionPlan;
+    @ManyToMany
+    @JoinTable(
+            name = "subscription_plan_hierarchy",
+            joinColumns = @JoinColumn(name = "child_plan_id"),
+            inverseJoinColumns = @JoinColumn(name = "parent_plan_id")
+    )
+    private List<SubscriptionPlan> parentPlans;
 
-    @ManyToOne
-    @JoinColumn(name="parent_subscription_plan_id")
-    private SubscriptionPlan parentSubscriptionPlan;
+    @ManyToMany(mappedBy = "parentPlans")
+    private List<SubscriptionPlan> childPlans;
 
     @OneToMany(mappedBy = "subscriptionPlan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlanDuration> planDurations;
