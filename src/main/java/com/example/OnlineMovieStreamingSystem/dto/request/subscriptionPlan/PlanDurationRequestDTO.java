@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PlanDurationRequestDTO {
+    private long id;
     private String name;
     private double price;
     private int durationInMonths;

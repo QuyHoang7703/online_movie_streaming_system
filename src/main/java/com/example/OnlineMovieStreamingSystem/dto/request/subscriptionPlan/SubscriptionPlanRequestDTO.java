@@ -13,8 +13,10 @@ import java.util.List;
 @NoArgsConstructor
 public class SubscriptionPlanRequestDTO {
     private String name;
-    private List<String> description;
-    private Long parentId;
+    private String description;
+    private List<String> features;
+    private List<Long> parentPlanIds;
+    private boolean isActive;
     private List<PlanDurationRequestDTO> planDurations;
 
 }

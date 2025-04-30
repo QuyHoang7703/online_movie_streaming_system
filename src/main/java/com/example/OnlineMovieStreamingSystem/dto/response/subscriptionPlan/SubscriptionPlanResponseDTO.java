@@ -14,6 +14,11 @@ import java.util.List;
 public class SubscriptionPlanResponseDTO {
     private long id;
     private String name;
-    private List<String> description;
+    private String description;
+    private List<String> features;
+    private boolean isActive;
     private List<PlanDurationResponseDTO> planDurations;
+    private List<SubscriptionPlanSummaryDTO> parentPlans;
+    private List<SubscriptionPlanSummaryDTO> childPlans;
+
 }

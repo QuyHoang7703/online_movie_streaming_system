@@ -19,15 +19,15 @@ import java.util.List;
 
 @RestControllerAdvice
 public class GlobalException {
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<RestResponse<Object>> handleAllException(Exception ex){
-        RestResponse<Object> restResponse = new RestResponse<>();
-        restResponse.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        restResponse.setMessage(ex.getMessage());
-        restResponse.setError("Internal Server Error");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(restResponse);
-
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<RestResponse<Object>> handleAllException(Exception ex){
+//        RestResponse<Object> restResponse = new RestResponse<>();
+//        restResponse.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+//        restResponse.setMessage(ex.getMessage());
+//        restResponse.setError("Internal Server Error");
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(restResponse);
+//
+//    }
 
     @ExceptionHandler(value = {
             SQLIntegrityConstraintViolationException.class,
