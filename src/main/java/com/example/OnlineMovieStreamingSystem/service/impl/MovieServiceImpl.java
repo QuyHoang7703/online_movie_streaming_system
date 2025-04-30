@@ -58,8 +58,8 @@ public class MovieServiceImpl implements MovieService {
         movie.setTrailerUrl(movieRequestDTO.getTrailerUrl());
         movie.setMovieType(movieRequestDTO.getMovieType());
 
-        String posterUrl = this.imageStorageService.uploadImage(CONTAINER_NAME, poster.getOriginalFilename(), poster.getInputStream());
-        String backdropUrl = this.imageStorageService.uploadImage(CONTAINER_NAME, backdrop.getOriginalFilename(), backdrop.getInputStream());
+        String posterUrl = this.imageStorageService.uploadFile(CONTAINER_NAME, poster.getOriginalFilename(), poster.getInputStream());
+        String backdropUrl = this.imageStorageService.uploadFile(CONTAINER_NAME, backdrop.getOriginalFilename(), backdrop.getInputStream());
 
         movie.setPosterUrl(posterUrl);
         movie.setBackdropUrl(backdropUrl);
@@ -272,18 +272,18 @@ public class MovieServiceImpl implements MovieService {
         }
 
         if(poster!=null) {
-            String newPosterUrl = this.imageStorageService.uploadImage(CONTAINER_NAME, poster.getOriginalFilename(), poster.getInputStream());
+            String newPosterUrl = this.imageStorageService.uploadFile(CONTAINER_NAME, poster.getOriginalFilename(), poster.getInputStream());
             if(newPosterUrl!=null) {
                 String oldFilenamePoster = movieDB.getPosterUrl().substring(movieDB.getPosterUrl().lastIndexOf("/") +1);
-                this.imageStorageService.deleteImage(CONTAINER_NAME, oldFilenamePoster);
+                this.imageStorageService.deleteFile(CONTAINER_NAME, oldFilenamePoster);
                 movieDB.setPosterUrl(newPosterUrl);
             }
         }
         if(backdrop!=null) {
-            String newBackdropUrl = this.imageStorageService.uploadImage(CONTAINER_NAME, backdrop.getOriginalFilename(), backdrop.getInputStream());
+            String newBackdropUrl = this.imageStorageService.uploadFile(CONTAINER_NAME, backdrop.getOriginalFilename(), backdrop.getInputStream());
             if(newBackdropUrl!=null) {
                 String oldFilenameBackdrop = movieDB.getBackdropUrl().substring(movieDB.getBackdropUrl().lastIndexOf("/") +1);
-                this.imageStorageService.deleteImage(CONTAINER_NAME, oldFilenameBackdrop);
+                this.imageStorageService.deleteFile(CONTAINER_NAME, oldFilenameBackdrop);
                 movieDB.setBackdropUrl(newBackdropUrl);
             }
         }

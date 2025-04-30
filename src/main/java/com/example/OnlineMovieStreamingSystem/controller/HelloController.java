@@ -21,13 +21,13 @@ public class HelloController {
 
     @PostMapping("/images")
     public ResponseEntity<String> uploadImage(@RequestParam MultipartFile file) throws IOException {
-        String urlImage = this.imageStorageService.uploadImage("artifact-image-container", file.getOriginalFilename(), file.getInputStream());
+        String urlImage = this.imageStorageService.uploadFile("actor-image-container", file.getOriginalFilename(), file.getInputStream());
         return ResponseEntity.ok().body(urlImage);
     }
 
     @DeleteMapping("/images")
     public ResponseEntity<Void> deleteImage(@RequestParam String blobName) throws IOException {
-        this.imageStorageService.deleteImage("artifact-image-container", blobName);
+        this.imageStorageService.deleteFile("actor-image-container", blobName);
         return ResponseEntity.noContent().build();
     }
 }

@@ -13,9 +13,12 @@ import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationExceptio
 import jakarta.mail.Multipart;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
+import org.apache.tika.Tika;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
@@ -26,35 +29,46 @@ import java.util.UUID;
 public class AzureImageStorageService implements ImageStorageService {
     // Automatically create object with config to connect storage account
     private final BlobServiceClient blobServiceClient;
+
     @Override
-    public String uploadImage(String containerName, String originalImageName, InputStream data) throws IOException {
-        try{
-           // Get the BlobContainerClient object to interact with the container
-           BlobContainerClient blobContainerClient = this.blobServiceClient.getBlobContainerClient(containerName);
+    public String uploadFile(String containerName, String originalFileName, InputStream data) throws IOException {
+        try {
+            // Đọc toàn bộ file vào byte array
+            byte[] bytes = IOUtils.toByteArray(data);
 
-           String typeFile = originalImageName.substring(originalImageName.lastIndexOf(".") + 1); // Lấy phần mở rộng mà không có dấu "."
-           String newImageName = UUID.randomUUID().toString() + "." + typeFile;  // Thêm dấu "." vào tên mới của file
+            // Detect content type bằng Tika
+            Tika tika = new Tika();
+            String contentType = tika.detect(bytes, originalFileName);
+            log.info("Content type: " + contentType);
 
-           // Get the BlobClient object to interact with the specified blob
-            BlobClient blobClient = blobContainerClient.getBlobClient(newImageName);
+            // Tạo lại InputStream từ byte array để upload
+            InputStream uploadStream = new ByteArrayInputStream(bytes);
+
+            // Tạo tên file mới
+            String typeFile = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
+            String newFileName = UUID.randomUUID().toString() + "." + typeFile;
+
+            // Lấy BlobClient
+            BlobContainerClient blobContainerClient = this.blobServiceClient.getBlobContainerClient(containerName);
+            BlobClient blobClient = blobContainerClient.getBlobClient(newFileName);
+
+            // Set Content-Type đúng
             BlobHttpHeaders headers = new BlobHttpHeaders()
-                    .setContentType("image/" + typeFile); // Hoặc dùng Tika để tự detect loại file
+                    .setContentType(contentType);
 
-
-            BlobParallelUploadOptions options = new BlobParallelUploadOptions(data)
+            BlobParallelUploadOptions options = new BlobParallelUploadOptions(uploadStream)
                     .setHeaders(headers);
 
             blobClient.uploadWithResponse(options, null, Context.NONE);
 
-           return blobClient.getBlobUrl();
-       }catch (BlobStorageException e){
-           throw new ApplicationException("Failed to upload image: " + e.getMessage());
-       }
-
+            return blobClient.getBlobUrl();
+        } catch (BlobStorageException e) {
+            throw new ApplicationException("Failed to upload file: " + e.getMessage());
+        }
     }
 
     @Override
-    public void deleteImage(String containerName, String originalImageName) throws IOException {
+    public void deleteFile(String containerName, String originalImageName) throws IOException {
         try{
             BlobContainerClient blobContainerClient = this.blobServiceClient.getBlobContainerClient(containerName);
             BlobClient blobClient = blobContainerClient.getBlobClient(originalImageName);
@@ -69,4 +83,41 @@ public class AzureImageStorageService implements ImageStorageService {
             throw new ApplicationException("Failed to delete image: " + e.getMessage());
         }
     }
+
+//    @Override
+//    public String uploadFile2(String containerName, String originalFileName, InputStream data) throws IOException {
+//        try {
+//            // Đọc toàn bộ file vào byte array
+//            byte[] bytes = IOUtils.toByteArray(data);
+//
+//            // Detect content type bằng Tika
+//            Tika tika = new Tika();
+//            String contentType = tika.detect(bytes, originalFileName);
+//            log.info("Content type: " + contentType);
+//
+//            // Tạo lại InputStream từ byte array để upload
+//            InputStream uploadStream = new ByteArrayInputStream(bytes);
+//
+//            // Tạo tên file mới
+//            String typeFile = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
+//            String newFileName = UUID.randomUUID().toString() + "." + typeFile;
+//
+//            // Lấy BlobClient
+//            BlobContainerClient blobContainerClient = this.blobServiceClient.getBlobContainerClient(containerName);
+//            BlobClient blobClient = blobContainerClient.getBlobClient(newFileName);
+//
+//            // Set Content-Type đúng
+//            BlobHttpHeaders headers = new BlobHttpHeaders()
+//                    .setContentType(contentType);
+//
+//            BlobParallelUploadOptions options = new BlobParallelUploadOptions(uploadStream)
+//                    .setHeaders(headers);
+//
+//            blobClient.uploadWithResponse(options, null, Context.NONE);
+//
+//            return blobClient.getBlobUrl();
+//        } catch (BlobStorageException e) {
+//            throw new ApplicationException("Failed to upload file: " + e.getMessage());
+//        }
+//    }
 }
