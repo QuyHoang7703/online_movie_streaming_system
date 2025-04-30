@@ -11,6 +11,7 @@ import com.example.OnlineMovieStreamingSystem.service.ActorService;
 import com.example.OnlineMovieStreamingSystem.service.ImageStorageService;
 import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,7 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ActorServiceImpl implements ActorService {
     private final ActorRepository actorRepository;
     private final ImageStorageService imageStorageService;
@@ -38,7 +40,7 @@ public class ActorServiceImpl implements ActorService {
         actor.setGender(actorRequestDTO.getGender());
         actor.setPlaceOfBirth(actorRequestDTO.getPlaceOfBirth());
 
-        String avatarUrl = this.imageStorageService.uploadImage(CONTAINER_NAME, avatar.getOriginalFilename(), avatar.getInputStream());
+        String avatarUrl = this.imageStorageService.uploadFile(CONTAINER_NAME, avatar.getOriginalFilename(), avatar.getInputStream());
         actor.setAvatarUrl(avatarUrl);
 
         Actor savedActor = actorRepository.save(actor);
@@ -74,11 +76,13 @@ public class ActorServiceImpl implements ActorService {
 
         String avatarUrl = actorDB.getAvatarUrl();
         if(avatar != null && avatarUrl != null){
-            String newAvatarUrl = this.imageStorageService.uploadImage(CONTAINER_NAME, avatar.getOriginalFilename(), avatar.getInputStream());
+            String newAvatarUrl = this.imageStorageService.uploadFile(CONTAINER_NAME, avatar.getOriginalFilename(), avatar.getInputStream());
             // After uploaded successfully then delete old avatar
             String originalAvatarName = avatarUrl.substring(avatarUrl.lastIndexOf("/") + 1);
-            this.imageStorageService.deleteImage(CONTAINER_NAME, originalAvatarName);
+            this.imageStorageService.deleteFile(CONTAINER_NAME, originalAvatarName);
             actorDB.setAvatarUrl(newAvatarUrl);
+        }else{
+            log.info("Not avatar to update");
         }
         Actor updatedActor = this.actorRepository.save(actorDB);
 
@@ -92,7 +96,7 @@ public class ActorServiceImpl implements ActorService {
 
         String avatarUrl = actor.getAvatarUrl();
         String originalAvatar = avatarUrl.substring(avatarUrl.lastIndexOf("/") + 1);
-        this.imageStorageService.deleteImage(CONTAINER_NAME, originalAvatar);
+        this.imageStorageService.deleteFile(CONTAINER_NAME, originalAvatar);
 
         this.actorRepository.delete(actor);
     }

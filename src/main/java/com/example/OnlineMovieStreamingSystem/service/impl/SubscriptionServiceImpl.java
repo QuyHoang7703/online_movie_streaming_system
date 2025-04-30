@@ -77,8 +77,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         ResultPaginationDTO resultPaginationDTO = new ResultPaginationDTO();
 
         Meta meta = new Meta();
-        meta.setPageSize(pageable.getPageSize() + 1);
-        meta.setCurrentPage(pageable.getPageNumber());
+        meta.setCurrentPage(pageable.getPageNumber() +1);
+        meta.setPageSize(pageable.getPageSize());
         meta.setTotalPages(subscriptionPlanPage.getTotalPages());
         meta.setTotalElements(subscriptionPlanPage.getTotalElements());
 

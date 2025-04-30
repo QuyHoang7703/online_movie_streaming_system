@@ -6,26 +6,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SeriesMovie {
+public class Episode {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private int season;
+    private String title;
     private int episodeNumber;
+    private int duration;
+    private String videoUrl;
 
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "id")
-    private Movie movie;
-
-    @OneToMany(mappedBy = "seriesMovie")
-    private List<Episode> episodes;
-
+    @ManyToOne
+    @JoinColumn(name="series_movie_id")
+    private SeriesMovie seriesMovie;
 }
