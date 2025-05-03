@@ -26,12 +26,6 @@ public class SubscriptionPlan {
     private Instant createAt;
     private Instant updateAt;
 
-//    @OneToMany(mappedBy = "parentSubscriptionPlan", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<SubscriptionPlan> childSubscriptionPlans;
-//
-//    @ManyToOne
-//    @JoinColumn(name="parent_subscription_plan_id")
-//    private SubscriptionPlan parentSubscriptionPlan;
     @ManyToMany
     @JoinTable(
             name = "subscription_plan_hierarchy",
