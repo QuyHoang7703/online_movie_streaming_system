@@ -22,4 +22,11 @@ public interface SubscriptionPlanRepository extends JpaRepository<SubscriptionPl
             "sp.id != :subscriptionId")
     List<SubscriptionPlan> getParentOptions(Long subscriptionId);
 
+    @Query("SELECT sp FROM SubscriptionPlan sp " +
+            "WHERE sp.parentPlans IS EMPTY ")
+    List<SubscriptionPlan> findRootPlans();
+
+
+
+
 }

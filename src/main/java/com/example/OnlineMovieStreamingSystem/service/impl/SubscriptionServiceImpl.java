@@ -10,6 +10,7 @@ import com.example.OnlineMovieStreamingSystem.dto.request.subscriptionPlan.Subsc
 import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionPlan.PlanDurationResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionPlan.SubscriptionPlanResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionPlan.SubscriptionPlanSummaryDTO;
+import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionPlan.SubscriptionPlanTreeDTO;
 import com.example.OnlineMovieStreamingSystem.repository.SubscriptionPlanRepository;
 import com.example.OnlineMovieStreamingSystem.service.SubscriptionService;
 import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
@@ -52,6 +53,9 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
         if(subscriptionPlanRequestDTO.getParentPlanIds() != null) {
             List<SubscriptionPlan> parentPlans = this.subscriptionPlanRepository.findByIdIn(subscriptionPlanRequestDTO.getParentPlanIds());
+            if (parentPlans == null || parentPlans.isEmpty()) {
+                throw new ApplicationException("Gói cha không tồn tại");
+            }
             subscriptionPlan.setParentPlans(parentPlans);
         }
 
@@ -94,7 +98,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public List<SubscriptionPlanSummaryDTO> getParentOptions(Long subscriptionPlanId) {
+    public List<SubscriptionPlanSummaryDTO> getSubscriptionPlanOptions(Long subscriptionPlanId) {
         List<SubscriptionPlan> subscriptionPlans = this.subscriptionPlanRepository.getParentOptions(subscriptionPlanId);
         List<SubscriptionPlanSummaryDTO> subscriptionPlanSummaryDTOS = subscriptionPlans.stream()
                 .map(this::convertToSubscriptionPlanSummaryDTO)
@@ -204,6 +208,37 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         this.subscriptionPlanRepository.delete(subscriptionPlan);
     }
 
+//    @Override
+//    public List<SubscriptionPlanTreeDTO> getSubscriptionPlanTree() {
+//        List<SubscriptionPlan> rootSubscriptionPlans = this.subscriptionPlanRepository.findRootPlans();
+//        List<SubscriptionPlanTreeDTO> subscriptionPlanTreeDTOs = rootSubscriptionPlans.stream()
+//                .map(this::convertToSubscriptionPlanTreeDTO)
+//                .toList();
+//        return subscriptionPlanTreeDTOs;
+//    }
+
+//    @Override
+//    public List<SubscriptionPlanSummaryDTO> getSubscriptionPlanSummaries() {
+//        List<SubscriptionPlan> subscriptionPlans = this.subscriptionPlanRepository.findAll();
+//        List<SubscriptionPlanSummaryDTO> subscriptionPlanSummaryDTOS = subscriptionPlans.stream()
+//                .map(this::convertToSubscriptionPlanSummaryDTO).toList();
+//        return subscriptionPlanSummaryDTOS;
+//    }
+
+//    private SubscriptionPlanTreeDTO convertToSubscriptionPlanTreeDTO(SubscriptionPlan subscriptionPlan) {
+//        SubscriptionPlanTreeDTO subscriptionPlanTreeDTO = new SubscriptionPlanTreeDTO();
+//        subscriptionPlanTreeDTO.setId(subscriptionPlan.getId());
+//        subscriptionPlanTreeDTO.setName(subscriptionPlan.getName());
+//        List<SubscriptionPlan> childPlans = subscriptionPlan.getChildPlans();
+//        if(childPlans != null && !childPlans.isEmpty()) {
+//            List<SubscriptionPlanTreeDTO> childrenSubscriptionPlanTreeDTOs = childPlans.stream()
+//                    .map(this::convertToSubscriptionPlanTreeDTO)
+//                    .toList();
+//            subscriptionPlanTreeDTO.setChildren(childrenSubscriptionPlanTreeDTOs);
+//        }
+//        return subscriptionPlanTreeDTO;
+//    }
+
     private SubscriptionPlanResponseDTO convertToSubscriptionPlanResponseDTO(SubscriptionPlan subscriptionPlan) {
         SubscriptionPlanResponseDTO subscriptionPlanResponseDTO = new SubscriptionPlanResponseDTO();
         subscriptionPlanResponseDTO.setId(subscriptionPlan.getId());
@@ -255,7 +290,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .id(subscriptionPlan.getId())
                 .name(subscriptionPlan.getName())
                 .build();
-
+        if(subscriptionPlan.getParentPlans() != null) {
+            List<Long> parentIds = subscriptionPlan.getParentPlans().stream().map(SubscriptionPlan::getId).toList();
+            subscriptionPlanSummaryDTO.setParentIds(parentIds);
+        }
         return subscriptionPlanSummaryDTO;
     }
 }

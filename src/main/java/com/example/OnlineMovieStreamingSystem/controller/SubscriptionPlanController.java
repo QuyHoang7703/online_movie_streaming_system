@@ -4,6 +4,7 @@ import com.example.OnlineMovieStreamingSystem.dto.ResultPaginationDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.subscriptionPlan.SubscriptionPlanRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionPlan.SubscriptionPlanResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionPlan.SubscriptionPlanSummaryDTO;
+import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionPlan.SubscriptionPlanTreeDTO;
 import com.example.OnlineMovieStreamingSystem.service.SubscriptionService;
 import com.example.OnlineMovieStreamingSystem.util.annotation.ApiMessage;
 import lombok.RequiredArgsConstructor;
@@ -38,10 +39,10 @@ public class SubscriptionPlanController {
         return ResponseEntity.status(HttpStatus.OK).body(this.subscriptionService.getSubscriptionPlans(page, size));
     }
 
-    @GetMapping("/parent-options")
-    public ResponseEntity<List<SubscriptionPlanSummaryDTO>> getParentSubscriptionPlans(@RequestParam(required = false) Long currentSubscriptionPlanId) {
+    @GetMapping("/options")
+    public ResponseEntity<List<SubscriptionPlanSummaryDTO>> getSubscriptionPlansOptions(@RequestParam(required = false) Long currentSubscriptionPlanId) {
 
-        return ResponseEntity.status(HttpStatus.OK).body(this.subscriptionService.getParentOptions(currentSubscriptionPlanId));
+        return ResponseEntity.status(HttpStatus.OK).body(this.subscriptionService.getSubscriptionPlanOptions(currentSubscriptionPlanId));
     }
 
     @PatchMapping("{subscriptionPlanId}")
@@ -58,5 +59,7 @@ public class SubscriptionPlanController {
         this.subscriptionService.deleteSubscriptionPlan(subscriptionPlanId);
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
+
+
 
 }
