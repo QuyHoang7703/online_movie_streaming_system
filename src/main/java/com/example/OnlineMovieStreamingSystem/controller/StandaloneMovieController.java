@@ -22,8 +22,9 @@ public class StandaloneMovieController {
     @ApiMessage("Thêm phim thành công")
     public ResponseEntity<StandaloneMovieResponseDTO> createStandaloneMovie(@RequestPart(name="movieInfo") StandaloneMovieRequestDTO standaloneMovieRequestDTO,
                                                                             @RequestParam("poster")MultipartFile poster,
-                                                                            @RequestParam("backdrop") MultipartFile backdrop) throws IOException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.standaloneMovieService.createStandaloneMovie(standaloneMovieRequestDTO, poster, backdrop));
+                                                                            @RequestParam("backdrop") MultipartFile backdrop,
+                                                                            @RequestPart(name="video", required = false) MultipartFile video) throws IOException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.standaloneMovieService.createStandaloneMovie(standaloneMovieRequestDTO, poster, backdrop, video));
     }
 
     @PatchMapping("{movieId}")
@@ -31,9 +32,10 @@ public class StandaloneMovieController {
     public ResponseEntity<StandaloneMovieResponseDTO> updateStandaloneMovie(@PathVariable long movieId,
                                                                             @RequestPart(name="movieInfo") StandaloneMovieRequestDTO standaloneMovieRequestDTO,
                                                                             @RequestParam(name="poster", required = false)MultipartFile poster,
-                                                                            @RequestParam(name="backdrop", required = false) MultipartFile backdrop) throws IOException {
+                                                                            @RequestParam(name="backdrop", required = false) MultipartFile backdrop,
+                                                                            @RequestPart(name="video", required = false) MultipartFile video) throws IOException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(this.standaloneMovieService.updateStandaloneMovie(movieId, standaloneMovieRequestDTO, poster, backdrop));
+        return ResponseEntity.status(HttpStatus.OK).body(this.standaloneMovieService.updateStandaloneMovie(movieId, standaloneMovieRequestDTO, poster, backdrop, video));
     }
 
     @GetMapping("{movieId}")

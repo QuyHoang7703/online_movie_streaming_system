@@ -1,5 +1,6 @@
 package com.example.OnlineMovieStreamingSystem.dto.response.movie;
 import com.example.OnlineMovieStreamingSystem.dto.response.genre.GenreSummaryDTO;
+import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionPlan.SubscriptionPlanSummaryDTO;
 import com.example.OnlineMovieStreamingSystem.util.constant.MovieType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,6 +29,7 @@ public class MovieResponseDTO {
     private MovieType movieType;
     private List<MovieActorResponseDTO> movieActors;
     private List<GenreSummaryDTO> genres;
+    private List<SubscriptionPlanSummaryDTO> subscriptionPlans;
     private Instant createAt;
     private Instant updateAt;
 }

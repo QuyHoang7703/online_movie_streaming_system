@@ -10,9 +10,8 @@ import com.example.OnlineMovieStreamingSystem.dto.request.subscriptionPlan.Subsc
 import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionPlan.PlanDurationResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionPlan.SubscriptionPlanResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionPlan.SubscriptionPlanSummaryDTO;
-import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionPlan.SubscriptionPlanTreeDTO;
 import com.example.OnlineMovieStreamingSystem.repository.SubscriptionPlanRepository;
-import com.example.OnlineMovieStreamingSystem.service.SubscriptionService;
+import com.example.OnlineMovieStreamingSystem.service.SubscriptionPlanService;
 import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,7 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class SubscriptionServiceImpl implements SubscriptionService {
+public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
     private final SubscriptionPlanRepository subscriptionPlanRepository;
 
     @Override
@@ -192,8 +191,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return true;
     }
 
-
-
     @Override
     public void deleteSubscriptionPlan(long subscriptionPlanId) {
         SubscriptionPlan subscriptionPlan = this.subscriptionPlanRepository.findById(subscriptionPlanId)
@@ -208,36 +205,18 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         this.subscriptionPlanRepository.delete(subscriptionPlan);
     }
 
-//    @Override
-//    public List<SubscriptionPlanTreeDTO> getSubscriptionPlanTree() {
-//        List<SubscriptionPlan> rootSubscriptionPlans = this.subscriptionPlanRepository.findRootPlans();
-//        List<SubscriptionPlanTreeDTO> subscriptionPlanTreeDTOs = rootSubscriptionPlans.stream()
-//                .map(this::convertToSubscriptionPlanTreeDTO)
-//                .toList();
-//        return subscriptionPlanTreeDTOs;
-//    }
-
-//    @Override
-//    public List<SubscriptionPlanSummaryDTO> getSubscriptionPlanSummaries() {
-//        List<SubscriptionPlan> subscriptionPlans = this.subscriptionPlanRepository.findAll();
-//        List<SubscriptionPlanSummaryDTO> subscriptionPlanSummaryDTOS = subscriptionPlans.stream()
-//                .map(this::convertToSubscriptionPlanSummaryDTO).toList();
-//        return subscriptionPlanSummaryDTOS;
-//    }
-
-//    private SubscriptionPlanTreeDTO convertToSubscriptionPlanTreeDTO(SubscriptionPlan subscriptionPlan) {
-//        SubscriptionPlanTreeDTO subscriptionPlanTreeDTO = new SubscriptionPlanTreeDTO();
-//        subscriptionPlanTreeDTO.setId(subscriptionPlan.getId());
-//        subscriptionPlanTreeDTO.setName(subscriptionPlan.getName());
-//        List<SubscriptionPlan> childPlans = subscriptionPlan.getChildPlans();
-//        if(childPlans != null && !childPlans.isEmpty()) {
-//            List<SubscriptionPlanTreeDTO> childrenSubscriptionPlanTreeDTOs = childPlans.stream()
-//                    .map(this::convertToSubscriptionPlanTreeDTO)
-//                    .toList();
-//            subscriptionPlanTreeDTO.setChildren(childrenSubscriptionPlanTreeDTOs);
-//        }
-//        return subscriptionPlanTreeDTO;
-//    }
+    @Override
+    public SubscriptionPlanSummaryDTO convertToSubscriptionPlanSummaryDTO(SubscriptionPlan subscriptionPlan) {
+        SubscriptionPlanSummaryDTO subscriptionPlanSummaryDTO = SubscriptionPlanSummaryDTO.builder()
+                .id(subscriptionPlan.getId())
+                .name(subscriptionPlan.getName())
+                .build();
+        if(subscriptionPlan.getParentPlans() != null) {
+            List<Long> parentIds = subscriptionPlan.getParentPlans().stream().map(SubscriptionPlan::getId).toList();
+            subscriptionPlanSummaryDTO.setParentIds(parentIds);
+        }
+        return subscriptionPlanSummaryDTO;
+    }
 
     private SubscriptionPlanResponseDTO convertToSubscriptionPlanResponseDTO(SubscriptionPlan subscriptionPlan) {
         SubscriptionPlanResponseDTO subscriptionPlanResponseDTO = new SubscriptionPlanResponseDTO();
@@ -285,15 +264,5 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return planDurationResponseDTO;
     }
 
-    private SubscriptionPlanSummaryDTO convertToSubscriptionPlanSummaryDTO(SubscriptionPlan subscriptionPlan) {
-        SubscriptionPlanSummaryDTO subscriptionPlanSummaryDTO = SubscriptionPlanSummaryDTO.builder()
-                .id(subscriptionPlan.getId())
-                .name(subscriptionPlan.getName())
-                .build();
-        if(subscriptionPlan.getParentPlans() != null) {
-            List<Long> parentIds = subscriptionPlan.getParentPlans().stream().map(SubscriptionPlan::getId).toList();
-            subscriptionPlanSummaryDTO.setParentIds(parentIds);
-        }
-        return subscriptionPlanSummaryDTO;
-    }
+
 }

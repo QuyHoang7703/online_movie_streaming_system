@@ -84,40 +84,4 @@ public class AzureImageStorageService implements ImageStorageService {
         }
     }
 
-//    @Override
-//    public String uploadFile2(String containerName, String originalFileName, InputStream data) throws IOException {
-//        try {
-//            // Đọc toàn bộ file vào byte array
-//            byte[] bytes = IOUtils.toByteArray(data);
-//
-//            // Detect content type bằng Tika
-//            Tika tika = new Tika();
-//            String contentType = tika.detect(bytes, originalFileName);
-//            log.info("Content type: " + contentType);
-//
-//            // Tạo lại InputStream từ byte array để upload
-//            InputStream uploadStream = new ByteArrayInputStream(bytes);
-//
-//            // Tạo tên file mới
-//            String typeFile = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
-//            String newFileName = UUID.randomUUID().toString() + "." + typeFile;
-//
-//            // Lấy BlobClient
-//            BlobContainerClient blobContainerClient = this.blobServiceClient.getBlobContainerClient(containerName);
-//            BlobClient blobClient = blobContainerClient.getBlobClient(newFileName);
-//
-//            // Set Content-Type đúng
-//            BlobHttpHeaders headers = new BlobHttpHeaders()
-//                    .setContentType(contentType);
-//
-//            BlobParallelUploadOptions options = new BlobParallelUploadOptions(uploadStream)
-//                    .setHeaders(headers);
-//
-//            blobClient.uploadWithResponse(options, null, Context.NONE);
-//
-//            return blobClient.getBlobUrl();
-//        } catch (BlobStorageException e) {
-//            throw new ApplicationException("Failed to upload file: " + e.getMessage());
-//        }
-//    }
 }

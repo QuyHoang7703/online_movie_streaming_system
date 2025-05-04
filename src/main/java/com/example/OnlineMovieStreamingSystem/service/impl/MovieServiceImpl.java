@@ -17,6 +17,7 @@ import com.example.OnlineMovieStreamingSystem.repository.SubscriptionPlanReposit
 import com.example.OnlineMovieStreamingSystem.service.GenreService;
 import com.example.OnlineMovieStreamingSystem.service.ImageStorageService;
 import com.example.OnlineMovieStreamingSystem.service.MovieService;
+import com.example.OnlineMovieStreamingSystem.service.SubscriptionPlanService;
 import com.example.OnlineMovieStreamingSystem.util.constant.MovieType;
 import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,7 @@ public class MovieServiceImpl implements MovieService {
     private final String CONTAINER_NAME= "movie-image-container";
     private final ActorRepository actorRepository;
     private final GenreService genreService;
+    private final SubscriptionPlanService subscriptionPlanService;
 
     @Override
     public Movie createMovieFromDTO(MovieRequestDTO movieRequestDTO, MultipartFile poster, MultipartFile backdrop) throws IOException {
@@ -129,6 +131,13 @@ public class MovieServiceImpl implements MovieService {
                         .map(this.genreService::convertToGenreSummaryDTO)
                         .toList();
                 dto.setGenres(genreSummaryDTOS);
+            }
+
+            if(movie.getSubscriptionPlans() != null && !movie.getSubscriptionPlans().isEmpty()) {
+                List<SubscriptionPlanSummaryDTO> subscriptionPlanSummaryDTOS = movie.getSubscriptionPlans().stream()
+                        .map(this.subscriptionPlanService::convertToSubscriptionPlanSummaryDTO)
+                        .toList();
+                dto.setSubscriptionPlans(subscriptionPlanSummaryDTOS);
             }
 
 
@@ -227,7 +236,7 @@ public class MovieServiceImpl implements MovieService {
             List<Long> currentSubscriptionPlanIds = movieDB.getSubscriptionPlans().stream().map(SubscriptionPlan::getId).toList();
             List<Long> updateSubscriptionPlanIds = movieRequestDTO.getSubscriptionPlanIds();
             if(!currentSubscriptionPlanIds.equals(updateSubscriptionPlanIds)) {
-                List<SubscriptionPlan> subscriptionPlans = this.subscriptionPlanRepository.findByIdIn(currentSubscriptionPlanIds);
+                List<SubscriptionPlan> subscriptionPlans = this.subscriptionPlanRepository.findByIdIn(updateSubscriptionPlanIds);
                 movieDB.setSubscriptionPlans(subscriptionPlans);
             }
         }
@@ -272,12 +281,15 @@ public class MovieServiceImpl implements MovieService {
         }
 
         if(poster!=null) {
+            log.info("Có poster mới: " + poster.getOriginalFilename());
             String newPosterUrl = this.imageStorageService.uploadFile(CONTAINER_NAME, poster.getOriginalFilename(), poster.getInputStream());
             if(newPosterUrl!=null) {
                 String oldFilenamePoster = movieDB.getPosterUrl().substring(movieDB.getPosterUrl().lastIndexOf("/") +1);
                 this.imageStorageService.deleteFile(CONTAINER_NAME, oldFilenamePoster);
                 movieDB.setPosterUrl(newPosterUrl);
             }
+        }else{
+            log.info("ko có  poster mới: ");
         }
         if(backdrop!=null) {
             String newBackdropUrl = this.imageStorageService.uploadFile(CONTAINER_NAME, backdrop.getOriginalFilename(), backdrop.getInputStream());
