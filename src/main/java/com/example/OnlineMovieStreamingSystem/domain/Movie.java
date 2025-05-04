@@ -28,7 +28,7 @@ public class Movie {
     private String backdropUrl;
     private String country;
     private LocalDate releaseDate;
-    private boolean isFree;
+    private boolean free;
     private String trailerUrl;
     @Enumerated(EnumType.STRING)
     private MovieType movieType;

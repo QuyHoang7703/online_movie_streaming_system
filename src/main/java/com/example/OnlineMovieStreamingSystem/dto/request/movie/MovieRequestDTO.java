@@ -17,11 +17,12 @@ public class MovieRequestDTO {
     private String director;
     private String country;
     private LocalDate releaseDate;
-    private boolean isFree;
+    private boolean free;
     private String trailerUrl;
-    private List<Long> genreIds;
-    private List<Long> subscriptionPlanIds;
-    private List<MovieActorRequestDTO> movieActors;
     private MovieType movieType;
+    private List<Long> genreIds;
+    private List<MovieActorRequestDTO> movieActors;
+    private List<Long> subscriptionPlanIds;
+
 
 }
