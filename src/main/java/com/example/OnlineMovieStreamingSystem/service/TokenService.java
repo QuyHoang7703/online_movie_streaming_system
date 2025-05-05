@@ -9,4 +9,5 @@ public interface TokenService {
     void deleteRefreshToken(String username);
     void blacklistAccessToken(String jti, Duration expiration);
     boolean isAccessTokenBlacklisted(String jti);
+
 }

@@ -4,6 +4,8 @@ import com.example.OnlineMovieStreamingSystem.dto.UserInfoDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.LoginRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.RegisterRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.VerifyOTPRequestDTO;
+import com.example.OnlineMovieStreamingSystem.dto.request.auth.ChangePasswordRequestDTO;
+import com.example.OnlineMovieStreamingSystem.dto.request.auth.ForgetPasswordRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.AuthResponseDTO;
 import com.example.OnlineMovieStreamingSystem.service.AuthService;
 import com.example.OnlineMovieStreamingSystem.service.TokenService;
@@ -30,7 +32,6 @@ import java.io.IOException;
 public class AuthController {
     private final UserService userService;
     private final SecurityUtil securityUtil;
-    private final TokenService tokenService;
     private final AuthService authService;
 
     @Value("${datn.jwt.access-token-validity-in-seconds}")
@@ -61,12 +62,14 @@ public class AuthController {
 
     @GetMapping("/refresh")
     public ResponseEntity<AuthResponseDTO> getRefreshToken(@CookieValue(name="refresh_token", defaultValue = "noRefreshTokenInCookie") String refreshToken) {
+        log.info("Có refresk token: " + refreshToken);
         AuthResponseDTO authResponseDTO = this.authService.refreshAuthToken(refreshToken);
-
+        ResponseCookie accessTokenCookies = this.securityUtil.createTokenCookie("access_token", authResponseDTO.getAccessToken(), accessTokenExpiration);
+        ResponseCookie refreshTokenCookies = this.securityUtil.createTokenCookie("refresh_token", authResponseDTO.getRefreshToken(), refreshTokenExpiration);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .header(HttpHeaders.SET_COOKIE, authResponseDTO.getAccessToken())
-                .header(HttpHeaders.SET_COOKIE, authResponseDTO.getRefreshToken())
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookies.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookies.toString())
                 .body(authResponseDTO);
     }
 
@@ -110,6 +113,30 @@ public class AuthController {
         UserInfoDTO userInfoDTO = this.userService.getUserInfo();
         return ResponseEntity.status(HttpStatus.OK).body(userInfoDTO);
     }
+
+    @PostMapping("/forgot-password")
+    @ApiMessage("Đã gửi yêu cầu qua email")
+    public ResponseEntity<Void> sendRequestForgotPassword(@RequestBody @Valid ForgetPasswordRequestDTO forgetPasswordRequestDTO) {
+        this.authService.createTokenForResetPassword(forgetPasswordRequestDTO.getEmail());
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    @GetMapping("/verify-token")
+    public ResponseEntity<Boolean> verifyToken(@RequestParam String token) {
+
+        return ResponseEntity.status(HttpStatus.OK).body(this.authService.isValidToken(token));
+    }
+
+    @PostMapping("/reset-password")
+    @ApiMessage("Thay đổi mật khẩu thành công")
+    public ResponseEntity<Void> resetPassword(@RequestBody @Valid ChangePasswordRequestDTO changePasswordRequestDTO) {
+        this.authService.handleResetPassword(changePasswordRequestDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+
+
+
 
 
 

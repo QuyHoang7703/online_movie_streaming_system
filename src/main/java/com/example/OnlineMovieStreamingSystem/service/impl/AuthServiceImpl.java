@@ -5,6 +5,7 @@ import com.example.OnlineMovieStreamingSystem.domain.user.User;
 import com.example.OnlineMovieStreamingSystem.dto.request.LoginRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.RegisterRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.VerifyOTPRequestDTO;
+import com.example.OnlineMovieStreamingSystem.dto.request.auth.ChangePasswordRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.AuthResponseDTO;
 import com.example.OnlineMovieStreamingSystem.repository.RoleRepository;
 import com.example.OnlineMovieStreamingSystem.repository.UserRepository;
@@ -32,6 +33,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +53,8 @@ public class AuthServiceImpl implements AuthService {
     private final RedisTemplate<String, String> redisTemplate;
     private final PasswordEncoder passwordEncoder;
     private final String REGISTER_PREFIX = "register:";
+    private final String FORGET_PASSWORD_PREFIX = "forget_password:";
+    private final String FORGOT_PASSWORD_COOLDOWN_PREFIX = "reset_password_request:";
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final EmailService emailService;
@@ -81,8 +85,6 @@ public class AuthServiceImpl implements AuthService {
         authResponseDTO.setRefreshToken(refreshToken);
 
         this.tokenService.storeRefreshToken(email, refreshToken, refreshTokenExpiration);
-
-
 
         return authResponseDTO;
     }
@@ -127,9 +129,10 @@ public class AuthServiceImpl implements AuthService {
             this.tokenService.blacklistAccessToken(jti, duration);
             this.tokenService.deleteRefreshToken(email);
 
-        }else{
-            throw new ApplicationException("No token in header received");
         }
+//        else{
+//            throw new ApplicationException("No token in header received");
+//        }
     }
 
     @Override
@@ -216,6 +219,63 @@ public class AuthServiceImpl implements AuthService {
 
     }
 
+    @Override
+    public void createTokenForResetPassword(String email) {
+        String token = UUID.randomUUID().toString();
+
+        String key = FORGET_PASSWORD_PREFIX + token;
+        String cooldownKey = FORGOT_PASSWORD_COOLDOWN_PREFIX + email;
+
+        boolean isAvailableRequest = Boolean.TRUE.equals(redisTemplate.hasKey(cooldownKey));
+
+        if (isAvailableRequest) {
+            throw new ApplicationException("Vui lòng đợi ít phút để gửi lại yêu cầu");
+        }
+
+        redisTemplate.opsForValue().set(key, email, Duration.ofMinutes(5));
+        log.info("Token for reset password: " + token);
+
+        // Create cooldown key for the email
+        redisTemplate.opsForValue().set(cooldownKey, email, Duration.ofMinutes(2));
+
+        // Send link through email
+        this.sendForgotPasswordRequest(email, token);
+    }
+
+    @Override
+    public boolean isValidToken(String token) {
+        String key = FORGET_PASSWORD_PREFIX + token;
+        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+    }
+
+    @Override
+    public void handleResetPassword(ChangePasswordRequestDTO changePasswordRequestDTO) {
+        String key = FORGET_PASSWORD_PREFIX + changePasswordRequestDTO.getToken();
+        if(Boolean.FALSE.equals(redisTemplate.hasKey(key))) {
+            throw new ApplicationException("Yêu cầu của bạn đã hết hạn vui lòng thử lại");
+        }
+        if(!changePasswordRequestDTO.getConfirmPassword().equals(changePasswordRequestDTO.getPassword())) {
+            throw new ApplicationException("Mật khẩu không trùng khớp");
+        }
+
+        String email = redisTemplate.opsForValue().get(key);
+        User user = this.userRepository.findByEmail(email)
+                .orElseThrow(() -> new ApplicationException("Không tồn tại tài khoản với email này"));
+        String decodedPassword = this.passwordEncoder.encode(changePasswordRequestDTO.getPassword());
+        user.setPassword(decodedPassword);
+        this.userRepository.save(user);
+
+        // Delete token in redis
+        redisTemplate.delete(key);
+
+        // Delete cooldown key
+        String cooldownKey = FORGOT_PASSWORD_COOLDOWN_PREFIX + email;
+        if(Boolean.TRUE.equals(redisTemplate.hasKey(cooldownKey))) {
+            redisTemplate.delete(cooldownKey);
+        }
+
+    }
+
     private String generateOTP() {
         Random random = new Random();
         int otpValue = 100000 + random.nextInt(900000);
@@ -228,5 +288,19 @@ public class AuthServiceImpl implements AuthService {
         Context context = new Context();
         context.setVariable("otp", otp);
         this.emailService.sendEmail(email, subject, "otp-email", context);
+    }
+
+    private void sendForgotPasswordRequest(String email, String token) {
+        String subject = "Đặt lại mật khẩu";
+
+        // Tạo liên kết chứa token để người dùng nhấn vào => chuyển đến fe xử lý
+        String resetPasswordLink = "http://localhost:5173/reset-password?token=" + token;
+
+        // Tạo nội dung email từ template HTML
+        Context context = new Context();
+        context.setVariable("resetPasswordLink", resetPasswordLink);
+
+        this.emailService.sendEmail(email, subject, "reset-password", context);
+
     }
 }
