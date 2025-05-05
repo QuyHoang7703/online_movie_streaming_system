@@ -77,14 +77,15 @@ public class AuthServiceImpl implements AuthService {
         log.info("Email: " + authentication.getName());
         AuthResponseDTO authResponseDTO = this.userService.convertToLoginResponseDTO(email);
 
-        // Create access token, refresh token
-        String accessToken = this.securityUtil.createAccessToken(email, authResponseDTO.getUserInfo());
-        String refreshToken = this.securityUtil.createRefreshToken(email, authResponseDTO.getUserInfo());
-
-        authResponseDTO.setAccessToken(accessToken);
-        authResponseDTO.setRefreshToken(refreshToken);
-
-        this.tokenService.storeRefreshToken(email, refreshToken, refreshTokenExpiration);
+//        // Create access token, refresh token
+//        String accessToken = this.securityUtil.createAccessToken(email, authResponseDTO.getUserInfo());
+//        String refreshToken = this.securityUtil.createRefreshToken(email, authResponseDTO.getUserInfo());
+//
+//        authResponseDTO.setAccessToken(accessToken);
+//        authResponseDTO.setRefreshToken(refreshToken);
+//
+//        this.tokenService.storeRefreshToken(email, refreshToken, refreshTokenExpiration);
+        this.generateAndAttachTokens(authResponseDTO);
 
         return authResponseDTO;
     }
@@ -103,6 +104,15 @@ public class AuthServiceImpl implements AuthService {
 
         AuthResponseDTO authResponseDTO = this.userService.convertToLoginResponseDTO(email);
 
+        this.generateAndAttachTokens(authResponseDTO);
+
+        return authResponseDTO;
+
+    }
+
+    @Override
+    public void generateAndAttachTokens(AuthResponseDTO authResponseDTO) {
+        String email = authResponseDTO.getUserInfo().getEmail();
         // Create new access token, refresh token
         String newAccessToken = this.securityUtil.createAccessToken(email, authResponseDTO.getUserInfo());
         String newRefreshToken = this.securityUtil.createRefreshToken(email, authResponseDTO.getUserInfo());
@@ -112,8 +122,6 @@ public class AuthServiceImpl implements AuthService {
 
         // Update new refresh token in redis
         this.tokenService.storeRefreshToken(email, newRefreshToken, refreshTokenExpiration);
-
-        return authResponseDTO;
 
     }
 
@@ -303,4 +311,6 @@ public class AuthServiceImpl implements AuthService {
         this.emailService.sendEmail(email, subject, "reset-password", context);
 
     }
+
+
 }

@@ -18,5 +18,5 @@ public interface AuthService {
     void createTokenForResetPassword(String email);
     boolean isValidToken(String token);
     void handleResetPassword(ChangePasswordRequestDTO changePasswordRequestDTO);
-
+    void generateAndAttachTokens(AuthResponseDTO authResponseDTO);
 }
