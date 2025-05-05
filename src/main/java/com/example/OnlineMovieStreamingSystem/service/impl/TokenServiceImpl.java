@@ -1,22 +1,28 @@
 package com.example.OnlineMovieStreamingSystem.service.impl;
 
+import com.example.OnlineMovieStreamingSystem.service.EmailService;
 import com.example.OnlineMovieStreamingSystem.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
 public class TokenServiceImpl implements TokenService {
     private final RedisTemplate<String, String> redisTemplate;
+    private final EmailService emailService;
 
     private final String REFRESH_TOKEN_PREFIX = "refresh_token:";
     private final String BLACKLIST_TOKEN_PREFIX = "blacklist_token:";
+
     @Override
     public void storeRefreshToken(String username, String refreshToken, long expiration) {
         String key = REFRESH_TOKEN_PREFIX + username;
@@ -47,6 +53,5 @@ public class TokenServiceImpl implements TokenService {
         String key = BLACKLIST_TOKEN_PREFIX + jti;
         return Boolean.TRUE.equals(redisTemplate.hasKey(key));
     }
-
 
 }
