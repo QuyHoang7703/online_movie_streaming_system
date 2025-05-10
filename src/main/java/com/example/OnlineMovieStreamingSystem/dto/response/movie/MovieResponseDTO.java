@@ -27,6 +27,9 @@ public class MovieResponseDTO {
     private boolean isFree;
     private String trailerUrl;
     private MovieType movieType;
+    private String status;
+    private double voteAverage;
+    private double voteCount;
     private List<MovieActorResponseDTO> movieActors;
     private List<GenreSummaryDTO> genres;
     private List<SubscriptionPlanSummaryDTO> subscriptionPlans;

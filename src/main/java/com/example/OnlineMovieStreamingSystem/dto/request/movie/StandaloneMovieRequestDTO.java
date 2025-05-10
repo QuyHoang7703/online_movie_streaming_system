@@ -7,6 +7,6 @@ import lombok.*;
 @Getter
 @Setter
 public class StandaloneMovieRequestDTO extends MovieRequestDTO {
-    private int duration;
+    private Integer duration;
     private String videoUrl;
 }

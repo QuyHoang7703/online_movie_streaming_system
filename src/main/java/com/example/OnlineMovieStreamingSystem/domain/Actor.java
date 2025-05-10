@@ -24,6 +24,7 @@ public class Actor {
     @Column(columnDefinition = "MEDIUMTEXT")
     private String biography;
     private LocalDate birthDate;
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String otherName;
     private String placeOfBirth;
     @Enumerated(EnumType.STRING)

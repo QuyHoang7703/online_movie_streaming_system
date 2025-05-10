@@ -21,6 +21,7 @@ public class Movie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String title;
+    private String originalTitle;
     @Column(columnDefinition = "MEDIUMTEXT")
     private String description;
     private String director;
@@ -32,6 +33,10 @@ public class Movie {
     private String trailerUrl;
     @Enumerated(EnumType.STRING)
     private MovieType movieType;
+    private String status;
+    private double voteAverage;
+    private double voteCount;
+
     private Instant createAt;
     private Instant updateAt;
 

@@ -60,9 +60,9 @@ public class EpisodeServiceImpl implements EpisodeService {
     @Override
     public ResultPaginationDTO getEpisodeList(long seriesMovieId, int page, int size) {
         Pageable pageable = PageRequest.of(page-1, size);
-        Page<Episode> episodePage = this.episodeRepository.findAll(pageable);
+        Page<Episode> episodePage = this.episodeRepository.findBySeriesMovieId(seriesMovieId, pageable);
 
-        ResultPaginationDTO resultPaginationDTO = new ResultPaginationDTO();
+            ResultPaginationDTO resultPaginationDTO = new ResultPaginationDTO();
 
         Meta meta = new Meta();
         meta.setCurrentPage(pageable.getPageNumber() + 1);

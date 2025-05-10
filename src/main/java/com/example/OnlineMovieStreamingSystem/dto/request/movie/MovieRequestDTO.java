@@ -20,6 +20,7 @@ public class MovieRequestDTO {
     private boolean free;
     private String trailerUrl;
     private MovieType movieType;
+    private String status;
     private List<Long> genreIds;
     private List<MovieActorRequestDTO> movieActors;
     private List<Long> subscriptionPlanIds;

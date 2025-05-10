@@ -15,7 +15,7 @@ public class StandaloneMovie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private int duration;
+    private Integer duration;
     private String videoUrl;
 
     @OneToOne

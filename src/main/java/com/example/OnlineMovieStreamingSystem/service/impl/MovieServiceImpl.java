@@ -115,6 +115,9 @@ public class MovieServiceImpl implements MovieService {
             dto.setFree(movie.isFree());
             dto.setTrailerUrl(movie.getTrailerUrl());
             dto.setMovieType(movie.getMovieType());
+            dto.setStatus(movie.getStatus());
+            dto.setVoteAverage(movie.getVoteAverage());
+            dto.setVoteCount(movie.getVoteCount());
             dto.setCreateAt(movie.getCreateAt());
             dto.setUpdateAt(movie.getUpdateAt());
 
