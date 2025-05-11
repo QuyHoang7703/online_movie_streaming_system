@@ -36,7 +36,7 @@ public class Movie {
     private String status;
     private double voteAverage;
     private double voteCount;
-
+    private String quality;
     private Instant createAt;
     private Instant updateAt;
 

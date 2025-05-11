@@ -1,7 +1,10 @@
 package com.example.OnlineMovieStreamingSystem.dto.response.movie;
 
+import com.example.OnlineMovieStreamingSystem.dto.response.videoVersion.VideoVersionResponseDTO;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -10,5 +13,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class StandaloneMovieResponseDTO extends MovieResponseDTO {
     private int duration;
-    private String videoUrl;
+    private double budget;
+    private double revenue;
+//    private List<VideoVersionResponseDTO> videoVersion;
+//    private String videoUrl;
 }

@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -15,12 +17,19 @@ public class StandaloneMovie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private Integer duration;
-    private String videoUrl;
+    private double budget;
+    private double revenue;
+    private int duration;
+//    private String videoUrl;
 
     @OneToOne
     @MapsId
     @JoinColumn(name="id")
     private Movie movie;
+
+    @OneToMany(mappedBy = "standaloneMovie", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VideoVersion> videoVersions;
+
+
 
 }

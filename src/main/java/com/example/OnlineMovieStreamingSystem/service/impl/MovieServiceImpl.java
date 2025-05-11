@@ -52,6 +52,7 @@ public class MovieServiceImpl implements MovieService {
         Movie movie = new Movie();
         // Set attributes for movie
         movie.setTitle(movieRequestDTO.getTitle());
+        movie.setOriginalTitle(movieRequestDTO.getOriginalTitle());
         movie.setDescription(movieRequestDTO.getDescription());
         movie.setDirector(movieRequestDTO.getDirector());
         movie.setCountry(movieRequestDTO.getCountry());
@@ -59,6 +60,8 @@ public class MovieServiceImpl implements MovieService {
         movie.setFree(movieRequestDTO.isFree());
         movie.setTrailerUrl(movieRequestDTO.getTrailerUrl());
         movie.setMovieType(movieRequestDTO.getMovieType());
+        movie.setVoteAverage(movieRequestDTO.getVoteAverage());
+        movie.setVoteCount(movieRequestDTO.getVoteCount());
 
         String posterUrl = this.imageStorageService.uploadFile(CONTAINER_NAME, poster.getOriginalFilename(), poster.getInputStream());
         String backdropUrl = this.imageStorageService.uploadFile(CONTAINER_NAME, backdrop.getOriginalFilename(), backdrop.getInputStream());
@@ -106,6 +109,7 @@ public class MovieServiceImpl implements MovieService {
             T dto = clazz.getDeclaredConstructor().newInstance();
             dto.setId(movie.getId());
             dto.setTitle(movie.getTitle());
+            dto.setOriginalTitle(movie.getOriginalTitle());
             dto.setDescription(movie.getDescription());
             dto.setDirector(movie.getDirector());
             dto.setPosterUrl(movie.getPosterUrl());

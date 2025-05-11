@@ -18,6 +18,7 @@ import java.util.List;
 public class MovieResponseDTO {
     private long id;
     private String title;
+    private String originalTitle;
     private String description;
     private String director;
     private String posterUrl;
