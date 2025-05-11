@@ -41,14 +41,14 @@ public class EpisodeServiceImpl implements EpisodeService {
         episode.setDuration(episodeRequestDTO.getDuration());
 
 
-        if(video != null && !video.isEmpty())  {
-            String videoUrl = this.imageStorageService.uploadFile(CONTAINER_NAME, video.getOriginalFilename(), video.getInputStream());
-            if(videoUrl != null) {
-                episode.setVideoUrl(videoUrl);
-            }
-        }else if(episodeRequestDTO.getVideoUrl() != null) {
-            episode.setVideoUrl(episodeRequestDTO.getVideoUrl());
-        }
+//        if(video != null && !video.isEmpty())  {
+//            String videoUrl = this.imageStorageService.uploadFile(CONTAINER_NAME, video.getOriginalFilename(), video.getInputStream());
+//            if(videoUrl != null) {
+//                episode.setVideoUrl(videoUrl);
+//            }
+//        }else if(episodeRequestDTO.getVideoUrl() != null) {
+//            episode.setVideoUrl(episodeRequestDTO.getVideoUrl());
+//        }
 
         episode.setSeriesMovie(seriesMovie);
         Episode savedEpisode = this.episodeRepository.save(episode);
@@ -105,24 +105,24 @@ public class EpisodeServiceImpl implements EpisodeService {
             episodeDB.setDuration(episodeRequestDTO.getDuration());
         }
 
-        String currentVideoUrl = episodeDB.getVideoUrl();
-        if(video != null && !video.isEmpty()) {
-            String newVideoUrl = this.imageStorageService.uploadFile(CONTAINER_NAME, video.getOriginalFilename(), video.getInputStream());
-            if(currentVideoUrl != null && !currentVideoUrl.trim().isEmpty()) {
-                String originVideoName = episodeDB.getVideoUrl().substring(currentVideoUrl.lastIndexOf("/" ) + 1);
-                this.imageStorageService.deleteFile(CONTAINER_NAME, originVideoName);
-            }
-            episodeDB.setVideoUrl(newVideoUrl);
-
-        } else if (episodeRequestDTO.getVideoUrl() != null && !episodeRequestDTO.getVideoUrl().trim().isEmpty()) {
-            if(!Objects.equals(currentVideoUrl, episodeRequestDTO.getVideoUrl())) {
-                if(currentVideoUrl != null && currentVideoUrl.contains("blob.core.windows.net")) {
-                    String originVideoName = episodeDB.getVideoUrl().substring(currentVideoUrl.lastIndexOf("/" ) + 1);
-                    this.imageStorageService.deleteFile(CONTAINER_NAME, originVideoName);
-                }
-                episodeDB.setVideoUrl(episodeRequestDTO.getVideoUrl());
-            }
-        }
+//        String currentVideoUrl = episodeDB.getVideoUrl();
+//        if(video != null && !video.isEmpty()) {
+//            String newVideoUrl = this.imageStorageService.uploadFile(CONTAINER_NAME, video.getOriginalFilename(), video.getInputStream());
+//            if(currentVideoUrl != null && !currentVideoUrl.trim().isEmpty()) {
+//                String originVideoName = episodeDB.getVideoUrl().substring(currentVideoUrl.lastIndexOf("/" ) + 1);
+//                this.imageStorageService.deleteFile(CONTAINER_NAME, originVideoName);
+//            }
+//            episodeDB.setVideoUrl(newVideoUrl);
+//
+//        } else if (episodeRequestDTO.getVideoUrl() != null && !episodeRequestDTO.getVideoUrl().trim().isEmpty()) {
+//            if(!Objects.equals(currentVideoUrl, episodeRequestDTO.getVideoUrl())) {
+//                if(currentVideoUrl != null && currentVideoUrl.contains("blob.core.windows.net")) {
+//                    String originVideoName = episodeDB.getVideoUrl().substring(currentVideoUrl.lastIndexOf("/" ) + 1);
+//                    this.imageStorageService.deleteFile(CONTAINER_NAME, originVideoName);
+//                }
+//                episodeDB.setVideoUrl(episodeRequestDTO.getVideoUrl());
+//            }
+//        }
 
         Episode updatedEpisode = this.episodeRepository.save(episodeDB);
 
@@ -143,7 +143,7 @@ public class EpisodeServiceImpl implements EpisodeService {
                 .title(episode.getTitle())
                 .episodeNumber(episode.getEpisodeNumber())
                 .duration(episode.getDuration())
-                .videoUrl(episode.getVideoUrl())
+//                .videoUrl(episode.getVideoUrl())
                 .seriesMovieId(episode.getSeriesMovie().getId())
                 .build();
         return episodeDetailResponseDTO;

@@ -7,7 +7,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 public interface StandaloneMovieService {
-    StandaloneMovieResponseDTO createStandaloneMovie(StandaloneMovieRequestDTO standaloneMovieRequestDTO, MultipartFile poster, MultipartFile backdrop, MultipartFile video) throws IOException;
+    StandaloneMovieResponseDTO createStandaloneMovie(StandaloneMovieRequestDTO standaloneMovieRequestDTO,
+                                                     MultipartFile poster,
+                                                     MultipartFile backdrop,
+                                                     MultipartFile voiceOverVideo,
+                                                     MultipartFile dubbedVideo,
+                                                     MultipartFile vietsubVideo) throws IOException;
     StandaloneMovieResponseDTO updateStandaloneMovie(long movieId, StandaloneMovieRequestDTO standaloneMovieRequestDTO, MultipartFile poster, MultipartFile backdrop, MultipartFile video) throws IOException;
     StandaloneMovieResponseDTO getStandaloneMovie(long movieId);
 }
