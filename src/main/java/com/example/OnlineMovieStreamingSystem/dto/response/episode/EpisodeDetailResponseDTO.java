@@ -15,6 +15,6 @@ public class EpisodeDetailResponseDTO {
     private int episodeNumber;
     private int duration;
     private String videoUrl;
-    private long seriesMovieId;
+    private long videoVersionId;
 
 }

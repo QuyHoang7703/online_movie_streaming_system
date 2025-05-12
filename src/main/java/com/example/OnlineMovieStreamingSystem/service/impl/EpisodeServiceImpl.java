@@ -2,6 +2,7 @@ package com.example.OnlineMovieStreamingSystem.service.impl;
 
 import com.example.OnlineMovieStreamingSystem.domain.Episode;
 import com.example.OnlineMovieStreamingSystem.domain.SeriesMovie;
+import com.example.OnlineMovieStreamingSystem.domain.VideoVersion;
 import com.example.OnlineMovieStreamingSystem.dto.Meta;
 import com.example.OnlineMovieStreamingSystem.dto.ResultPaginationDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.episode.EpisodeRequestDTO;
@@ -9,6 +10,7 @@ import com.example.OnlineMovieStreamingSystem.dto.response.episode.EpisodeDetail
 import com.example.OnlineMovieStreamingSystem.dto.response.episode.EpisodeSummaryResponseDTO;
 import com.example.OnlineMovieStreamingSystem.repository.EpisodeRepository;
 import com.example.OnlineMovieStreamingSystem.repository.SeriesMovieRepository;
+import com.example.OnlineMovieStreamingSystem.repository.VideoVersionRepository;
 import com.example.OnlineMovieStreamingSystem.service.EpisodeService;
 import com.example.OnlineMovieStreamingSystem.service.ImageStorageService;
 import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
@@ -27,65 +29,64 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class EpisodeServiceImpl implements EpisodeService {
     private final EpisodeRepository episodeRepository;
-    private final SeriesMovieRepository seriesMovieRepository;
     private final ImageStorageService imageStorageService;
+    private final VideoVersionRepository videoVersionRepository;
     private final String CONTAINER_NAME = "movie-video-container";
 
     @Override
-    public EpisodeDetailResponseDTO createEpisode(long seriesMovieId, EpisodeRequestDTO episodeRequestDTO, MultipartFile video) throws IOException {
-        SeriesMovie seriesMovie = this.seriesMovieRepository.findById(seriesMovieId)
-                .orElseThrow(() -> new ApplicationException("Không có phim bộ này"));
+    public EpisodeDetailResponseDTO createEpisode(long videoVersionId, EpisodeRequestDTO episodeRequestDTO, MultipartFile video) throws IOException {
+        VideoVersion videoVersion = this.videoVersionRepository.findById(videoVersionId)
+                .orElseThrow(() -> new ApplicationException("Không có phiên bản video với id: " + videoVersionId));
         Episode episode = new Episode();
         episode.setTitle(episodeRequestDTO.getTitle());
         episode.setEpisodeNumber(episodeRequestDTO.getEpisodeNumber());
         episode.setDuration(episodeRequestDTO.getDuration());
 
 
-//        if(video != null && !video.isEmpty())  {
-//            String videoUrl = this.imageStorageService.uploadFile(CONTAINER_NAME, video.getOriginalFilename(), video.getInputStream());
-//            if(videoUrl != null) {
-//                episode.setVideoUrl(videoUrl);
-//            }
-//        }else if(episodeRequestDTO.getVideoUrl() != null) {
-//            episode.setVideoUrl(episodeRequestDTO.getVideoUrl());
-//        }
+        if(video != null && !video.isEmpty())  {
+            String videoUrl = this.imageStorageService.uploadFile(CONTAINER_NAME, video.getOriginalFilename(), video.getInputStream());
+            if(videoUrl != null) {
+                episode.setVideoUrl(videoUrl);
+            }
+        }else if(episodeRequestDTO.getVideoUrl() != null) {
+            episode.setVideoUrl(episodeRequestDTO.getVideoUrl());
+        }
 
-//        episode.setSeriesMovie(seriesMovie);
+        episode.setVideoVersion(videoVersion);
+
         Episode savedEpisode = this.episodeRepository.save(episode);
-
 
         return this.convertToEpisodeDetailResponseDTO(savedEpisode);
     }
 
     @Override
-    public ResultPaginationDTO getEpisodeList(long seriesMovieId, int page, int size) {
-//        Pageable pageable = PageRequest.of(page-1, size);
-//        Page<Episode> episodePage = this.episodeRepository.findBySeriesMovieId(seriesMovieId, pageable);
-//
-//            ResultPaginationDTO resultPaginationDTO = new ResultPaginationDTO();
-//
-//        Meta meta = new Meta();
-//        meta.setCurrentPage(pageable.getPageNumber() + 1);
-//        meta.setPageSize(pageable.getPageSize());
-//        meta.setTotalPages(episodePage.getTotalPages());
-//        meta.setTotalElements(episodePage.getTotalElements());
-//
-//        resultPaginationDTO.setMeta(meta);
-//
-//        List<EpisodeSummaryResponseDTO> episodeSummaryResponseDTOS = episodePage.getContent().stream()
-//                .map(this::convertToEpisodeSummaryResponseDTO)
-//                .toList();
-//
-//        resultPaginationDTO.setResult(episodeSummaryResponseDTOS);
-//
-//        return resultPaginationDTO;
-        return null;
+    public ResultPaginationDTO getEpisodeList(long videoVersionId, int page, int size) {
+        Pageable pageable = PageRequest.of(page-1, size);
+        Page<Episode> episodePage = this.episodeRepository.findByVideoVersionId(videoVersionId, pageable);
+
+        ResultPaginationDTO resultPaginationDTO = new ResultPaginationDTO();
+
+        Meta meta = new Meta();
+        meta.setCurrentPage(pageable.getPageNumber() + 1);
+        meta.setPageSize(pageable.getPageSize());
+        meta.setTotalPages(episodePage.getTotalPages());
+        meta.setTotalElements(episodePage.getTotalElements());
+
+        resultPaginationDTO.setMeta(meta);
+
+        List<EpisodeSummaryResponseDTO> episodeSummaryResponseDTOS = episodePage.getContent().stream()
+                .map(this::convertToEpisodeSummaryResponseDTO)
+                .toList();
+
+        resultPaginationDTO.setResult(episodeSummaryResponseDTOS);
+
+        return resultPaginationDTO;
     }
 
     @Override
     public EpisodeDetailResponseDTO getEpisodeDetail(long episodeId) {
         Episode episode = this.episodeRepository.findById(episodeId)
-                .orElseThrow(() -> new ApplicationException("Không tồn tại tập phim này"));
+                .orElseThrow(() -> new ApplicationException("Không tồn tại tập phim với id là " + episodeId));
 
         return this.convertToEpisodeDetailResponseDTO(episode);
     }
@@ -95,7 +96,8 @@ public class EpisodeServiceImpl implements EpisodeService {
                                                   EpisodeRequestDTO episodeRequestDTO,
                                                   MultipartFile video) throws IOException {
         Episode episodeDB = this.episodeRepository.findById(episodeId)
-                .orElseThrow(() -> new ApplicationException("Không tồn tại episode với id là " + episodeId));
+                .orElseThrow(() -> new ApplicationException("Không tồn tại tập phim với id là " + episodeId));
+
         if(!Objects.equals(episodeDB.getTitle(), episodeRequestDTO.getTitle())) {
             episodeDB.setTitle(episodeRequestDTO.getTitle());
         }
@@ -106,24 +108,26 @@ public class EpisodeServiceImpl implements EpisodeService {
             episodeDB.setDuration(episodeRequestDTO.getDuration());
         }
 
-//        String currentVideoUrl = episodeDB.getVideoUrl();
-//        if(video != null && !video.isEmpty()) {
-//            String newVideoUrl = this.imageStorageService.uploadFile(CONTAINER_NAME, video.getOriginalFilename(), video.getInputStream());
-//            if(currentVideoUrl != null && !currentVideoUrl.trim().isEmpty()) {
-//                String originVideoName = episodeDB.getVideoUrl().substring(currentVideoUrl.lastIndexOf("/" ) + 1);
-//                this.imageStorageService.deleteFile(CONTAINER_NAME, originVideoName);
-//            }
-//            episodeDB.setVideoUrl(newVideoUrl);
-//
-//        } else if (episodeRequestDTO.getVideoUrl() != null && !episodeRequestDTO.getVideoUrl().trim().isEmpty()) {
-//            if(!Objects.equals(currentVideoUrl, episodeRequestDTO.getVideoUrl())) {
-//                if(currentVideoUrl != null && currentVideoUrl.contains("blob.core.windows.net")) {
-//                    String originVideoName = episodeDB.getVideoUrl().substring(currentVideoUrl.lastIndexOf("/" ) + 1);
-//                    this.imageStorageService.deleteFile(CONTAINER_NAME, originVideoName);
-//                }
-//                episodeDB.setVideoUrl(episodeRequestDTO.getVideoUrl());
-//            }
-//        }
+        String currentVideoUrl = episodeDB.getVideoUrl();
+        if(video != null && !video.isEmpty()) {
+            String newVideoUrl = this.imageStorageService.uploadFile(CONTAINER_NAME, video.getOriginalFilename(), video.getInputStream());
+           // Delete old video url for episode
+            if(currentVideoUrl != null && !currentVideoUrl.trim().isEmpty()) {
+                String originVideoName = episodeDB.getVideoUrl().substring(currentVideoUrl.lastIndexOf("/" ) + 1);
+                this.imageStorageService.deleteFile(CONTAINER_NAME, originVideoName);
+            }
+
+            episodeDB.setVideoUrl(newVideoUrl);
+
+        } else if (episodeRequestDTO.getVideoUrl() != null && !episodeRequestDTO.getVideoUrl().trim().isEmpty()) {
+            if(!Objects.equals(currentVideoUrl, episodeRequestDTO.getVideoUrl())) {
+                if(currentVideoUrl != null && currentVideoUrl.contains("blob.core.windows.net")) {
+                    String originVideoName = episodeDB.getVideoUrl().substring(currentVideoUrl.lastIndexOf("/" ) + 1);
+                    this.imageStorageService.deleteFile(CONTAINER_NAME, originVideoName);
+                }
+                episodeDB.setVideoUrl(episodeRequestDTO.getVideoUrl());
+            }
+        }
 
         Episode updatedEpisode = this.episodeRepository.save(episodeDB);
 
@@ -144,8 +148,8 @@ public class EpisodeServiceImpl implements EpisodeService {
                 .title(episode.getTitle())
                 .episodeNumber(episode.getEpisodeNumber())
                 .duration(episode.getDuration())
-//                .videoUrl(episode.getVideoUrl())
-//                .seriesMovieId(episode.getSeriesMovie().getId())
+                .videoUrl(episode.getVideoUrl())
+                .videoVersionId(episode.getVideoVersion().getId())
                 .build();
         return episodeDetailResponseDTO;
     }

@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 public interface EpisodeService {
-    EpisodeDetailResponseDTO createEpisode(long seriesMovieId, EpisodeRequestDTO episodeRequestDTO,
+    EpisodeDetailResponseDTO createEpisode(long videoVersionId, EpisodeRequestDTO episodeRequestDTO,
                                            MultipartFile video) throws IOException;
 
     ResultPaginationDTO getEpisodeList(long seriesMovieId, int page, int size);
