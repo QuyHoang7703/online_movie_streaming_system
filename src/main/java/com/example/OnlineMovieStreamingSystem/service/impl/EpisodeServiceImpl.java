@@ -50,7 +50,7 @@ public class EpisodeServiceImpl implements EpisodeService {
 //            episode.setVideoUrl(episodeRequestDTO.getVideoUrl());
 //        }
 
-        episode.setSeriesMovie(seriesMovie);
+//        episode.setSeriesMovie(seriesMovie);
         Episode savedEpisode = this.episodeRepository.save(episode);
 
 
@@ -59,26 +59,27 @@ public class EpisodeServiceImpl implements EpisodeService {
 
     @Override
     public ResultPaginationDTO getEpisodeList(long seriesMovieId, int page, int size) {
-        Pageable pageable = PageRequest.of(page-1, size);
-        Page<Episode> episodePage = this.episodeRepository.findBySeriesMovieId(seriesMovieId, pageable);
-
-            ResultPaginationDTO resultPaginationDTO = new ResultPaginationDTO();
-
-        Meta meta = new Meta();
-        meta.setCurrentPage(pageable.getPageNumber() + 1);
-        meta.setPageSize(pageable.getPageSize());
-        meta.setTotalPages(episodePage.getTotalPages());
-        meta.setTotalElements(episodePage.getTotalElements());
-
-        resultPaginationDTO.setMeta(meta);
-
-        List<EpisodeSummaryResponseDTO> episodeSummaryResponseDTOS = episodePage.getContent().stream()
-                .map(this::convertToEpisodeSummaryResponseDTO)
-                .toList();
-
-        resultPaginationDTO.setResult(episodeSummaryResponseDTOS);
-
-        return resultPaginationDTO;
+//        Pageable pageable = PageRequest.of(page-1, size);
+//        Page<Episode> episodePage = this.episodeRepository.findBySeriesMovieId(seriesMovieId, pageable);
+//
+//            ResultPaginationDTO resultPaginationDTO = new ResultPaginationDTO();
+//
+//        Meta meta = new Meta();
+//        meta.setCurrentPage(pageable.getPageNumber() + 1);
+//        meta.setPageSize(pageable.getPageSize());
+//        meta.setTotalPages(episodePage.getTotalPages());
+//        meta.setTotalElements(episodePage.getTotalElements());
+//
+//        resultPaginationDTO.setMeta(meta);
+//
+//        List<EpisodeSummaryResponseDTO> episodeSummaryResponseDTOS = episodePage.getContent().stream()
+//                .map(this::convertToEpisodeSummaryResponseDTO)
+//                .toList();
+//
+//        resultPaginationDTO.setResult(episodeSummaryResponseDTOS);
+//
+//        return resultPaginationDTO;
+        return null;
     }
 
     @Override
@@ -144,7 +145,7 @@ public class EpisodeServiceImpl implements EpisodeService {
                 .episodeNumber(episode.getEpisodeNumber())
                 .duration(episode.getDuration())
 //                .videoUrl(episode.getVideoUrl())
-                .seriesMovieId(episode.getSeriesMovie().getId())
+//                .seriesMovieId(episode.getSeriesMovie().getId())
                 .build();
         return episodeDetailResponseDTO;
     }

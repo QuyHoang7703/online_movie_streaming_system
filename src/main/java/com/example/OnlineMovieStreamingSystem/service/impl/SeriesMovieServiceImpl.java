@@ -5,7 +5,6 @@ import com.example.OnlineMovieStreamingSystem.domain.SeriesMovie;
 import com.example.OnlineMovieStreamingSystem.domain.StandaloneMovie;
 import com.example.OnlineMovieStreamingSystem.dto.request.movie.SeriesMovieRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.movie.SeriesMovieResponseDTO;
-import com.example.OnlineMovieStreamingSystem.dto.response.movie.StandaloneMovieResponseDTO;
 import com.example.OnlineMovieStreamingSystem.repository.MovieRepository;
 import com.example.OnlineMovieStreamingSystem.service.MovieService;
 import com.example.OnlineMovieStreamingSystem.service.SeriesMovieService;
@@ -30,7 +29,7 @@ public class SeriesMovieServiceImpl implements SeriesMovieService {
         //  Set attributes for series movie
         SeriesMovie seriesMovie = new SeriesMovie();
         seriesMovie.setSeason(seriesMovieRequestDTO.getSeason());
-        seriesMovie.setEpisodeNumber(seriesMovieRequestDTO.getEpisodeNumber());
+        seriesMovie.setTotalEpisodes(seriesMovieRequestDTO.getTotalEpisodes());
         seriesMovie.setMovie(movie);
         movie.setSeriesMovie(seriesMovie);
 
@@ -46,8 +45,8 @@ public class SeriesMovieServiceImpl implements SeriesMovieService {
         if(!Objects.equals(seriesMovie.getSeason(), seriesMovieRequestDTO.getSeason())){
             seriesMovie.setSeason(seriesMovieRequestDTO.getSeason());
         }
-        if(!Objects.equals(seriesMovie.getEpisodeNumber(), seriesMovieRequestDTO.getEpisodeNumber())){
-            seriesMovie.setEpisodeNumber(seriesMovieRequestDTO.getEpisodeNumber());
+        if(!Objects.equals(seriesMovie.getTotalEpisodes(), seriesMovieRequestDTO.getTotalEpisodes())){
+            seriesMovie.setTotalEpisodes(seriesMovieRequestDTO.getTotalEpisodes());
         }
         updateMovie.setSeriesMovie(seriesMovie);
         Movie updatedMovie = this.movieRepository.save(updateMovie);
@@ -70,7 +69,7 @@ public class SeriesMovieServiceImpl implements SeriesMovieService {
     private SeriesMovieResponseDTO convertToSeriesResponseDTO(Movie movie){
         SeriesMovieResponseDTO seriesMovieResponseDTO = this.movieService.convertToMovieInfoDTO(movie, SeriesMovieResponseDTO.class);
         seriesMovieResponseDTO.setSeason(movie.getSeriesMovie().getSeason());
-        seriesMovieResponseDTO.setEpisodeNumber(movie.getSeriesMovie().getEpisodeNumber());
+        seriesMovieResponseDTO.setTotalEpisodes(movie.getSeriesMovie().getTotalEpisodes());
         return seriesMovieResponseDTO;
     }
 }

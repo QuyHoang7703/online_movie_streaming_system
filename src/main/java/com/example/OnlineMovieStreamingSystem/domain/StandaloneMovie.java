@@ -19,16 +19,13 @@ public class StandaloneMovie {
     private long id;
     private double budget;
     private double revenue;
-    private int duration;
+//    private int duration;
 //    private String videoUrl;
 
     @OneToOne
     @MapsId
     @JoinColumn(name="id")
     private Movie movie;
-
-    @OneToMany(mappedBy = "standaloneMovie", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<VideoVersion> videoVersions;
 
 
 

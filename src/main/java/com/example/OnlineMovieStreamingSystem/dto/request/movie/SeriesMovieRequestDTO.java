@@ -11,5 +11,5 @@ import lombok.Setter;
 @Setter
 public class SeriesMovieRequestDTO extends MovieRequestDTO {
     private int season;
-    private int episodeNumber;
+    private int totalEpisodes;
 }

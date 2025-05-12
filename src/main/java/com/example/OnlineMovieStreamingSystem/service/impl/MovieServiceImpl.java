@@ -5,19 +5,14 @@ import com.example.OnlineMovieStreamingSystem.dto.Meta;
 import com.example.OnlineMovieStreamingSystem.dto.ResultPaginationDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.movie.MovieActorRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.movie.MovieRequestDTO;
+import com.example.OnlineMovieStreamingSystem.dto.response.country.CountryResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.genre.GenreSummaryDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.movie.MovieActorResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.movie.MovieResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.movie.MovieSummaryResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionPlan.SubscriptionPlanSummaryDTO;
-import com.example.OnlineMovieStreamingSystem.repository.ActorRepository;
-import com.example.OnlineMovieStreamingSystem.repository.GenreRepository;
-import com.example.OnlineMovieStreamingSystem.repository.MovieRepository;
-import com.example.OnlineMovieStreamingSystem.repository.SubscriptionPlanRepository;
-import com.example.OnlineMovieStreamingSystem.service.GenreService;
-import com.example.OnlineMovieStreamingSystem.service.ImageStorageService;
-import com.example.OnlineMovieStreamingSystem.service.MovieService;
-import com.example.OnlineMovieStreamingSystem.service.SubscriptionPlanService;
+import com.example.OnlineMovieStreamingSystem.repository.*;
+import com.example.OnlineMovieStreamingSystem.service.*;
 import com.example.OnlineMovieStreamingSystem.util.constant.MovieType;
 import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +41,8 @@ public class MovieServiceImpl implements MovieService {
     private final ActorRepository actorRepository;
     private final GenreService genreService;
     private final SubscriptionPlanService subscriptionPlanService;
+    private final CountryRepository countryRepository;
+    private final CountryService countryService;
 
     @Override
     public Movie createMovieFromDTO(MovieRequestDTO movieRequestDTO, MultipartFile poster, MultipartFile backdrop) throws IOException {
@@ -55,13 +52,15 @@ public class MovieServiceImpl implements MovieService {
         movie.setOriginalTitle(movieRequestDTO.getOriginalTitle());
         movie.setDescription(movieRequestDTO.getDescription());
         movie.setDirector(movieRequestDTO.getDirector());
-        movie.setCountry(movieRequestDTO.getCountry());
+//        movie.setCountry(movieRequestDTO.getCountry());
         movie.setReleaseDate(movieRequestDTO.getReleaseDate());
         movie.setFree(movieRequestDTO.isFree());
         movie.setTrailerUrl(movieRequestDTO.getTrailerUrl());
         movie.setMovieType(movieRequestDTO.getMovieType());
+        movie.setStatus(movieRequestDTO.getStatus());
         movie.setVoteAverage(movieRequestDTO.getVoteAverage());
         movie.setVoteCount(movieRequestDTO.getVoteCount());
+        movie.setQuality(movieRequestDTO.getQuality());
 
         String posterUrl = this.imageStorageService.uploadFile(CONTAINER_NAME, poster.getOriginalFilename(), poster.getInputStream());
         String backdropUrl = this.imageStorageService.uploadFile(CONTAINER_NAME, backdrop.getOriginalFilename(), backdrop.getInputStream());
@@ -99,6 +98,14 @@ public class MovieServiceImpl implements MovieService {
                     }).toList();
             movie.setMovieActors(movieActors);
         }
+
+        // Set countries for movie
+        List<String> countryIds = movieRequestDTO.getCountryIds();
+        if(countryIds != null && !countryIds.isEmpty()) {
+            List<Country> countries = this.countryRepository.findByIdIn(countryIds);
+            movie.setCountries(countries);
+        }
+
         return movie;
     }
 
@@ -114,7 +121,7 @@ public class MovieServiceImpl implements MovieService {
             dto.setDirector(movie.getDirector());
             dto.setPosterUrl(movie.getPosterUrl());
             dto.setBackdropUrl(movie.getBackdropUrl());
-            dto.setCountry(movie.getCountry());
+//            dto.setCountry(movie.getCountry());
             dto.setReleaseDate(movie.getReleaseDate());
             dto.setFree(movie.isFree());
             dto.setTrailerUrl(movie.getTrailerUrl());
@@ -122,6 +129,7 @@ public class MovieServiceImpl implements MovieService {
             dto.setStatus(movie.getStatus());
             dto.setVoteAverage(movie.getVoteAverage());
             dto.setVoteCount(movie.getVoteCount());
+            dto.setQuality(movie.getQuality());
             dto.setCreateAt(movie.getCreateAt());
             dto.setUpdateAt(movie.getUpdateAt());
 
@@ -147,6 +155,12 @@ public class MovieServiceImpl implements MovieService {
                 dto.setSubscriptionPlans(subscriptionPlanSummaryDTOS);
             }
 
+            if(movie.getCountries() != null && !movie.getCountries().isEmpty()) {
+                List<CountryResponseDTO> countryResponseDTOS = movie.getCountries().stream()
+                        .map(this.countryService::convertToCountryResponseDTO)
+                        .toList();
+                dto.setCountries(countryResponseDTOS);
+            }
 
             return dto;
         } catch (Exception e) {
@@ -198,7 +212,8 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public List<String> getAllCountriesOfMovie() {
-        return this.movieRepository.getAllCountriesOfMovies();
+        return null;
+//        return this.movieRepository.getAllCountriesOfMovies();
     }
 
     @Transactional
@@ -215,9 +230,9 @@ public class MovieServiceImpl implements MovieService {
         if(!Objects.equals(movieRequestDTO.getDirector(), movieDB.getDirector())) {
             movieDB.setDirector(movieRequestDTO.getDirector());
         }
-        if(!Objects.equals(movieRequestDTO.getCountry(), movieDB.getCountry())) {
-            movieDB.setCountry(movieRequestDTO.getCountry());
-        }
+//        if(!Objects.equals(movieRequestDTO.getCountry(), movieDB.getCountry())) {
+//            movieDB.setCountry(movieRequestDTO.getCountry());
+//        }
         if(!Objects.equals(movieRequestDTO.getReleaseDate(), movieDB.getReleaseDate())) {
             movieDB.setReleaseDate(movieRequestDTO.getReleaseDate());
         }
@@ -227,6 +242,9 @@ public class MovieServiceImpl implements MovieService {
         if(!Objects.equals(movieRequestDTO.getTrailerUrl(), movieDB.getTrailerUrl())) {
             movieDB.setTrailerUrl(movieRequestDTO.getTrailerUrl());
         }
+        if(!Objects.equals(movieRequestDTO.getQuality(), movieDB.getQuality())) {
+            movieDB.setQuality(movieRequestDTO.getQuality());
+        }
 
         // Update genre for movie
         if(movieRequestDTO.getGenreIds() != null) {
@@ -235,6 +253,16 @@ public class MovieServiceImpl implements MovieService {
             if(!currentGenreIds.equals(updateGenreIds)) {
                 List<Genre> genres = this.genreRepository.findByIdIn(updateGenreIds);
                 movieDB.setGenres(genres);
+            }
+        }
+
+        // Update countries for movie
+        if(movieRequestDTO.getCountryIds() != null) {
+            List<String> currentCountryIds = movieDB.getCountries().stream().map(Country::getId).toList();
+            List<String> updateCountryIds = movieRequestDTO.getCountryIds();
+            if(!currentCountryIds.equals(updateCountryIds)) {
+                List<Country> countries = this.countryRepository.findByIdIn(updateCountryIds);
+                movieDB.setCountries(countries);
             }
         }
 

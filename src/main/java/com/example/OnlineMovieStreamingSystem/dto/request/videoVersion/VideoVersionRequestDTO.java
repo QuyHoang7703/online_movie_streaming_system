@@ -1,6 +1,8 @@
-package com.example.OnlineMovieStreamingSystem.dto.response.videoVersion;
+package com.example.OnlineMovieStreamingSystem.dto.request.videoVersion;
 
 import com.example.OnlineMovieStreamingSystem.util.constant.VideoType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,8 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class VideoVersionResponseDTO {
-    private long id;
-    private long movieId;
+public class VideoVersionRequestDTO {
+    @Enumerated(EnumType.STRING)
     private VideoType videoType;
 }

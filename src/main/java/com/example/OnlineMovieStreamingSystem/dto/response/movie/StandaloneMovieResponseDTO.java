@@ -12,9 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StandaloneMovieResponseDTO extends MovieResponseDTO {
-    private int duration;
     private double budget;
     private double revenue;
-//    private List<VideoVersionResponseDTO> videoVersion;
-//    private String videoUrl;
+//    private List<VideoVersionResponseDTO> videoVersions;
 }

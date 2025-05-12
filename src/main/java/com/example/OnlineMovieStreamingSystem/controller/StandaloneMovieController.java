@@ -28,18 +28,18 @@ public class StandaloneMovieController {
                                                                             @RequestPart(name="voiceOverVideo", required = false) MultipartFile voiceOverVideo,
                                                                             @RequestPart(name="dubbedVideo", required = false) MultipartFile dubbedVideo,
                                                                             @RequestPart(name="vietSubVideo", required = false) MultipartFile vietSubVideo) throws IOException {
-        VideoUrlRequestDTO videoUrlRequestDTO = standaloneMovieRequestDTO.getVideoUrlRequest();
-        String vietSubVideoUrl = videoUrlRequestDTO.getVietSubVideoUrl();
-        String dubbedVideoUrl = videoUrlRequestDTO.getDubbedVideoUrl();
-        String voiceOverVideoUrl = videoUrlRequestDTO.getVoiceOverVideoUrl();
+//        VideoUrlRequestDTO videoUrlRequestDTO = standaloneMovieRequestDTO.getVideoUrlRequest();
+//        String vietSubVideoUrl = videoUrlRequestDTO.getVietSubVideoUrl();
+//        String dubbedVideoUrl = videoUrlRequestDTO.getDubbedVideoUrl();
+//        String voiceOverVideoUrl = videoUrlRequestDTO.getVoiceOverVideoUrl();
+//
+//        boolean isAtLeastOneVideoProvided = vietSubVideoUrl != null || dubbedVideoUrl != null || voiceOverVideoUrl != null ||
+//                vietSubVideo != null || dubbedVideo != null || voiceOverVideo != null;
+//        if (!isAtLeastOneVideoProvided) {
+//            throw new ApplicationException("Phải cung cấp ít nhất 1 loại video");
+//        }
 
-        boolean isAtLeastOneVideoProvided = vietSubVideoUrl != null || dubbedVideoUrl != null || voiceOverVideoUrl != null ||
-                vietSubVideo != null || dubbedVideo != null || voiceOverVideo != null;
-        if (!isAtLeastOneVideoProvided) {
-            throw new ApplicationException("Phải cung cấp ít nhất 1 loại video");
-        }
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.standaloneMovieService.createStandaloneMovie(standaloneMovieRequestDTO, poster, backdrop, voiceOverVideo, dubbedVideo, vietSubVideo));
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.standaloneMovieService.createStandaloneMovie(standaloneMovieRequestDTO, poster, backdrop));
     }
 
     @PatchMapping("{movieId}")

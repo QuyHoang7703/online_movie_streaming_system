@@ -18,7 +18,7 @@ public class MovieRequestDTO {
     private String originalTitle;
     private String description;
     private String director;
-    private String country;
+//    private String country;
     private LocalDate releaseDate;
     private boolean free;
     private String trailerUrl;
@@ -31,6 +31,7 @@ public class MovieRequestDTO {
     private List<Long> genreIds;
     private List<MovieActorRequestDTO> movieActors;
     private List<Long> subscriptionPlanIds;
+    private List<String> countryIds;
 
 
 }
