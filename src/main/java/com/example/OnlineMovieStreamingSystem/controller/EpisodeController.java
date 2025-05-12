@@ -19,7 +19,7 @@ import java.io.IOException;
 public class EpisodeController {
     private final EpisodeService episodeService;
 
-    @PostMapping("/series-movie/{seriesMovieId}/episodes")
+    @PostMapping("/video-versions/{seriesMovieId}/episodes")
     @ApiMessage("Thêm tập phim thành công")
     public ResponseEntity<EpisodeDetailResponseDTO> createEpisode(@PathVariable("seriesMovieId") long seriesMovieId,
                                                                   @RequestPart("episodeInfo") EpisodeRequestDTO episodeRequestDTO,
@@ -28,7 +28,7 @@ public class EpisodeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(this.episodeService.createEpisode(seriesMovieId, episodeRequestDTO, video));
     }
 
-    @GetMapping("/series-movie/{seriesMovieId}/episodes")
+    @GetMapping("/video-versions/{seriesMovieId}/episodes")
     public ResponseEntity<ResultPaginationDTO> getEpisodeOfSeriesMovie(@PathVariable("seriesMovieId") long seriesMovieId,
                                                                        @RequestParam(name = "page", defaultValue = "1") int page,
                                                                        @RequestParam(name = "size", defaultValue = "5") int size) {

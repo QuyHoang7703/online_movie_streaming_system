@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class EpisodeRequestDTO {
     private String title;
     private int episodeNumber;
-    private String videoUrl;
+    private String videoUrl; // null khi chọn chức năng upload file
     private int duration;
 }
