@@ -10,7 +10,5 @@ import lombok.*;
 public class StandaloneMovieRequestDTO extends MovieRequestDTO {
     private double budget;
     private double revenue;
-    private Integer duration;
-    private VideoUrlRequestDTO videoUrlRequest;
 
 }

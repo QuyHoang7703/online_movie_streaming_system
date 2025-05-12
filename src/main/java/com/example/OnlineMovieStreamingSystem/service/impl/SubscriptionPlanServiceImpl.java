@@ -50,7 +50,7 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
             subscriptionPlan.setPlanDurations(planDurations);
         }
 
-        if(subscriptionPlanRequestDTO.getParentPlanIds() != null) {
+        if(subscriptionPlanRequestDTO.getParentPlanIds() != null && !subscriptionPlanRequestDTO.getParentPlanIds().isEmpty()) {
             List<SubscriptionPlan> parentPlans = this.subscriptionPlanRepository.findByIdIn(subscriptionPlanRequestDTO.getParentPlanIds());
             if (parentPlans == null || parentPlans.isEmpty()) {
                 throw new ApplicationException("Gói cha không tồn tại");

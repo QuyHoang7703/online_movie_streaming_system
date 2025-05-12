@@ -27,7 +27,7 @@ public class Movie {
     private String director;
     private String posterUrl;
     private String backdropUrl;
-    private String country;
+//    private String country;
     private LocalDate releaseDate;
     private boolean free;
     private String trailerUrl;
@@ -59,6 +59,13 @@ public class Movie {
             joinColumns = @JoinColumn(name="movie_id"),
             inverseJoinColumns = @JoinColumn(name="subscription_plan_id"))
     private List<SubscriptionPlan> subscriptionPlans;
+
+    @ManyToMany
+    @JoinTable(name="movie_country", joinColumns = @JoinColumn(name="movie_id"), inverseJoinColumns = @JoinColumn(name="country_id"))
+    private List<Country> countries;
+
+    @OneToMany(mappedBy = "movie")
+    private List<VideoVersion> videoVersions;
 
     @PrePersist
     protected void prePersist() {

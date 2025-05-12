@@ -18,14 +18,12 @@ public class SeriesMovie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private int season;
-    private int episodeNumber;
+    private int totalEpisodes;
 
     @OneToOne
     @MapsId
     @JoinColumn(name = "id")
     private Movie movie;
 
-    @OneToMany(mappedBy = "seriesMovie")
-    private List<Episode> episodes;
 
 }

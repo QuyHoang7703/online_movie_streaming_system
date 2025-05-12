@@ -13,5 +13,5 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class SeriesMovieResponseDTO extends MovieResponseDTO {
     private int season;
-    private int episodeNumber;
+    private int totalEpisodes;
 }

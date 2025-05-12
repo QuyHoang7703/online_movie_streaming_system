@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -19,19 +21,13 @@ public class VideoVersion {
     private long id;
     @Enumerated(EnumType.STRING)
     private VideoType videoType;
-    private String videoUrl;
 
     @ManyToOne
-    @JoinColumn(name="standalone_id")
-    private StandaloneMovie standaloneMovie;
+    @JoinColumn(name="movie_id")
+    private Movie movie;
 
-    @ManyToOne
-    @JoinColumn(name="episode_id")
-    private Episode episode;
+    @OneToMany(mappedBy = "videoVersion")
+    private List<Episode> episodes;
 
-    @AssertTrue(message = "VideoVersion must belong to either a StandaloneMovie or an Episode, not both.")
-    public boolean isValidOwner() {
-        return (standaloneMovie != null && episode == null) ||
-                (standaloneMovie == null && episode != null);
-    }
+
 }

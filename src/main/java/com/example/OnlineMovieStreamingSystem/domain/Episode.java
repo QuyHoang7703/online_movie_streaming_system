@@ -20,12 +20,12 @@ public class Episode {
     private String title;
     private int episodeNumber;
     private int duration;
-//    private String videoUrl;
+    private String videoUrl;
 
     @ManyToOne
-    @JoinColumn(name="series_movie_id")
-    private SeriesMovie seriesMovie;
+    @JoinColumn(name="video_version_id")
+    private VideoVersion videoVersion;
 
-    @OneToMany(mappedBy = "episode")
-    private List<VideoVersion> videoVersions;
+
+
 }

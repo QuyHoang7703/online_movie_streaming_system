@@ -6,6 +6,7 @@ import com.example.OnlineMovieStreamingSystem.domain.VideoVersion;
 import com.example.OnlineMovieStreamingSystem.dto.request.movie.StandaloneMovieRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.videoVersion.VideoUrlRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.movie.StandaloneMovieResponseDTO;
+import com.example.OnlineMovieStreamingSystem.dto.response.videoVersion.VideoVersionResponseDTO;
 import com.example.OnlineMovieStreamingSystem.repository.MovieRepository;
 import com.example.OnlineMovieStreamingSystem.service.ImageStorageService;
 import com.example.OnlineMovieStreamingSystem.service.MovieService;
@@ -37,10 +38,7 @@ public class StandaloneMovieServiceImpl implements StandaloneMovieService {
     @Override
     public StandaloneMovieResponseDTO createStandaloneMovie(StandaloneMovieRequestDTO standaloneMovieRequestDTO,
                                                             MultipartFile poster,
-                                                            MultipartFile backdrop,
-                                                            MultipartFile voiceOverVideo,
-                                                            MultipartFile dubbedVideo,
-                                                            MultipartFile vietsubVideo) throws IOException {
+                                                            MultipartFile backdrop) throws IOException {
 
         Movie movie = this.movieService.createMovieFromDTO(standaloneMovieRequestDTO, poster, backdrop);
 
@@ -48,30 +46,30 @@ public class StandaloneMovieServiceImpl implements StandaloneMovieService {
         StandaloneMovie standaloneMovie = new StandaloneMovie();
         standaloneMovie.setRevenue(standaloneMovieRequestDTO.getRevenue());
         standaloneMovie.setBudget(standaloneMovieRequestDTO.getBudget());
-        standaloneMovie.setDuration(standaloneMovieRequestDTO.getDuration());
+//        standaloneMovie.setDuration(standaloneMovieRequestDTO.getDuration());
 
         standaloneMovie.setMovie(movie);
         movie.setStandaloneMovie(standaloneMovie);
 
         // Set video version for movie
-        VideoUrlRequestDTO videoUrlRequestDTO = standaloneMovieRequestDTO.getVideoUrlRequest();
-        String voiceOverVideoUrl = videoUrlRequestDTO.getVoiceOverVideoUrl();
-        String dubbedVideoUrl = videoUrlRequestDTO.getDubbedVideoUrl();
-        String vietSubVideoUrl = videoUrlRequestDTO.getVietSubVideoUrl();
+//        VideoUrlRequestDTO videoUrlRequestDTO = standaloneMovieRequestDTO.getVideoUrlRequest();
+//        String voiceOverVideoUrl = videoUrlRequestDTO.getVoiceOverVideoUrl();
+//        String dubbedVideoUrl = videoUrlRequestDTO.getDubbedVideoUrl();
+//        String vietSubVideoUrl = videoUrlRequestDTO.getVietSubVideoUrl();
 
-        List<VideoVersion> videoVersions = new ArrayList<>();
-
-        voiceOverVideoUrl = this.videoVersionService.resolveVideoUrl(voiceOverVideoUrl, voiceOverVideo);
-        dubbedVideoUrl = this.videoVersionService.resolveVideoUrl(dubbedVideoUrl, dubbedVideo);
-        vietSubVideoUrl = this.videoVersionService.resolveVideoUrl(vietSubVideoUrl, vietsubVideo);
-
-        this.videoVersionService.addVideoVersionIfAvailable(videoVersions, voiceOverVideoUrl, VideoType.VOICEOVER, v -> v.setStandaloneMovie(standaloneMovie));
-        this.videoVersionService.addVideoVersionIfAvailable(videoVersions, dubbedVideoUrl, VideoType.DUBBED, v -> v.setStandaloneMovie(standaloneMovie));
-        this.videoVersionService.addVideoVersionIfAvailable(videoVersions, vietSubVideoUrl, VideoType.VIETSUB, v -> v.setStandaloneMovie(standaloneMovie));
-
-        if(!videoVersions.isEmpty()) {
-            standaloneMovie.setVideoVersions(videoVersions);
-        }
+//        List<VideoVersion> videoVersions = new ArrayList<>();
+//
+//        voiceOverVideoUrl = this.videoVersionService.resolveVideoUrl(voiceOverVideoUrl, voiceOverVideo);
+//        dubbedVideoUrl = this.videoVersionService.resolveVideoUrl(dubbedVideoUrl, dubbedVideo);
+//        vietSubVideoUrl = this.videoVersionService.resolveVideoUrl(vietSubVideoUrl, vietsubVideo);
+//
+//        this.videoVersionService.addVideoVersionIfAvailable(videoVersions, voiceOverVideoUrl, VideoType.VOICEOVER, v -> v.setStandaloneMovie(standaloneMovie));
+//        this.videoVersionService.addVideoVersionIfAvailable(videoVersions, dubbedVideoUrl, VideoType.DUBBED, v -> v.setStandaloneMovie(standaloneMovie));
+//        this.videoVersionService.addVideoVersionIfAvailable(videoVersions, vietSubVideoUrl, VideoType.VIETSUB, v -> v.setStandaloneMovie(standaloneMovie));
+//
+//        if(!videoVersions.isEmpty()) {
+//            standaloneMovie.setVideoVersions(videoVersions);
+//        }
 
         Movie savedMovie = this.movieRepository.save(movie);
 
@@ -96,9 +94,9 @@ public class StandaloneMovieServiceImpl implements StandaloneMovieService {
            standaloneMovie.setRevenue(standaloneMovieRequestDTO.getRevenue());
         }
 
-        if(!Objects.equals(standaloneMovie.getDuration(), standaloneMovieRequestDTO.getDuration())) {
-           standaloneMovie.setDuration(standaloneMovieRequestDTO.getDuration());
-        }
+//        if(!Objects.equals(standaloneMovie.getDuration(), standaloneMovieRequestDTO.getDuration())) {
+//           standaloneMovie.setDuration(standaloneMovieRequestDTO.getDuration());
+//        }
 
 
 //        String currentVideoUrl = standaloneMovie.getVideoUrl();
@@ -142,9 +140,15 @@ public class StandaloneMovieServiceImpl implements StandaloneMovieService {
         StandaloneMovieResponseDTO standaloneMovieResponseDTO = this.movieService.convertToMovieInfoDTO(movie, StandaloneMovieResponseDTO.class);
         standaloneMovieResponseDTO.setBudget(movie.getStandaloneMovie().getBudget());
         standaloneMovieResponseDTO.setRevenue(movie.getStandaloneMovie().getRevenue());
-        standaloneMovieResponseDTO.setDuration(movie.getStandaloneMovie().getDuration());
+//        standaloneMovieResponseDTO.setDuration(movie.getStandaloneMovie().getDuration());
 
-//        standaloneMovieResponseDTO.setVideoUrl(movie.getStandaloneMovie().getVideoUrl());
+//        List<VideoVersion> videoVersions = movie.getStandaloneMovie().getVideoVersions();
+//        List<VideoVersionResponseDTO> videoVersionResponseDTOs = videoVersions.stream()
+//                .map(this.videoVersionService::convertToVideoVersionResponseDTO)
+//                .toList();
+//
+//        standaloneMovieResponseDTO.setVideoVersions(videoVersionResponseDTOs);
+
         return standaloneMovieResponseDTO;
     }
 

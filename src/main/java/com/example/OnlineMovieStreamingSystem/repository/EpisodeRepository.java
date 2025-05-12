@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface EpisodeRepository extends JpaRepository<Episode, Long> {
     Optional<Episode> findById(Long id);
-    Page<Episode> findBySeriesMovieId(Long seriesId, Pageable pageable);
+//    Page<Episode> findBySeriesMovieId(Long seriesId, Pageable pageable);
 
 //    Page<Episode> findByFilter
 }
