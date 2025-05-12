@@ -121,7 +121,6 @@ public class MovieServiceImpl implements MovieService {
             dto.setDirector(movie.getDirector());
             dto.setPosterUrl(movie.getPosterUrl());
             dto.setBackdropUrl(movie.getBackdropUrl());
-//            dto.setCountry(movie.getCountry());
             dto.setReleaseDate(movie.getReleaseDate());
             dto.setFree(movie.isFree());
             dto.setTrailerUrl(movie.getTrailerUrl());
@@ -230,9 +229,6 @@ public class MovieServiceImpl implements MovieService {
         if(!Objects.equals(movieRequestDTO.getDirector(), movieDB.getDirector())) {
             movieDB.setDirector(movieRequestDTO.getDirector());
         }
-//        if(!Objects.equals(movieRequestDTO.getCountry(), movieDB.getCountry())) {
-//            movieDB.setCountry(movieRequestDTO.getCountry());
-//        }
         if(!Objects.equals(movieRequestDTO.getReleaseDate(), movieDB.getReleaseDate())) {
             movieDB.setReleaseDate(movieRequestDTO.getReleaseDate());
         }
@@ -244,6 +240,9 @@ public class MovieServiceImpl implements MovieService {
         }
         if(!Objects.equals(movieRequestDTO.getQuality(), movieDB.getQuality())) {
             movieDB.setQuality(movieRequestDTO.getQuality());
+        }
+        if(!Objects.equals(movieRequestDTO.getStatus(), movieDB.getStatus())) {
+            movieDB.setStatus(movieRequestDTO.getStatus());
         }
 
         // Update genre for movie
