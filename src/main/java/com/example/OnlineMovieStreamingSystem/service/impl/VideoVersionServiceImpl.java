@@ -8,6 +8,7 @@ import com.example.OnlineMovieStreamingSystem.repository.MovieRepository;
 import com.example.OnlineMovieStreamingSystem.repository.VideoVersionRepository;
 import com.example.OnlineMovieStreamingSystem.service.ImageStorageService;
 import com.example.OnlineMovieStreamingSystem.service.VideoVersionService;
+import com.example.OnlineMovieStreamingSystem.util.constant.MovieType;
 import com.example.OnlineMovieStreamingSystem.util.constant.VideoType;
 import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -53,6 +55,13 @@ public class VideoVersionServiceImpl implements VideoVersionService {
                 .movieId(videoVersion.getMovie().getId())
                 .videoType(videoVersion.getVideoType())
                 .build();
+
+        if(videoVersion.getMovie().getMovieType() == MovieType.STANDALONE) {
+            Movie movie = videoVersion.getMovie();
+            videoVersionResponseDTO.setMovieTitle(movie.getTitle());
+            videoVersionResponseDTO.setBackdropUrl(movie.getBackdropUrl());
+        }
+
         return videoVersionResponseDTO;
     }
 
@@ -89,5 +98,19 @@ public class VideoVersionServiceImpl implements VideoVersionService {
             throw new ApplicationException("Bạn phải xóa các tập phim của phiên bản video này trước");
         }
         this.videoVersionRepository.deleteById(videoVersionId);
+    }
+
+    @Override
+    public List<VideoVersionResponseDTO> getAllVideoVersionsOfMovie(long movieId) {
+        Movie movie = this.movieRepository.findById(movieId)
+                .orElseThrow(() -> new ApplicationException("Không tìm thấy phim với id: " + movieId));
+
+        List<VideoVersion> videoVersions = movie.getVideoVersions();
+
+        List<VideoVersionResponseDTO> videoVersionResponseDTOS = videoVersions.stream()
+                .map(this::convertToVideoVersionResponseDTO)
+                .toList();
+
+        return videoVersionResponseDTOS;
     }
 }

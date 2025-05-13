@@ -13,4 +13,5 @@ public class EpisodeSummaryResponseDTO {
     private long id;
     private int episodeNumber;
     private String title;
+    private int duration;
 }
