@@ -19,20 +19,20 @@ import java.io.IOException;
 public class EpisodeController {
     private final EpisodeService episodeService;
 
-    @PostMapping("/video-versions/{seriesMovieId}/episodes")
+    @PostMapping("/video-versions/{videoVersionId}/episodes")
     @ApiMessage("Thêm tập phim thành công")
-    public ResponseEntity<EpisodeDetailResponseDTO> createEpisode(@PathVariable("seriesMovieId") long seriesMovieId,
+    public ResponseEntity<EpisodeDetailResponseDTO> createEpisode(@PathVariable("videoVersionId") long videoVersionId,
                                                                   @RequestPart("episodeInfo") EpisodeRequestDTO episodeRequestDTO,
                                                                   @RequestPart(name="video", required = false) MultipartFile video) throws IOException {
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.episodeService.createEpisode(seriesMovieId, episodeRequestDTO, video));
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.episodeService.createEpisode(videoVersionId, episodeRequestDTO, video));
     }
 
-    @GetMapping("/video-versions/{seriesMovieId}/episodes")
-    public ResponseEntity<ResultPaginationDTO> getEpisodeOfSeriesMovie(@PathVariable("seriesMovieId") long seriesMovieId,
+    @GetMapping("/video-versions/{videoVersionId}/episodes")
+    public ResponseEntity<ResultPaginationDTO> getEpisodeOfSeriesMovie(@PathVariable("videoVersionId") long videoVersionId,
                                                                        @RequestParam(name = "page", defaultValue = "1") int page,
                                                                        @RequestParam(name = "size", defaultValue = "5") int size) {
-        return ResponseEntity.status(HttpStatus.OK).body(this.episodeService.getEpisodeList(seriesMovieId, page,size));
+        return ResponseEntity.status(HttpStatus.OK).body(this.episodeService.getEpisodeList(videoVersionId, page,size));
     }
 
     @GetMapping("/episodes/{episodeId}")

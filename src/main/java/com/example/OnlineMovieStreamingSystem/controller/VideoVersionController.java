@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/movies")
@@ -28,5 +30,12 @@ public class VideoVersionController {
         videoVersionService.deleteVideoVersion(videoVersionId);
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
+
+    @GetMapping("/{movieId}/video-versions")
+    public ResponseEntity<List<VideoVersionResponseDTO>> getVideoVersions(@PathVariable("movieId") long movieId) {
+        return ResponseEntity.status(HttpStatus.OK).body(this.videoVersionService.getAllVideoVersionsOfMovie(movieId));
+    }
+
+
 
 }

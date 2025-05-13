@@ -17,4 +17,6 @@ public interface VideoVersionService {
     VideoVersionResponseDTO createVideoVersion(long videoVersionId, VideoVersionRequestDTO videoVersionRequestDTO);
     VideoVersionResponseDTO updateVideoVersion(long videoVersionId, VideoVersionRequestDTO videoVersionRequestDTO);
     void deleteVideoVersion(long videoVersionId);
+    List<VideoVersionResponseDTO> getAllVideoVersionsOfMovie(long movieId);
+
 }

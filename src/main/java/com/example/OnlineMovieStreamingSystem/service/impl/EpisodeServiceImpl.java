@@ -159,6 +159,7 @@ public class EpisodeServiceImpl implements EpisodeService {
                 .id(episode.getId())
                 .title(episode.getTitle())
                 .episodeNumber(episode.getEpisodeNumber())
+                .duration(episode.getDuration())
                 .build();
 
         return episodeSummaryResponseDTO;
