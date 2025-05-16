@@ -18,11 +18,12 @@ import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/actors")
-@PreAuthorize("hasRole('ADMIN')")
+
 public class ActorController {
     private final ActorService actorService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiMessage("Created the actor")
     public ResponseEntity<ActorDetailResponseDTO> createActor(@Valid @RequestPart("actorInfo") ActorRequestDTO actorRequestDTO,
                                                               @RequestParam("avatar") MultipartFile avatar) throws IOException {
@@ -31,6 +32,7 @@ public class ActorController {
     }
 
     @PatchMapping("{actorId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiMessage("Updated the actor")
     public ResponseEntity<ActorDetailResponseDTO> updateActor(@PathVariable("actorId") long actorId,
                                                               @Valid @RequestPart("actorInfo") ActorRequestDTO actorRequestDTO,
@@ -39,6 +41,7 @@ public class ActorController {
     }
 
     @DeleteMapping("{actorId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiMessage("Deleted the actor")
     public ResponseEntity<Void> deleteActor(@PathVariable("actorId") long actorId) throws IOException {
         this.actorService.deleteActor(actorId);

@@ -60,7 +60,12 @@ public class SecurityConfiguration {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(
                         authz -> authz
-                                .requestMatchers("/", "/api/v1/auth/**", "/identity/auth/outbound/authentication").permitAll()
+                                .requestMatchers("/", "/api/v1/auth/**", "/identity/auth/outbound/authentication", "/api/v1/user/movies", "/api/v1/countries",
+                                        "/api/v1/genres/all", "/api/v1/movies/*/video-versions", "api/v1/video-versions/*/episodes").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/series-movie/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/standalone-movies/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/episodes/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/actors/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

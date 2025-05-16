@@ -2,6 +2,7 @@ package com.example.OnlineMovieStreamingSystem.service;
 
 import com.example.OnlineMovieStreamingSystem.domain.VideoVersion;
 import com.example.OnlineMovieStreamingSystem.dto.request.videoVersion.VideoVersionRequestDTO;
+import com.example.OnlineMovieStreamingSystem.dto.response.videoVersion.VideoVersionDetailResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.videoVersion.VideoVersionResponseDTO;
 import com.example.OnlineMovieStreamingSystem.util.constant.VideoType;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,5 +19,6 @@ public interface VideoVersionService {
     VideoVersionResponseDTO updateVideoVersion(long videoVersionId, VideoVersionRequestDTO videoVersionRequestDTO);
     void deleteVideoVersion(long videoVersionId);
     List<VideoVersionResponseDTO> getAllVideoVersionsOfMovie(long movieId);
+    VideoVersionDetailResponseDTO convertToVideoVersionDetailResponseDTO(VideoVersion videoVersion);
 
 }

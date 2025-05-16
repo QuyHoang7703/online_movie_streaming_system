@@ -1,22 +1,17 @@
 package com.example.OnlineMovieStreamingSystem.dto.response.videoVersion;
 
 import com.example.OnlineMovieStreamingSystem.util.constant.VideoType;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class VideoVersionResponseDTO {
+public class VideoVersionDetailResponseDTO {
     private long id;
-    private long movieId;
     private VideoType videoType;
-    private String movieTitle;
-    private String backdropUrl;
-    private Long episodeIdOfStandaloneMovie;
+    private int episodeCount;
 }

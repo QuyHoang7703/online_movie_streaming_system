@@ -18,12 +18,12 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1/genres")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
 @Slf4j
 public class GenreController {
     private final GenreService genreService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiMessage("Created new genre")
     public ResponseEntity<GenreResponseDTO> createGenre(@RequestBody GenreRequestDTO genreRequestDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(this.genreService.createGenre(genreRequestDTO));
@@ -37,6 +37,7 @@ public class GenreController {
     }
 
     @DeleteMapping("{genreId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiMessage("Deleted the genre")
     public ResponseEntity<Void> deleteGenre(@PathVariable("genreId") Long genreId) {
         this.genreService.deleteGenre(genreId);
@@ -44,6 +45,7 @@ public class GenreController {
     }
 
     @PatchMapping("{genreId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiMessage("Updated the genre")
     public ResponseEntity<GenreResponseDTO> updateGenre(@PathVariable("genreId") long genreId,
                                                         @RequestBody GenreRequestDTO genreRequestDTO) {

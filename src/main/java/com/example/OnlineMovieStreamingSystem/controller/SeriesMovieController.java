@@ -7,6 +7,7 @@ import com.example.OnlineMovieStreamingSystem.util.annotation.ApiMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,6 +20,7 @@ public class SeriesMovieController {
     private final SeriesMovieService seriesMovieService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiMessage("Thêm phim thành công")
     public ResponseEntity<SeriesMovieResponseDTO> createStandaloneMovie(@RequestPart(name="movieInfo") SeriesMovieRequestDTO seriesMovieRequestDTO,
                                                                             @RequestParam("poster") MultipartFile poster,
@@ -27,6 +29,7 @@ public class SeriesMovieController {
     }
 
     @PatchMapping("{movieId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiMessage("Cập nhập phim thành công")
     public ResponseEntity<SeriesMovieResponseDTO> updateStandaloneMovie(@PathVariable long movieId,
                                                                         @RequestPart(name="movieInfo") SeriesMovieRequestDTO seriesMovieRequestDTO,
@@ -37,7 +40,7 @@ public class SeriesMovieController {
     }
 
     @GetMapping("{movieId}")
-    public ResponseEntity<SeriesMovieResponseDTO> getStandaloneMovie(@PathVariable long movieId) {
+    public ResponseEntity<SeriesMovieResponseDTO> getSeriesMovie(@PathVariable long movieId) {
 
         return ResponseEntity.status(HttpStatus.OK).body(this.seriesMovieService.getSeriesMovie(movieId));
     }

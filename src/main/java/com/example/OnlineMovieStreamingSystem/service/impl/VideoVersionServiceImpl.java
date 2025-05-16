@@ -1,8 +1,10 @@
 package com.example.OnlineMovieStreamingSystem.service.impl;
 
+import com.example.OnlineMovieStreamingSystem.domain.Episode;
 import com.example.OnlineMovieStreamingSystem.domain.Movie;
 import com.example.OnlineMovieStreamingSystem.domain.VideoVersion;
 import com.example.OnlineMovieStreamingSystem.dto.request.videoVersion.VideoVersionRequestDTO;
+import com.example.OnlineMovieStreamingSystem.dto.response.videoVersion.VideoVersionDetailResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.videoVersion.VideoVersionResponseDTO;
 import com.example.OnlineMovieStreamingSystem.repository.MovieRepository;
 import com.example.OnlineMovieStreamingSystem.repository.VideoVersionRepository;
@@ -60,6 +62,10 @@ public class VideoVersionServiceImpl implements VideoVersionService {
             Movie movie = videoVersion.getMovie();
             videoVersionResponseDTO.setMovieTitle(movie.getTitle());
             videoVersionResponseDTO.setBackdropUrl(movie.getBackdropUrl());
+            if(videoVersion.getEpisodes() != null && !videoVersion.getEpisodes().isEmpty()) {
+                Episode episodeOfStandaloneMovie = videoVersion.getEpisodes().get(0);
+                videoVersionResponseDTO.setEpisodeIdOfStandaloneMovie(episodeOfStandaloneMovie.getId());
+            }
         }
 
         return videoVersionResponseDTO;
@@ -112,5 +118,17 @@ public class VideoVersionServiceImpl implements VideoVersionService {
                 .toList();
 
         return videoVersionResponseDTOS;
+    }
+
+    @Override
+    public VideoVersionDetailResponseDTO convertToVideoVersionDetailResponseDTO(VideoVersion videoVersion) {
+        VideoVersionDetailResponseDTO videoVersionDetailResponseDTO = new VideoVersionDetailResponseDTO();
+        videoVersionDetailResponseDTO.setId(videoVersion.getId());
+        videoVersionDetailResponseDTO.setVideoType(videoVersion.getVideoType());
+        if(videoVersion.getEpisodes() != null && !videoVersion.getEpisodes().isEmpty()) {
+            videoVersionDetailResponseDTO.setEpisodeCount(videoVersion.getEpisodes().size());
+        }
+
+        return videoVersionDetailResponseDTO;
     }
 }
