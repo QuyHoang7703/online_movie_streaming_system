@@ -1,6 +1,7 @@
 package com.example.OnlineMovieStreamingSystem.service.impl;
 
 import com.example.OnlineMovieStreamingSystem.domain.*;
+import com.example.OnlineMovieStreamingSystem.domain.user.User;
 import com.example.OnlineMovieStreamingSystem.dto.Meta;
 import com.example.OnlineMovieStreamingSystem.dto.ResultPaginationDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.movie.MovieActorRequestDTO;
@@ -15,6 +16,7 @@ import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionPlan.Subs
 import com.example.OnlineMovieStreamingSystem.dto.response.videoVersion.VideoVersionDetailResponseDTO;
 import com.example.OnlineMovieStreamingSystem.repository.*;
 import com.example.OnlineMovieStreamingSystem.service.*;
+import com.example.OnlineMovieStreamingSystem.util.SecurityUtil;
 import com.example.OnlineMovieStreamingSystem.util.constant.MovieType;
 import com.example.OnlineMovieStreamingSystem.util.constant.VideoType;
 import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
@@ -48,6 +50,7 @@ public class MovieServiceImpl implements MovieService {
     private final CountryRepository countryRepository;
     private final CountryService countryService;
     private final VideoVersionService videoVersionService;
+    private final UserRepository userRepository;
 
     @Override
     public Movie createMovieFromDTO(MovieRequestDTO movieRequestDTO, MultipartFile poster, MultipartFile backdrop) throws IOException {
@@ -183,6 +186,7 @@ public class MovieServiceImpl implements MovieService {
         Function<Movie, MovieUserResponseDTO> userMapper = (movie) -> this.convertToMovieUserResponseDTO(movie);
         return getMovies(title, genreNames, movieType, countries, page, size, userMapper);
     }
+
 
     @Override
     public ResultPaginationDTO getMoviesForAdmin(String title,

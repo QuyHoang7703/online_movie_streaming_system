@@ -1,5 +1,6 @@
 package com.example.OnlineMovieStreamingSystem.domain;
 
+import com.example.OnlineMovieStreamingSystem.domain.user.User;
 import com.example.OnlineMovieStreamingSystem.util.constant.MovieType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -66,6 +67,9 @@ public class Movie {
 
     @OneToMany(mappedBy = "movie")
     private List<VideoVersion> videoVersions;
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FavoriteMovie> favoriteMovies;
 
     @PrePersist
     protected void prePersist() {

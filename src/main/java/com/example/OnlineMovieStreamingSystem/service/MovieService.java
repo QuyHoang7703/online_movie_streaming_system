@@ -31,4 +31,6 @@ public interface MovieService {
                                          List<String> countries,
                                          int page,
                                          int size) throws BadRequestException;
+
+
 }
