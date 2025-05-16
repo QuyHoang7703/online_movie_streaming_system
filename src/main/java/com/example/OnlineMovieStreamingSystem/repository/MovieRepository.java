@@ -31,9 +31,5 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     );
 
 
-//    @Query("SELECT DISTINCT m.country FROM Movie m " +
-//            "WHERE m.country IS NOT NULL")
-//    List<String> getAllCountriesOfMovies();
 
-    Optional<Movie> findByIdAndMovieType(long id, MovieType movieType);
 }

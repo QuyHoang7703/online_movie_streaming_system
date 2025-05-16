@@ -1,7 +1,11 @@
 package com.example.OnlineMovieStreamingSystem.domain.user;
 
+import com.example.OnlineMovieStreamingSystem.domain.FavoriteMovie;
+import com.example.OnlineMovieStreamingSystem.domain.Movie;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 
 @Entity
@@ -26,4 +30,6 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserDetail userDetail;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FavoriteMovie> favoriteMovies;
 }
