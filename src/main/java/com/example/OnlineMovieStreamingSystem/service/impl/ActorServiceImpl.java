@@ -1,14 +1,18 @@
 package com.example.OnlineMovieStreamingSystem.service.impl;
 
 import com.example.OnlineMovieStreamingSystem.domain.Actor;
+import com.example.OnlineMovieStreamingSystem.domain.Movie;
+import com.example.OnlineMovieStreamingSystem.domain.MovieActor;
 import com.example.OnlineMovieStreamingSystem.dto.Meta;
 import com.example.OnlineMovieStreamingSystem.dto.ResultPaginationDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.actor.ActorRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.actor.ActorDetailResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.actor.ActorResponseDTO;
+import com.example.OnlineMovieStreamingSystem.dto.response.movie.MovieUserResponseDTO;
 import com.example.OnlineMovieStreamingSystem.repository.ActorRepository;
 import com.example.OnlineMovieStreamingSystem.service.ActorService;
 import com.example.OnlineMovieStreamingSystem.service.ImageStorageService;
+import com.example.OnlineMovieStreamingSystem.service.MovieService;
 import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +32,7 @@ import java.util.Objects;
 public class ActorServiceImpl implements ActorService {
     private final ActorRepository actorRepository;
     private final ImageStorageService imageStorageService;
+    private final MovieService movieService;
     private final String CONTAINER_NAME = "actor-image-container";
 
     @Override
@@ -142,6 +147,12 @@ public class ActorServiceImpl implements ActorService {
         actorDetailResponseDTO.setOtherName(actor.getOtherName());
         actorDetailResponseDTO.setPlaceOfBirth(actor.getPlaceOfBirth());
         actorDetailResponseDTO.setGender(actor.getGender());
+        
+        List<Movie> movies = actor.getMovieActors().stream().map(MovieActor::getMovie).toList();
+        List<MovieUserResponseDTO> movieUserResponseDTOS = movies.stream()
+                .map(this.movieService::convertToMovieUserResponseDTO)
+                .toList();
+        actorDetailResponseDTO.setMovies(movieUserResponseDTOS);
 
         return actorDetailResponseDTO;
     }

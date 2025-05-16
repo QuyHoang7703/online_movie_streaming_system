@@ -1,22 +1,22 @@
-package com.example.OnlineMovieStreamingSystem.controller;
+package com.example.OnlineMovieStreamingSystem.controller.user;
 
 import com.example.OnlineMovieStreamingSystem.dto.ResultPaginationDTO;
 import com.example.OnlineMovieStreamingSystem.service.MovieService;
-import com.example.OnlineMovieStreamingSystem.util.annotation.ApiMessage;
-import com.example.OnlineMovieStreamingSystem.util.constant.MovieType;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1/movies")
+@RequestMapping("api/v1/user/movies")
 @RequiredArgsConstructor
-public class MovieController {
+public class MovieUserController {
     private final MovieService movieService;
 
     @GetMapping
@@ -27,23 +27,8 @@ public class MovieController {
                                                          @RequestParam(name="page", defaultValue = "1") int page,
                                                          @RequestParam(name="size", defaultValue = "10") int size) throws BadRequestException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(this.movieService.getMoviesForAdmin(title, genreNames, movieType, countries, page, size));
+        return ResponseEntity.status(HttpStatus.OK).body(this.movieService.getMoviesForUser(title, genreNames, movieType, countries, page, size));
     }
-
-
-    @GetMapping("/countries")
-    public ResponseEntity<List<String>> getCountriesOfMovies() {
-        return ResponseEntity.status(HttpStatus.OK).body(this.movieService.getAllCountriesOfMovie());
-    }
-
-    @DeleteMapping("{movieId}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @ApiMessage("Đã xóa phim thành công")
-    public ResponseEntity<Void> deleteMovie(@PathVariable("movieId") int movieId) {
-        this.movieService.deleteMovie(movieId);
-        return ResponseEntity.status(HttpStatus.OK).body(null);
-    }
-
 
 
 }

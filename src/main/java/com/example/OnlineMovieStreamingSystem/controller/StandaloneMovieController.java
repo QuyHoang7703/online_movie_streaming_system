@@ -9,6 +9,7 @@ import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationExceptio
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +22,7 @@ public class StandaloneMovieController {
     private final StandaloneMovieService standaloneMovieService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiMessage("Thêm phim thành công")
     public ResponseEntity<StandaloneMovieResponseDTO> createStandaloneMovie(@RequestPart(name="movieInfo") StandaloneMovieRequestDTO standaloneMovieRequestDTO,
                                                                             @RequestParam("poster")MultipartFile poster,
@@ -28,21 +30,12 @@ public class StandaloneMovieController {
                                                                             @RequestPart(name="voiceOverVideo", required = false) MultipartFile voiceOverVideo,
                                                                             @RequestPart(name="dubbedVideo", required = false) MultipartFile dubbedVideo,
                                                                             @RequestPart(name="vietSubVideo", required = false) MultipartFile vietSubVideo) throws IOException {
-//        VideoUrlRequestDTO videoUrlRequestDTO = standaloneMovieRequestDTO.getVideoUrlRequest();
-//        String vietSubVideoUrl = videoUrlRequestDTO.getVietSubVideoUrl();
-//        String dubbedVideoUrl = videoUrlRequestDTO.getDubbedVideoUrl();
-//        String voiceOverVideoUrl = videoUrlRequestDTO.getVoiceOverVideoUrl();
-//
-//        boolean isAtLeastOneVideoProvided = vietSubVideoUrl != null || dubbedVideoUrl != null || voiceOverVideoUrl != null ||
-//                vietSubVideo != null || dubbedVideo != null || voiceOverVideo != null;
-//        if (!isAtLeastOneVideoProvided) {
-//            throw new ApplicationException("Phải cung cấp ít nhất 1 loại video");
-//        }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(this.standaloneMovieService.createStandaloneMovie(standaloneMovieRequestDTO, poster, backdrop));
     }
 
     @PatchMapping("{movieId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiMessage("Cập nhập phim thành công")
     public ResponseEntity<StandaloneMovieResponseDTO> updateStandaloneMovie(@PathVariable long movieId,
                                                                             @RequestPart(name="movieInfo") StandaloneMovieRequestDTO standaloneMovieRequestDTO,

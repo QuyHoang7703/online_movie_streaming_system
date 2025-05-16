@@ -10,10 +10,13 @@ import com.example.OnlineMovieStreamingSystem.dto.response.genre.GenreSummaryDTO
 import com.example.OnlineMovieStreamingSystem.dto.response.movie.MovieActorResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.movie.MovieResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.movie.MovieSummaryResponseDTO;
+import com.example.OnlineMovieStreamingSystem.dto.response.movie.MovieUserResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionPlan.SubscriptionPlanSummaryDTO;
+import com.example.OnlineMovieStreamingSystem.dto.response.videoVersion.VideoVersionDetailResponseDTO;
 import com.example.OnlineMovieStreamingSystem.repository.*;
 import com.example.OnlineMovieStreamingSystem.service.*;
 import com.example.OnlineMovieStreamingSystem.util.constant.MovieType;
+import com.example.OnlineMovieStreamingSystem.util.constant.VideoType;
 import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,6 +47,7 @@ public class MovieServiceImpl implements MovieService {
     private final SubscriptionPlanService subscriptionPlanService;
     private final CountryRepository countryRepository;
     private final CountryService countryService;
+    private final VideoVersionService videoVersionService;
 
     @Override
     public Movie createMovieFromDTO(MovieRequestDTO movieRequestDTO, MultipartFile poster, MultipartFile backdrop) throws IOException {
@@ -129,6 +134,7 @@ public class MovieServiceImpl implements MovieService {
             dto.setVoteAverage(movie.getVoteAverage());
             dto.setVoteCount(movie.getVoteCount());
             dto.setQuality(movie.getQuality());
+            dto.setDuration(movie.getVideoVersions().get(0).getEpisodes().get(0).getDuration());
             dto.setCreateAt(movie.getCreateAt());
             dto.setUpdateAt(movie.getUpdateAt());
 
@@ -168,46 +174,27 @@ public class MovieServiceImpl implements MovieService {
         }
     }
 
-    @Override
-    public ResultPaginationDTO getMovies(String title,
-                                         List<String> genreNames,
-                                         String movieType,
-                                         List<String> countries,
-                                         int page,
-                                         int size) throws BadRequestException {
-        MovieType type = null;
-        if (movieType != null && !movieType.isEmpty()) {
-            try {
-                type = MovieType.valueOf(movieType.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                // Bắt lỗi nếu truyền sai enum → trả lỗi cho FE hoặc set null tùy logic
-                throw new BadRequestException("Movie type không hợp lệ: " + movieType);
-            }
-        }
-
-        if(movieType != null && !movieType.isEmpty()) {
-            type = MovieType.valueOf(movieType.toUpperCase());
-        }
-        Pageable pageable = PageRequest.of(page - 1, size);
-        Page<Movie> moviePage = this.movieRepository.findMoviesByFilter(title, genreNames, type, countries, pageable);
-
-        Meta meta = new Meta();
-        meta.setCurrentPage(pageable.getPageNumber() + 1);
-        meta.setPageSize(pageable.getPageSize());
-        meta.setTotalPages(moviePage.getTotalPages());
-        meta.setTotalElements(moviePage.getTotalElements());
-
-        ResultPaginationDTO resultPaginationDTO = new ResultPaginationDTO();
-        resultPaginationDTO.setMeta(meta);
-
-        List<MovieSummaryResponseDTO> movieSummaryResponseDTOS = moviePage.getContent().stream()
-                .map(this::convertToMovieSummaryResponseDTO)
-                .toList();
-
-        resultPaginationDTO.setResult(movieSummaryResponseDTOS);
-
-        return resultPaginationDTO;
+    public ResultPaginationDTO getMoviesForUser(String title,
+                                               List<String> genreNames,
+                                               String movieType,
+                                               List<String> countries,
+                                               int page,
+                                               int size) throws BadRequestException {
+        Function<Movie, MovieUserResponseDTO> userMapper = (movie) -> this.convertToMovieUserResponseDTO(movie);
+        return getMovies(title, genreNames, movieType, countries, page, size, userMapper);
     }
+
+    @Override
+    public ResultPaginationDTO getMoviesForAdmin(String title,
+                                               List<String> genreNames,
+                                               String movieType,
+                                               List<String> countries,
+                                               int page,
+                                               int size) throws BadRequestException {
+        Function<Movie, MovieSummaryResponseDTO> adminMapper = (movie) -> this.convertToMovieSummaryResponseDTO(movie);
+        return getMovies(title, genreNames, movieType, countries, page, size, adminMapper);
+    }
+
 
     @Override
     public List<String> getAllCountriesOfMovie() {
@@ -342,8 +329,53 @@ public class MovieServiceImpl implements MovieService {
     @Override
     public void deleteMovie(long movieId) {
         Movie movie = this.movieRepository.findById(movieId)
-                .orElseThrow(() -> new ApplicationException("Không tìm thấy phim"));
+                .orElseThrow(() -> new ApplicationException("Không tồn tại phim với id " + movieId));
         this.movieRepository.delete(movie);
+    }
+
+    @Override
+    public MovieUserResponseDTO convertToMovieUserResponseDTO(Movie movie) {
+
+        MovieUserResponseDTO movieUserResponseDTO = MovieUserResponseDTO.builder()
+                .movieId(movie.getId())
+                .movieType(movie.getMovieType())
+                .title(movie.getTitle())
+                .originalTitle(movie.getOriginalTitle())
+                .posterUrl(movie.getPosterUrl())
+                .backdropUrl(movie.getBackdropUrl())
+                .voteAverage(movie.getVoteAverage())
+                .year(movie.getReleaseDate().getYear())
+                .build();
+
+        if(movie.getGenres() != null && !movie.getGenres().isEmpty()) {
+            List<GenreSummaryDTO> genreSummaryDTOS = movie.getGenres().stream()
+                    .map(this.genreService::convertToGenreSummaryDTO)
+                    .toList();
+            movieUserResponseDTO.setGenres(genreSummaryDTOS);
+        }
+
+        if(movie.getVideoVersions() != null && !movie.getVideoVersions().isEmpty()) {
+            List<VideoVersion> videoVersions = movie.getVideoVersions();
+            List<VideoVersionDetailResponseDTO> videoVersionDetailResponseDTOS = videoVersions.stream()
+                    .map(this.videoVersionService::convertToVideoVersionDetailResponseDTO)
+                    .toList();
+            movieUserResponseDTO.setVideoVersions(videoVersionDetailResponseDTOS);
+        }
+
+        // Set attribute for standaloneMovie
+        if(movie.getMovieType() == MovieType.STANDALONE) {
+            if(movie.getVideoVersions() != null && !movie.getVideoVersions().isEmpty()) {
+                movieUserResponseDTO.setDuration(movie.getVideoVersions().get(0).getEpisodes().get(0).getDuration());
+            }
+        }
+
+        // Set attribute for seriesMovie
+        if(movie.getMovieType() == MovieType.SERIES) {
+            movieUserResponseDTO.setSeason(movie.getSeriesMovie().getSeason());
+            movieUserResponseDTO.setTotalEpisodes(movie.getSeriesMovie().getTotalEpisodes());
+        }
+
+        return movieUserResponseDTO;
     }
 
     private MovieActorResponseDTO convertToMovieActorDTO(MovieActor movieActor) {
@@ -385,6 +417,48 @@ public class MovieServiceImpl implements MovieService {
 
         return movieSummaryResponseDTO;
     }
+
+    private ResultPaginationDTO getMovies(String title,
+                                          List<String> genreNames,
+                                          String movieType,
+                                          List<String> countries,
+                                          int page,
+                                          int size, Function<Movie, ?> movieMapper) throws BadRequestException {
+        MovieType type = null;
+        if (movieType != null && !movieType.isEmpty()) {
+            try {
+                type = MovieType.valueOf(movieType.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                // Bắt lỗi nếu truyền sai enum → trả lỗi cho FE hoặc set null tùy logic
+                throw new BadRequestException("Movie type không hợp lệ: " + movieType);
+            }
+        }
+
+        if(movieType != null && !movieType.isEmpty()) {
+            type = MovieType.valueOf(movieType.toUpperCase());
+        }
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<Movie> moviePage = this.movieRepository.findMoviesByFilter(title, genreNames, type, countries, pageable);
+
+        Meta meta = new Meta();
+        meta.setCurrentPage(pageable.getPageNumber() + 1);
+        meta.setPageSize(pageable.getPageSize());
+        meta.setTotalPages(moviePage.getTotalPages());
+        meta.setTotalElements(moviePage.getTotalElements());
+
+        ResultPaginationDTO resultPaginationDTO = new ResultPaginationDTO();
+        resultPaginationDTO.setMeta(meta);
+
+
+        List<?> mappedResults  = moviePage.getContent().stream()
+                .map(movieMapper)
+                .toList();
+
+        resultPaginationDTO.setResult(mappedResults);
+
+        return resultPaginationDTO;
+    }
+
 
 
 
