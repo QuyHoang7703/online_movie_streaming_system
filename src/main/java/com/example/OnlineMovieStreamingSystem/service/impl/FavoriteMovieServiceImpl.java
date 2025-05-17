@@ -32,11 +32,7 @@ public class FavoriteMovieServiceImpl implements FavoriteMovieService {
     private final MovieService movieService;
     @Override
     public void addFavoriteMovie(long movieId) {
-        String email = SecurityUtil.getCurrentLogin().orElse("anonymousUser");
-
-        if ("anonymousUser".equals(email)) {
-            throw new ApplicationException("Bạn phải đăng nhập để sử dụng tính năng này");
-        }
+        String email = SecurityUtil.getLoggedEmail();
 
         User user = this.userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApplicationException("Không tìm thấy user vơi email là " + email));
@@ -60,11 +56,7 @@ public class FavoriteMovieServiceImpl implements FavoriteMovieService {
     @Transactional
     @Override
     public void removeFavoriteMovie(long movieId) {
-        String email = SecurityUtil.getCurrentLogin().orElse("anonymousUser");
-
-        if ("anonymousUser".equals(email)) {
-            throw new ApplicationException("Bạn phải đăng nhập để sử dụng tính năng này");
-        }
+        String email = SecurityUtil.getLoggedEmail();
 
         User user = this.userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApplicationException("Không tìm thấy user với email là " + email));
@@ -80,11 +72,7 @@ public class FavoriteMovieServiceImpl implements FavoriteMovieService {
 
     @Override
     public ResultPaginationDTO getFavoriteMovies(int page, int size) {
-        String email = SecurityUtil.getCurrentLogin().orElse("anonymousUser");
-
-        if ("anonymousUser".equals(email)) {
-            throw new ApplicationException("Bạn phải đăng nhập để sử dụng tính năng này");
-        }
+        String email = SecurityUtil.getLoggedEmail();
 
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<FavoriteMovie> favoriteMoviePage = this.favoriteMovieRepository.getFavoriteMovieByEmail(email, pageable);

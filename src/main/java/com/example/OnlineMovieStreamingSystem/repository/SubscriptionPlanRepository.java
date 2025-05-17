@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public interface SubscriptionPlanRepository extends JpaRepository<SubscriptionPl
     @Query("SELECT sp FROM SubscriptionPlan sp " +
             "WHERE :subscriptionId IS NULL OR " +
             "sp.id != :subscriptionId")
-    List<SubscriptionPlan> getParentOptions(Long subscriptionId);
+    List<SubscriptionPlan> getParentOptions(@Param("subscriptionId") Long subscriptionId);
 
     @Query("SELECT sp FROM SubscriptionPlan sp " +
             "WHERE sp.parentPlans IS EMPTY ")

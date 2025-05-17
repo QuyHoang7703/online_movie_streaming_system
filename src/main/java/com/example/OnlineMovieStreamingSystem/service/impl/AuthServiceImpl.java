@@ -73,7 +73,7 @@ public class AuthServiceImpl implements AuthService {
         // Set authentication into Security Context Holder
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        log.info("Authentication: " + authentication);
+        log.info("Authentication Principal: " + authentication.getPrincipal());
         log.info("Email: " + authentication.getName());
         AuthResponseDTO authResponseDTO = this.userService.convertToLoginResponseDTO(email);
 

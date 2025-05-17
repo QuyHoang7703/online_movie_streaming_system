@@ -1,6 +1,7 @@
 package com.example.OnlineMovieStreamingSystem.util;
 
 import com.example.OnlineMovieStreamingSystem.dto.UserInfoDTO;
+import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
 import com.nimbusds.jose.util.Base64;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -101,6 +102,16 @@ public class SecurityUtil {
 //                .domain("localhost")
                 .sameSite("None")
                 .build();
+    }
+
+    public static String getLoggedEmail() {
+        String email = SecurityUtil.getCurrentLogin().orElse("anonymousUser");
+
+        if ("anonymousUser".equals(email)) {
+            throw new ApplicationException("Bạn phải đăng nhập để sử dụng tính năng này");
+        }
+
+        return email;
     }
 
     /**

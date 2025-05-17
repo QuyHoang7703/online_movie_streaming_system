@@ -34,5 +34,7 @@ public class MovieUserResponseDTO {
     private int season;
     private int totalEpisodes;
 
+    private boolean favorite;
+
 
 }

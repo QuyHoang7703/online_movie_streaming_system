@@ -17,12 +17,12 @@ public class MovieUserController {
     private final MovieService movieService;
 
     @GetMapping
-    public ResponseEntity<ResultPaginationDTO> getMovies(@RequestParam(name="title", required = false) String title,
-                                                         @RequestParam(name="genreNames", required = false) List<String> genreNames,
-                                                         @RequestParam(name="movieType", required = false) String movieType,
-                                                         @RequestParam(name="countries", required = false) List<String> countries,
-                                                         @RequestParam(name="page", defaultValue = "1") int page,
-                                                         @RequestParam(name="size", defaultValue = "10") int size) throws BadRequestException {
+    public ResponseEntity<ResultPaginationDTO> getMoviesForUser (@RequestParam(name="title", required = false) String title,
+                                                                 @RequestParam(name="genreNames", required = false) List<String> genreNames,
+                                                                 @RequestParam(name="movieType", required = false) String movieType,
+                                                                 @RequestParam(name="countries", required = false) List<String> countries,
+                                                                 @RequestParam(name="page", defaultValue = "1") int page,
+                                                                 @RequestParam(name="size", defaultValue = "10") int size) throws BadRequestException {
 
         return ResponseEntity.status(HttpStatus.OK).body(this.movieService.getMoviesForUser(title, genreNames, movieType, countries, page, size));
     }

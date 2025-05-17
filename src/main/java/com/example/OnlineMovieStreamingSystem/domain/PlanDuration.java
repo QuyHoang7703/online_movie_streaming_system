@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -22,4 +24,7 @@ public class PlanDuration {
     @ManyToOne
     @JoinColumn(name="subscription_plan_id")
     private SubscriptionPlan subscriptionPlan;
+
+    @OneToMany(mappedBy = "planDuration")
+    private List<SubscriptionOrder> subscriptionOrder;
 }
