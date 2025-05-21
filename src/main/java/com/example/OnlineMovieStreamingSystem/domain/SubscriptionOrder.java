@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.time.LocalDate;
 
 @Entity
@@ -24,7 +25,9 @@ public class SubscriptionOrder {
     private LocalDate endDate;
     private double price;
     private String transactionCode;
+    @Enumerated(EnumType.STRING)
     private SubscriptionOrderStatus status;
+    private Instant createAt;
 
     @ManyToOne
     @JoinColumn(name="user_id")
@@ -33,6 +36,12 @@ public class SubscriptionOrder {
     @ManyToOne
     @JoinColumn(name="plan_duration_id")
     private PlanDuration planDuration;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createAt = Instant.now();
+    }
+
 
 
 }

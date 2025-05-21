@@ -1,7 +1,9 @@
 package com.example.OnlineMovieStreamingSystem.controller.user;
 
 import com.example.OnlineMovieStreamingSystem.dto.ResultPaginationDTO;
+import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionPlan.SubscriptionPlanResponseDTO;
 import com.example.OnlineMovieStreamingSystem.service.MovieService;
+import com.example.OnlineMovieStreamingSystem.service.MovieUserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MovieUserController {
     private final MovieService movieService;
+    private final MovieUserService movieUserService;
 
     @GetMapping
     public ResponseEntity<ResultPaginationDTO> getMoviesForUser (@RequestParam(name="title", required = false) String title,
@@ -25,6 +28,18 @@ public class MovieUserController {
                                                                  @RequestParam(name="size", defaultValue = "10") int size) throws BadRequestException {
 
         return ResponseEntity.status(HttpStatus.OK).body(this.movieService.getMoviesForUser(title, genreNames, movieType, countries, page, size));
+    }
+
+    @GetMapping("/{movieId}/can-watch")
+    public ResponseEntity<Boolean> canUserWatchMovie(@PathVariable("movieId") long movieId) {
+
+        return ResponseEntity.status(HttpStatus.OK).body(this.movieUserService.canUserWatchMovie(movieId));
+    }
+
+    @GetMapping("{movieId}/subscription-plans")
+    public ResponseEntity<List<SubscriptionPlanResponseDTO>> getSubscriptionPlansForMovie(@PathVariable("movieId") long movieId) {
+
+        return ResponseEntity.status(HttpStatus.OK).body(this.movieUserService.getSubscriptionPlansForMovie(movieId));
     }
 
 

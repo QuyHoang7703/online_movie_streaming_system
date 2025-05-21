@@ -49,6 +49,21 @@ public class SecurityConfiguration {
         return new BCryptPasswordEncoder();
     }
 
+    private final static String[] WHITE_LIST = {
+            "/",
+            "/api/v1/auth/**",
+            "/identity/auth/outbound/authentication",
+            "/api/v1/user/movies/**",
+            "/api/v1/countries",
+            "/api/v1/genres/all",
+            "/api/v1/movies/*/video-versions",
+            "/api/v1/video-versions/*/episodes",
+            "/api/v1/subscription-orders",
+            "/api/v1/vn-pay-callback",
+            "api/v1/user/movies/**"
+
+    };
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    JwtDecoder jwtDecoder,
@@ -60,8 +75,7 @@ public class SecurityConfiguration {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(
                         authz -> authz
-                                .requestMatchers("/", "/api/v1/auth/**", "/identity/auth/outbound/authentication", "/api/v1/user/movies", "/api/v1/countries",
-                                        "/api/v1/genres/all", "/api/v1/movies/*/video-versions", "api/v1/video-versions/*/episodes").permitAll()
+                                .requestMatchers(WHITE_LIST).permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/series-movie/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/standalone-movies/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/episodes/**").permitAll()
