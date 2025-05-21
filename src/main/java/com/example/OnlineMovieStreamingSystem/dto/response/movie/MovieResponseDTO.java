@@ -24,7 +24,6 @@ public class MovieResponseDTO {
     private String director;
     private String posterUrl;
     private String backdropUrl;
-//    private String country;
     private LocalDate releaseDate;
     private boolean isFree;
     private String trailerUrl;
@@ -38,6 +37,9 @@ public class MovieResponseDTO {
     private List<GenreSummaryDTO> genres;
     private List<SubscriptionPlanSummaryDTO> subscriptionPlans;
     private List<CountryResponseDTO> countries;
+
+    private boolean favorite;
+
     private Instant createAt;
     private Instant updateAt;
 }

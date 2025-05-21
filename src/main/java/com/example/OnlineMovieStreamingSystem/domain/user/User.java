@@ -2,6 +2,7 @@ package com.example.OnlineMovieStreamingSystem.domain.user;
 
 import com.example.OnlineMovieStreamingSystem.domain.FavoriteMovie;
 import com.example.OnlineMovieStreamingSystem.domain.Movie;
+import com.example.OnlineMovieStreamingSystem.domain.SubscriptionOrder;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,4 +33,7 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FavoriteMovie> favoriteMovies;
+
+    @OneToMany(mappedBy = "user")
+    private List<SubscriptionOrder> subscriptionOrders;
 }

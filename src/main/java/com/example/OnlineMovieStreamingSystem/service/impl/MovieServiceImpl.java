@@ -51,6 +51,7 @@ public class MovieServiceImpl implements MovieService {
     private final CountryService countryService;
     private final VideoVersionService videoVersionService;
     private final UserRepository userRepository;
+    private final FavoriteMovieRepository favoriteMovieRepository;
 
     @Override
     public Movie createMovieFromDTO(MovieRequestDTO movieRequestDTO, MultipartFile poster, MultipartFile backdrop) throws IOException {
@@ -168,6 +169,15 @@ public class MovieServiceImpl implements MovieService {
                         .map(this.countryService::convertToCountryResponseDTO)
                         .toList();
                 dto.setCountries(countryResponseDTOS);
+            }
+
+            // Set favorite movie
+            String email = SecurityUtil.getCurrentLogin().orElse("anonymousUser");
+            if(!"anonymousUser".equals(email)) {
+                User user = this.userRepository.findByEmail(email)
+                        .orElseThrow(() -> new ApplicationException("Không tồn tại user với email là " + email));
+                boolean isFavoriteMovie = this.favoriteMovieRepository.existsByUserIdAndMovieId(user.getId(), movie.getId());
+                dto.setFavorite(isFavoriteMovie);
             }
 
             return dto;
@@ -377,6 +387,15 @@ public class MovieServiceImpl implements MovieService {
         if(movie.getMovieType() == MovieType.SERIES) {
             movieUserResponseDTO.setSeason(movie.getSeriesMovie().getSeason());
             movieUserResponseDTO.setTotalEpisodes(movie.getSeriesMovie().getTotalEpisodes());
+        }
+
+        // Set favorite movie
+        String email = SecurityUtil.getCurrentLogin().orElse("anonymousUser");
+        if(!"anonymousUser".equals(email)) {
+            User user = this.userRepository.findByEmail(email)
+                    .orElseThrow(() -> new ApplicationException("Không tồn tại user với email là " + email));
+            boolean isFavoriteMovie = this.favoriteMovieRepository.existsByUserIdAndMovieId(user.getId(), movie.getId());
+            movieUserResponseDTO.setFavorite(isFavoriteMovie);
         }
 
         return movieUserResponseDTO;

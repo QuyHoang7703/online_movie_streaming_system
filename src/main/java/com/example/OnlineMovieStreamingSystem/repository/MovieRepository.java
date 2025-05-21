@@ -18,7 +18,8 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     @Query("SELECT DISTINCT m FROM Movie m " +
             "LEFT JOIN m.genres g " +
             "LEFT JOIN m.countries c " +
-            "WHERE (:title IS NULL OR :title = '' OR LOWER(m.title) LIKE LOWER(CONCAT('%', :title, '%'))) " +
+            "WHERE (:title IS NULL OR :title = '' OR LOWER(m.title) LIKE LOWER(CONCAT('%', :title, '%')) " +
+            "OR LOWER(m.originalTitle) LIKE LOWER(CONCAT('%', :title, '%'))) " +
             "AND (:genreNames IS NULL OR LOWER(g.name) IN :genreNames) " +
             "AND (:movieType IS NULL OR m.movieType = :movieType) " +
             "AND (:countries IS NULL OR c.name IN :countries)")

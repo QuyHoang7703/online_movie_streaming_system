@@ -218,7 +218,8 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
         return subscriptionPlanSummaryDTO;
     }
 
-    private SubscriptionPlanResponseDTO convertToSubscriptionPlanResponseDTO(SubscriptionPlan subscriptionPlan) {
+    @Override
+    public SubscriptionPlanResponseDTO convertToSubscriptionPlanResponseDTO(SubscriptionPlan subscriptionPlan) {
         SubscriptionPlanResponseDTO subscriptionPlanResponseDTO = new SubscriptionPlanResponseDTO();
         subscriptionPlanResponseDTO.setId(subscriptionPlan.getId());
         subscriptionPlanResponseDTO.setName(subscriptionPlan.getName());
