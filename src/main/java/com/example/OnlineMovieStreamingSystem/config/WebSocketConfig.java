@@ -9,6 +9,7 @@ import org.springframework.messaging.converter.DefaultContentTypeResolver;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -23,6 +24,13 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON;
 @RequiredArgsConstructor
 @Order(Ordered.HIGHEST_PRECEDENCE + 99)
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+    private final AuthChannelInterceptorAdapter authChannelInterceptorAdapter;
+    private final AuthHandshakeInterceptor authHandshakeInterceptor;
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(authChannelInterceptorAdapter);
+    }
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         // Cấu hình destination cho các messgae gửi từ server đến client
@@ -51,8 +59,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
+                .addInterceptors(authHandshakeInterceptor)
                 .setAllowedOrigins("http://localhost:5173")
                 .withSockJS();
+//                .setSessionCookieNeeded(true); // <<< Cần dòng nà
     }
 
     @Override

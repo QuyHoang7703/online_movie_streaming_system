@@ -29,4 +29,5 @@ public class UserNotification {
     @ManyToOne
     @JoinColumn(name="notification_id")
     private Notification notification;
+
 }
