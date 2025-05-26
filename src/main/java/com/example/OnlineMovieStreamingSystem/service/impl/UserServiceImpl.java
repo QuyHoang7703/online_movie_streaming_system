@@ -75,6 +75,7 @@ public class UserServiceImpl implements UserService {
 
     private UserInfoDTO convertToUserInfoDTO(User user) {
         UserInfoDTO userInfoDTO = new UserInfoDTO();
+        userInfoDTO.setId(user.getId());
         userInfoDTO.setEmail(user.getEmail());
         userInfoDTO.setRole(user.getRole().getName());
 

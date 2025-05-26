@@ -5,16 +5,20 @@ import com.example.OnlineMovieStreamingSystem.domain.PlanDuration;
 import com.example.OnlineMovieStreamingSystem.domain.SubscriptionOrder;
 import com.example.OnlineMovieStreamingSystem.domain.SubscriptionPlan;
 import com.example.OnlineMovieStreamingSystem.domain.user.User;
+import com.example.OnlineMovieStreamingSystem.dto.request.notification.NotificationRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.subscriptionOrder.SubscriptionOrderRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionOrder.PaymentUrlResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionOrder.SubscriptionOrderResponseDTO;
 import com.example.OnlineMovieStreamingSystem.repository.PlanDurationRepository;
 import com.example.OnlineMovieStreamingSystem.repository.SubscriptionOrderRepository;
 import com.example.OnlineMovieStreamingSystem.repository.UserRepository;
+import com.example.OnlineMovieStreamingSystem.service.NotificationService;
 import com.example.OnlineMovieStreamingSystem.service.SubscriptionOrderService;
 import com.example.OnlineMovieStreamingSystem.util.SecurityUtil;
 import com.example.OnlineMovieStreamingSystem.util.VnPayUtil;
+import com.example.OnlineMovieStreamingSystem.util.constant.NotificationType;
 import com.example.OnlineMovieStreamingSystem.util.constant.SubscriptionOrderStatus;
+import com.example.OnlineMovieStreamingSystem.util.constant.TargetType;
 import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +43,7 @@ public class SubscriptionOrderServiceImpl implements SubscriptionOrderService {
     private final SubscriptionOrderRepository subscriptionOrderRepository;
     private final UserRepository userRepository;
     private final VnPayConfig vnPayConfig;
+    private final NotificationService notificationService;
 
     @Override
     public PaymentUrlResponseDTO getPaymentUrl(HttpServletRequest request, SubscriptionOrderRequestDTO subscriptionOrderRequestDTO) {
@@ -114,6 +119,10 @@ public class SubscriptionOrderServiceImpl implements SubscriptionOrderService {
 
         // Xóa redis key
         redisTemplate.delete(orderKey);
+
+        // Create notification
+        sendNotificationForOrderedUserAndAdmin(user, planDuration);
+
     }
 
     @Override
@@ -217,6 +226,32 @@ public class SubscriptionOrderServiceImpl implements SubscriptionOrderService {
         this.subscriptionOrderRepository.saveAll(activeChildOrders);
 
 
+    }
+
+    private void sendNotificationForOrderedUserAndAdmin(User user, PlanDuration planDuration) {
+        //Send notification for admin
+        List<User> adminUsers = this.userRepository.findByRoleName("ADMIN");
+        List<String> adminIds = adminUsers.stream().map(User::getId).toList();
+        NotificationRequestDTO notificationForAdmin = NotificationRequestDTO.builder()
+                .title("Người dùng đã mua gói dịch vụ")
+                .message(user.getEmail() + " đã mua gói " + planDuration.getSubscriptionPlan().getName())
+                .notificationType(NotificationType.PURCHASE_PLAN_DURATION)
+                .targetId(planDuration.getId())
+                .targetType(TargetType.PLAN_DURATION)
+                .build();
+
+        this.notificationService.sendNotificationToUsers(adminIds, notificationForAdmin);
+
+        // Send notification for user purchased
+        NotificationRequestDTO notificationForUser = NotificationRequestDTO.builder()
+                .title("Mua gói thành công")
+                .message("Bạn đã mua thành công gói " + planDuration.getSubscriptionPlan().getName() + " với thời hạn " + planDuration.getDurationInMonths() + "tháng")
+                .notificationType(NotificationType.PURCHASE_PLAN_DURATION)
+                .targetId(planDuration.getId())
+                .targetType(TargetType.PLAN_DURATION)
+                .build();
+
+        this.notificationService.sendNotificationToUser(user.getEmail(), notificationForUser);
     }
 
 
