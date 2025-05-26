@@ -31,6 +31,8 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
             Pageable pageable
     );
 
+    List<Movie> findByIdIn(List<Long> movieIds);
+
 
 
 }
