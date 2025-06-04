@@ -81,6 +81,7 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.GET, "/api/v1/standalone-movies/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/episodes/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/actors/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/comments/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

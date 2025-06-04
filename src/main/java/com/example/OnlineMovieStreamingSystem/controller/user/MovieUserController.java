@@ -45,7 +45,7 @@ public class MovieUserController {
         return ResponseEntity.status(HttpStatus.OK).body(this.movieUserService.getSubscriptionPlansForMovie(movieId));
     }
 
-    @GetMapping("/recommend")
+    @PostMapping("/recommend")
     public ResponseEntity<List<MovieUserResponseDTO>> getRecommendMovies(@RequestBody RecommendationMovieRequest recommendationMovieRequest) {
 
         return ResponseEntity.status(HttpStatus.OK).body(this.movieUserService.getRecommendationsForMovie(recommendationMovieRequest));

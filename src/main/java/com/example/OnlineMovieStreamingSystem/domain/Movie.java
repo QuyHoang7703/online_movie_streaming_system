@@ -71,6 +71,9 @@ public class Movie {
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FavoriteMovie> favoriteMovies;
 
+    @OneToMany(mappedBy = "movie")
+    private List<Comment> comments;
+
     @PrePersist
     protected void prePersist() {
         this.createAt = Instant.now();
