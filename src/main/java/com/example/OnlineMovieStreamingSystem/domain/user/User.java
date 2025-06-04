@@ -1,9 +1,6 @@
 package com.example.OnlineMovieStreamingSystem.domain.user;
 
-import com.example.OnlineMovieStreamingSystem.domain.FavoriteMovie;
-import com.example.OnlineMovieStreamingSystem.domain.Movie;
-import com.example.OnlineMovieStreamingSystem.domain.SubscriptionOrder;
-import com.example.OnlineMovieStreamingSystem.domain.UserNotification;
+import com.example.OnlineMovieStreamingSystem.domain.*;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -40,4 +37,7 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<UserNotification> userNotifications;
+
+    @OneToMany(mappedBy = "user")
+    private List<Comment> comments;
 }

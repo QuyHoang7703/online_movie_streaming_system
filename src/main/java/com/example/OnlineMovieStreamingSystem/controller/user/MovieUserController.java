@@ -1,6 +1,9 @@
 package com.example.OnlineMovieStreamingSystem.controller.user;
 
 import com.example.OnlineMovieStreamingSystem.dto.ResultPaginationDTO;
+import com.example.OnlineMovieStreamingSystem.dto.request.recommendMovie.RecommendationMovieRequest;
+import com.example.OnlineMovieStreamingSystem.dto.response.movie.MovieResponseDTO;
+import com.example.OnlineMovieStreamingSystem.dto.response.movie.MovieUserResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionPlan.SubscriptionPlanResponseDTO;
 import com.example.OnlineMovieStreamingSystem.service.MovieService;
 import com.example.OnlineMovieStreamingSystem.service.MovieUserService;
@@ -40,6 +43,12 @@ public class MovieUserController {
     public ResponseEntity<List<SubscriptionPlanResponseDTO>> getSubscriptionPlansForMovie(@PathVariable("movieId") long movieId) {
 
         return ResponseEntity.status(HttpStatus.OK).body(this.movieUserService.getSubscriptionPlansForMovie(movieId));
+    }
+
+    @PostMapping("/recommend")
+    public ResponseEntity<List<MovieUserResponseDTO>> getRecommendMovies(@RequestBody RecommendationMovieRequest recommendationMovieRequest) {
+
+        return ResponseEntity.status(HttpStatus.OK).body(this.movieUserService.getRecommendationsForMovie(recommendationMovieRequest));
     }
 
 

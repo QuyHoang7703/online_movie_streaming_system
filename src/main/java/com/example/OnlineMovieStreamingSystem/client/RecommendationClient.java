@@ -1,0 +1,12 @@
+package com.example.OnlineMovieStreamingSystem.client;
+
+import com.example.OnlineMovieStreamingSystem.dto.request.recommendMovie.RecommendationMovieRequest;
+import com.example.OnlineMovieStreamingSystem.dto.response.recommendMovie.RecommendationResponseWrapper;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PostMapping;
+
+@FeignClient(name="get-recommendation-movie", url="http://localhost:5000")
+public interface RecommendationClient {
+    @PostMapping("/api/recommend")
+    RecommendationResponseWrapper getRecommendationResponse(RecommendationMovieRequest request);
+}
