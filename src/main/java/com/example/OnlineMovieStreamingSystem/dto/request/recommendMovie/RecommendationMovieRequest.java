@@ -12,4 +12,7 @@ import lombok.NoArgsConstructor;
 public class RecommendationMovieRequest {
     private String title;
     private int numRecommendations;
+    // weight for CBF + NeuMF
+    private double cbfWeight;
+    private double neumfWeight;
 }

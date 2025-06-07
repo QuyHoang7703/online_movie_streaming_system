@@ -28,7 +28,6 @@ public class Movie {
     private String director;
     private String posterUrl;
     private String backdropUrl;
-//    private String country;
     private LocalDate releaseDate;
     private boolean free;
     private String trailerUrl;
@@ -73,6 +72,9 @@ public class Movie {
 
     @OneToMany(mappedBy = "movie")
     private List<Comment> comments;
+
+    @OneToMany(mappedBy = "movie", fetch = FetchType.LAZY)
+    private List<UserInteraction> userInteractions;
 
     @PrePersist
     protected void prePersist() {

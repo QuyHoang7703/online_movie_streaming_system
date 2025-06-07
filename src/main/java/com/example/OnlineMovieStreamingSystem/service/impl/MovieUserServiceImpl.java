@@ -6,6 +6,7 @@ import com.example.OnlineMovieStreamingSystem.domain.PlanDuration;
 import com.example.OnlineMovieStreamingSystem.domain.SubscriptionOrder;
 import com.example.OnlineMovieStreamingSystem.domain.SubscriptionPlan;
 import com.example.OnlineMovieStreamingSystem.domain.user.User;
+import com.example.OnlineMovieStreamingSystem.dto.Meta;
 import com.example.OnlineMovieStreamingSystem.dto.ResultPaginationDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.recommendMovie.RecommendationMovieRequest;
 import com.example.OnlineMovieStreamingSystem.dto.response.movie.MovieUserResponseDTO;
@@ -19,9 +20,14 @@ import com.example.OnlineMovieStreamingSystem.service.MovieService;
 import com.example.OnlineMovieStreamingSystem.service.MovieUserService;
 import com.example.OnlineMovieStreamingSystem.service.SubscriptionPlanService;
 import com.example.OnlineMovieStreamingSystem.util.SecurityUtil;
+import com.example.OnlineMovieStreamingSystem.util.constant.MovieType;
 import com.example.OnlineMovieStreamingSystem.util.constant.SubscriptionOrderStatus;
 import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -97,6 +103,8 @@ public class MovieUserServiceImpl implements MovieUserService {
 
     @Override
     public List<MovieUserResponseDTO> getRecommendationsForMovie(RecommendationMovieRequest recommendationMovieRequest) {
+        recommendationMovieRequest.setCbfWeight(0.4);
+        recommendationMovieRequest.setNeumfWeight(0.6);
         RecommendationResponseWrapper recommendationResponseWrapper = this.recommendationClient.getRecommendationResponse(recommendationMovieRequest);
         if(recommendationResponseWrapper != null) {
             List<RecommendationMovieResponse> recommendationMovieResponses = recommendationResponseWrapper.getData().getRecommendations();
@@ -109,6 +117,30 @@ public class MovieUserServiceImpl implements MovieUserService {
 
         }
         return null;
+    }
+
+    @Override
+    public ResultPaginationDTO getHotMovieByMovieType(MovieType movieType,String country, int size) {
+        Pageable pageable = PageRequest.of(0, size,
+                Sort.by(Sort.Order.desc("createAt"), Sort.Order.desc("voteCount")));
+
+        Page<Movie> moviePage = this.movieRepository.getHotMoviesByFilter(movieType, country, pageable);
+
+        ResultPaginationDTO resultPaginationDTO = new ResultPaginationDTO();
+
+        Meta meta = new Meta();
+        meta.setCurrentPage(pageable.getPageNumber() + 1);
+        meta.setPageSize(pageable.getPageSize());
+        meta.setTotalPages(moviePage.getTotalPages());
+        meta.setTotalElements(moviePage.getTotalElements());
+
+        List<MovieUserResponseDTO> movieUserResponseDTOS = moviePage.getContent().stream()
+                .map(this.movieService::convertToMovieUserResponseDTO).toList();
+
+        resultPaginationDTO.setMeta(meta);
+        resultPaginationDTO.setResult(movieUserResponseDTOS);
+
+        return resultPaginationDTO;
     }
 
 

@@ -1,4 +1,4 @@
-package com.example.OnlineMovieStreamingSystem.dto;
+package com.example.OnlineMovieStreamingSystem.dto.request.user;
 
 import com.example.OnlineMovieStreamingSystem.util.constant.GenderEnum;
 import lombok.AllArgsConstructor;
@@ -7,17 +7,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserInfoDTO {
-    private String id;
-    private String email;
+@Builder
+public class UserRequestDTO {
     private String name;
-    private String avatarUrl;
-    private String role;
     private String phoneNumber;
     private String address;
+    private String avatarUrl;
     private GenderEnum gender;
 
 }
