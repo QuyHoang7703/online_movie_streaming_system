@@ -10,6 +10,8 @@ import lombok.Data;
 public class RegisterRequestDTO {
     @NotBlank(message = "Email cannot be left blank")
     private String email;
+    @NotBlank(message = "Name cannot be left blank")
+    private String name;
     @NotBlank(message = "Password cannot be left blank")
     @Size(min = 6, message = "Password has to at least 6 characters")
     private String password;

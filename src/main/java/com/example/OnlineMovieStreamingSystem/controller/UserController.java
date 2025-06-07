@@ -20,7 +20,8 @@ import java.io.IOException;
 public class UserController {
     private final UserService userService;
 
-    @PatchMapping
+    @PatchMapping("/update-info")
+    @ApiMessage("Cập nhập thông tin thành công")
     public ResponseEntity<UserResponseDTO> updateUserInfo(@RequestPart("userInfo") UserRequestDTO userRequestDTO,
                                                           @RequestParam(name = "avatar", required = false) MultipartFile avatar) throws IOException {
 

@@ -33,6 +33,14 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     List<Movie> findByIdIn(List<Long> movieIds);
 
+    @Query("SELECT m FROM Movie m " +
+            "LEFT JOIN m.countries c " +
+            "WHERE (:movieType IS NULL OR m.movieType = :movieType) " )
+//            "AND (:country IS NULL OR :country = '' OR c.name = :country)")
+    Page<Movie> getHotMoviesByFilter(@Param("movieType") MovieType movieType,
+                                     @Param("country") String country,
+                                     Pageable pageable);
+
 
 
 }

@@ -1,5 +1,6 @@
 package com.example.OnlineMovieStreamingSystem.dto;
 
+import com.example.OnlineMovieStreamingSystem.util.constant.GenderEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,5 +16,8 @@ public class UserInfoDTO {
     private String name;
     private String avatarUrl;
     private String role;
+    private String phoneNumber;
+    private String address;
+    private GenderEnum gender;
 
 }

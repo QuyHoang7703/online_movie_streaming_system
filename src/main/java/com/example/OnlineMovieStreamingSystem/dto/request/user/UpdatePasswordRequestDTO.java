@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdatePasswordRequestDTO {
+    @NotBlank(message = "Current assword cannot be left blank")
+    private String currentPassword;
     @NotBlank(message = "Password cannot be left blank")
     private String password;
     @NotBlank(message = "Confirm password cannot be left blank")

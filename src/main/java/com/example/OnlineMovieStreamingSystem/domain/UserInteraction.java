@@ -8,39 +8,36 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
-import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Comment {
+public class UserInteraction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String comment;
+    private double rating;
     private Instant createAt;
-    
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_id", nullable = false)
-    private User user;
+    private Instant updateAt;
 
     @ManyToOne
-    @JoinColumn(name="movie_id", nullable = false)
+    @JoinColumn(name="user_id")
+    private User users;
+
+    @ManyToOne
+    @JoinColumn(name="movie_id")
     private Movie movie;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="parent_comment_id")
-    private Comment parentComment;
-
-    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL)
-    private List<Comment> replies;
 
     @PrePersist
     protected void onCreate() {
         this.createAt = Instant.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updateAt = Instant.now();
     }
 
 

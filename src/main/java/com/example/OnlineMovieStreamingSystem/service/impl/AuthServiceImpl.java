@@ -2,6 +2,7 @@ package com.example.OnlineMovieStreamingSystem.service.impl;
 
 import com.example.OnlineMovieStreamingSystem.domain.user.Role;
 import com.example.OnlineMovieStreamingSystem.domain.user.User;
+import com.example.OnlineMovieStreamingSystem.domain.user.UserDetail;
 import com.example.OnlineMovieStreamingSystem.dto.request.LoginRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.RegisterRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.VerifyOTPRequestDTO;
@@ -159,6 +160,7 @@ public class AuthServiceImpl implements AuthService {
 
         HashOperations<String, String , String> hashOperations = redisTemplate.opsForHash();
         hashOperations.put(key, "email",email);
+        hashOperations.put(key, "name",registerRequestDTO.getName());
         hashOperations.put(key, "password", encodedPassword);
         String otp = this.generateOTP();
         hashOperations.put(key, "otp", otp);
@@ -186,6 +188,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         String password = hashOperations.get(key, "password");
+        String name = hashOperations.get(key, "name");
         redisTemplate.delete(key);
 
         Role role = this.roleRepository.findByName("USER");
@@ -195,6 +198,11 @@ public class AuthServiceImpl implements AuthService {
                 .active(true)
                 .role(role)
                 .build();
+        UserDetail userDetail = new UserDetail();
+        userDetail.setName(name);
+        userDetail.setUser(user);
+
+        user.setUserDetail(userDetail);
 
         this.userRepository.save(user);
 

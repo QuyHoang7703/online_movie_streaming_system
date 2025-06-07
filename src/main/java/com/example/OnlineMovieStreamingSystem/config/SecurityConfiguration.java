@@ -61,7 +61,8 @@ public class SecurityConfiguration {
             "/api/v1/subscription-orders",
             "/api/v1/vn-pay-callback",
             "/api/v1/user/movies/**",
-            "/ws/**"
+            "/ws/**",
+            "/api/v1/home-page/**"
 
     };
 

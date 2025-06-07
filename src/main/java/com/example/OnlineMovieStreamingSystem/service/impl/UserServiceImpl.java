@@ -123,8 +123,11 @@ public class UserServiceImpl implements UserService {
         if(!updatePasswordRequestDTO.getPassword().equals(updatePasswordRequestDTO.getConfirmPassword())) {
             throw new ApplicationException("Mật khẩu không trùng khớp");
         }
-
         User user = this.findUserByEmail(email);
+
+        if(!this.passwordEncoder.matches(updatePasswordRequestDTO.getCurrentPassword(), user.getPassword())) {
+            throw new ApplicationException("Mật khẩu hiện tại không đúng");
+        }
         String decodedPassword = this.passwordEncoder.encode(updatePasswordRequestDTO.getPassword());
         user.setPassword(decodedPassword);
         this.userRepository.save(user);
@@ -143,10 +146,14 @@ public class UserServiceImpl implements UserService {
         userInfoDTO.setEmail(user.getEmail());
         userInfoDTO.setRole(user.getRole().getName());
 
+
         UserDetail userDetail = user.getUserDetail();
         if(userDetail != null){
             userInfoDTO.setName(userDetail.getName());
             userInfoDTO.setAvatarUrl(userDetail.getAvatarUrl());
+            userInfoDTO.setPhoneNumber(userDetail.getPhoneNumber());
+            userInfoDTO.setGender(userDetail.getGender());
+            userInfoDTO.setAddress(userDetail.getAddress());
         }
         return userInfoDTO;
     }
