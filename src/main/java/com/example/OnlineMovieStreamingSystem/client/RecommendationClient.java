@@ -5,8 +5,10 @@ import com.example.OnlineMovieStreamingSystem.dto.response.recommendMovie.Recomm
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 
-@FeignClient(name="get-recommendation-movie", url="http://localhost:5000")
+@FeignClient(name="get-recommendation-movie", url="http://localhost:5001")
 public interface RecommendationClient {
+    @PostMapping("/api/recommend/hybrid")
+    RecommendationResponseWrapper getRecommendationHybridResponse(RecommendationMovieRequest request);
     @PostMapping("/api/recommend")
-    RecommendationResponseWrapper getRecommendationResponse(RecommendationMovieRequest request);
+    RecommendationResponseWrapper getRecommendationCBFResponse(RecommendationMovieRequest request);
 }

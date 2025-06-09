@@ -60,7 +60,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Transactional
     @Override
-    public void sendNotificationToUsers(List<String> receiverIds, NotificationRequestDTO notificationRequestDTO) {
+    public void sendNotificationToUsers(List<Long> receiverIds, NotificationRequestDTO notificationRequestDTO) {
         Notification notification = this.createNotification(notificationRequestDTO);
         List<UserNotification> userNotifications = new ArrayList<>();
         List<User> receivers = this.userRepository.findAllById(receiverIds);

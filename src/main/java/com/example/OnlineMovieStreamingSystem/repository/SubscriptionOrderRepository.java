@@ -17,7 +17,7 @@ import java.util.Optional;
 @Repository
 public interface SubscriptionOrderRepository extends JpaRepository<SubscriptionOrder, Long> {
     boolean existsByUserIdAndPlanDuration_IdInAndStatusAndEndDateAfter(
-            String userId,
+            long userId,
             List<Long> planDurationIds,
             SubscriptionOrderStatus status,
             LocalDate date
@@ -32,7 +32,7 @@ public interface SubscriptionOrderRepository extends JpaRepository<SubscriptionO
             "AND so.status = :status " +
             "ORDER BY so.endDate DESC")
     List<SubscriptionOrder> findLatestActiveOrderByUserAndSubscriptionPlan(
-            @Param("userId") String userId,
+            @Param("userId") Long userId,
             @Param("subscriptionPlanId") long subscriptionPlanId,
             @Param("status") SubscriptionOrderStatus status,
             Pageable pageable);
@@ -45,7 +45,7 @@ public interface SubscriptionOrderRepository extends JpaRepository<SubscriptionO
           AND so.status = :status
           AND so.endDate <= :parentOrderEndDate
     """)
-    List<SubscriptionOrder> findByUserIdAndSubscriptionPlanIdsAndStatus(@Param("userId") String userId,
+    List<SubscriptionOrder> findByUserIdAndSubscriptionPlanIdsAndStatus(@Param("userId") long userId,
                                                                         @Param("subscriptionPlanIds") List<Long> subscriptionPlanIds,
                                                                         @Param("status") SubscriptionOrderStatus status,
                                                                         @Param("parentOrderEndDate") LocalDate parentOrderEndDate);

@@ -198,7 +198,7 @@ public class SubscriptionOrderServiceImpl implements SubscriptionOrderService {
     }
 
 
-    private void expiredChildrenSubscriptionOrder(long parentPlanDurationId, String userId, LocalDate parentSubscriptionOrderEndDate) {
+    private void expiredChildrenSubscriptionOrder(long parentPlanDurationId, long userId, LocalDate parentSubscriptionOrderEndDate) {
         PlanDuration parentPlanDuration = this.planDurationRepository.findById(parentPlanDurationId)
                 .orElseThrow(() -> new ApplicationException("Không tồn tại gói dịch vụ với id là " + parentPlanDurationId));
 
@@ -231,7 +231,7 @@ public class SubscriptionOrderServiceImpl implements SubscriptionOrderService {
     private void sendNotificationForOrderedUserAndAdmin(User user, PlanDuration planDuration) {
         //Send notification for admin
         List<User> adminUsers = this.userRepository.findByRoleName("ADMIN");
-        List<String> adminIds = adminUsers.stream().map(User::getId).toList();
+        List<Long> adminIds = adminUsers.stream().map(User::getId).toList();
         NotificationRequestDTO notificationForAdmin = NotificationRequestDTO.builder()
                 .title("Người dùng đã mua gói dịch vụ")
                 .message(user.getEmail() + " đã mua gói " + planDuration.getSubscriptionPlan().getName())

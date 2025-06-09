@@ -12,9 +12,9 @@ import java.util.Optional;
 
 @Repository
 public interface FavoriteMovieRepository extends JpaRepository<FavoriteMovie, Long> {
-    boolean existsByUserIdAndMovieId(String userId, Long movieId);
+    boolean existsByUserIdAndMovieId(Long userId, Long movieId);
 
-    void deleteByUser_IdAndMovie_Id(String userId, Long movieId);
+    void deleteByUser_IdAndMovie_Id(Long userId, Long movieId);
 
     @Query("SELECT fm FROM FavoriteMovie fm " +
             "JOIN fm.user u " +
