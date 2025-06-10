@@ -14,6 +14,6 @@ import java.util.List;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RecommendationResponseData {
-    private String inputMovie;
+    private String title;
     private List<RecommendationMovieResponse> recommendations;
 }

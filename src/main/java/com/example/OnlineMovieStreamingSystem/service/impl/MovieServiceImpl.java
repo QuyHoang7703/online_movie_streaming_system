@@ -138,9 +138,15 @@ public class MovieServiceImpl implements MovieService {
             dto.setVoteAverage(movie.getVoteAverage());
             dto.setVoteCount(movie.getVoteCount());
             dto.setQuality(movie.getQuality());
-            dto.setDuration(movie.getVideoVersions().get(0).getEpisodes().get(0).getDuration());
             dto.setCreateAt(movie.getCreateAt());
             dto.setUpdateAt(movie.getUpdateAt());
+
+            if(movie.getVideoVersions() != null && !movie.getVideoVersions().isEmpty()) {
+                VideoVersion videoVersion = movie.getVideoVersions().get(0);
+                if(videoVersion.getEpisodes() != null && !videoVersion.getEpisodes().isEmpty()) {
+                    dto.setDuration(movie.getVideoVersions().get(0).getEpisodes().get(0).getDuration());
+                }
+            }
 
             if(movie.getMovieActors() != null && !movie.getMovieActors().isEmpty()) {
                 List<MovieActorResponseDTO> movieActorResponseDTOS = movie.getMovieActors().stream()

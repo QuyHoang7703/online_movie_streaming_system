@@ -12,7 +12,7 @@ import lombok.*;
 @Builder
 public class UserDetail {
     @Id
-    private String id;
+    private long id;
     private String name;
     private String phoneNumber;
     private String address;

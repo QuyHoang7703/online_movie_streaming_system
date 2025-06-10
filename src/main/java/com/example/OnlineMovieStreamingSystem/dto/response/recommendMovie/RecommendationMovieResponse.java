@@ -11,12 +11,20 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+//@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RecommendationMovieResponse {
-    private long id;
+    private long movie_id;
+    private long tmdb_id;
     private String title;
-    private double voteAverage;
-    private double voteCount;
-    private double wr;
+    private double cbf_score;
+    private double neumf_score;
+    private double hybrid_score;
+    private double predicted_score;
+
+    private double vote_average;
+    private double vote_count;
+    private String source;
+
+
     private int year;
 }

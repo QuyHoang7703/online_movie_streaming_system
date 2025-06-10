@@ -19,26 +19,25 @@ public class UserInteraction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private double rating;
-    private Instant createAt;
-    private Instant updateAt;
+    private Instant updatedAt;  // lưu timestamp dạng số nguyên (epoch seconds)
 
     @ManyToOne
     @JoinColumn(name="user_id")
-    private User users;
+    private User user;
 
     @ManyToOne
     @JoinColumn(name="movie_id")
     private Movie movie;
 
+    private long userTemporaryId;
+    private long movieTemporaryId;
+
     @PrePersist
+    @PreUpdate
     protected void onCreate() {
-        this.createAt = Instant.now();
+        updatedAt = Instant.now();
     }
 
-    @PreUpdate
-    protected void onUpdate() {
-        this.updateAt = Instant.now();
-    }
 
 
 }

@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface NotificationService {
     void sendNotificationToUser(String receiverId, NotificationRequestDTO notificationRequestDTO);
-    void sendNotificationToUsers(List<String> receiverIds, NotificationRequestDTO notificationRequestDTO);
+    void sendNotificationToUsers(List<Long> receiverIds, NotificationRequestDTO notificationRequestDTO);
     ResultPaginationDTO getNotificationsForUser(int page, int size);
     NotificationResponseDTO updateSeenStatusForNotification(long notificationId);
     List<NotificationStatusResponseDTO> updateSeenStatusForAllNotifications();

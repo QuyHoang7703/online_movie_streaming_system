@@ -23,8 +23,14 @@ public class HomePageController {
     @GetMapping("/hot-movies")
     public ResponseEntity<ResultPaginationDTO> getHotMovieByFilter(@RequestParam(name = "size", defaultValue = "10") int size,
                                                                    @RequestParam(name = "movieType", required = false) MovieType movieType,
-                                                                   @RequestParam(name = "country", required = false) String country) {
+                                                                   @RequestParam(name = "country", required = false) String countryId) {
 
-        return ResponseEntity.status(HttpStatus.OK).body(this.movieUserService.getHotMovieByMovieType(movieType, country, size));
+        return ResponseEntity.status(HttpStatus.OK).body(this.movieUserService.getHotMovieByMovieType(movieType, countryId, size));
+    }
+
+    @GetMapping("/feature-movies")
+    public ResponseEntity<ResultPaginationDTO> getFeatureMovies(@RequestParam(name = "size", defaultValue = "6") int size) {
+
+        return ResponseEntity.status(HttpStatus.OK).body(this.movieUserService.getFeatureMovies(size));
     }
 }

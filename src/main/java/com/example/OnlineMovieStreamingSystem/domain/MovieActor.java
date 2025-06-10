@@ -15,6 +15,7 @@ public class MovieActor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String characterName;
 
     @ManyToOne
