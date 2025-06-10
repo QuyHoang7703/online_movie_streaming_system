@@ -66,10 +66,14 @@ public class SeriesMovieServiceImpl implements SeriesMovieService {
         return seriesMovieResponseDTO;
     }
 
-    private SeriesMovieResponseDTO convertToSeriesResponseDTO(Movie movie){
+    @Override
+    public SeriesMovieResponseDTO convertToSeriesResponseDTO(Movie movie){
         SeriesMovieResponseDTO seriesMovieResponseDTO = this.movieService.convertToMovieInfoDTO(movie, SeriesMovieResponseDTO.class);
-        seriesMovieResponseDTO.setSeason(movie.getSeriesMovie().getSeason());
-        seriesMovieResponseDTO.setTotalEpisodes(movie.getSeriesMovie().getTotalEpisodes());
+        if(movie.getSeriesMovie() != null) {
+            seriesMovieResponseDTO.setSeason(movie.getSeriesMovie().getSeason());
+            seriesMovieResponseDTO.setTotalEpisodes(movie.getSeriesMovie().getTotalEpisodes());
+        }
+
         return seriesMovieResponseDTO;
     }
 }

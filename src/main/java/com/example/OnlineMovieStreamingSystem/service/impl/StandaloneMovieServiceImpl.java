@@ -136,7 +136,8 @@ public class StandaloneMovieServiceImpl implements StandaloneMovieService {
         return standaloneMovieResponseDTO;
     }
 
-    private StandaloneMovieResponseDTO convertToStandaloneMovieResponseDTO(Movie movie){
+    @Override
+    public StandaloneMovieResponseDTO convertToStandaloneMovieResponseDTO(Movie movie){
         StandaloneMovieResponseDTO standaloneMovieResponseDTO = this.movieService.convertToMovieInfoDTO(movie, StandaloneMovieResponseDTO.class);
         standaloneMovieResponseDTO.setBudget(movie.getStandaloneMovie().getBudget());
         standaloneMovieResponseDTO.setRevenue(movie.getStandaloneMovie().getRevenue());

@@ -27,4 +27,10 @@ public class HomePageController {
 
         return ResponseEntity.status(HttpStatus.OK).body(this.movieUserService.getHotMovieByMovieType(movieType, countryId, size));
     }
+
+    @GetMapping("/feature-movies")
+    public ResponseEntity<ResultPaginationDTO> getFeatureMovies(@RequestParam(name = "size", defaultValue = "6") int size) {
+
+        return ResponseEntity.status(HttpStatus.OK).body(this.movieUserService.getFeatureMovies(size));
+    }
 }

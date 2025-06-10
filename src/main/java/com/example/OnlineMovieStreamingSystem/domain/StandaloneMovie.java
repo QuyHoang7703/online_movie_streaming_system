@@ -19,8 +19,7 @@ public class StandaloneMovie {
     private long id;
     private double budget;
     private double revenue;
-//    private int duration;
-//    private String videoUrl;
+
 
     @OneToOne
     @MapsId

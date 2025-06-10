@@ -9,6 +9,7 @@ import com.example.OnlineMovieStreamingSystem.domain.user.User;
 import com.example.OnlineMovieStreamingSystem.dto.Meta;
 import com.example.OnlineMovieStreamingSystem.dto.ResultPaginationDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.recommendMovie.RecommendationMovieRequest;
+import com.example.OnlineMovieStreamingSystem.dto.response.movie.MovieResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.movie.MovieUserResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.recommendMovie.RecommendationMovieResponse;
 import com.example.OnlineMovieStreamingSystem.dto.response.recommendMovie.RecommendationResponseWrapper;
@@ -17,9 +18,7 @@ import com.example.OnlineMovieStreamingSystem.repository.MovieRepository;
 import com.example.OnlineMovieStreamingSystem.repository.SubscriptionOrderRepository;
 import com.example.OnlineMovieStreamingSystem.repository.UserInteractionRepository;
 import com.example.OnlineMovieStreamingSystem.repository.UserRepository;
-import com.example.OnlineMovieStreamingSystem.service.MovieService;
-import com.example.OnlineMovieStreamingSystem.service.MovieUserService;
-import com.example.OnlineMovieStreamingSystem.service.SubscriptionPlanService;
+import com.example.OnlineMovieStreamingSystem.service.*;
 import com.example.OnlineMovieStreamingSystem.util.SecurityUtil;
 import com.example.OnlineMovieStreamingSystem.util.constant.MovieType;
 import com.example.OnlineMovieStreamingSystem.util.constant.SubscriptionOrderStatus;
@@ -33,6 +32,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -51,6 +51,8 @@ public class MovieUserServiceImpl implements MovieUserService {
     private final MovieService movieService;
     private final UserInteractionRepository interactionRepository;
     private final UserInteractionRepository userInteractionRepository;
+    private final StandaloneMovieService standaloneMovieService;
+    private final SeriesMovieService seriesMovieService;
 
     @Override
     public boolean canUserWatchMovie(long movieId) {
@@ -163,7 +165,9 @@ public class MovieUserServiceImpl implements MovieUserService {
     @Override
     public ResultPaginationDTO getHotMovieByMovieType(MovieType movieType,String countryId, int size) {
         Pageable pageable = PageRequest.of(0, size,
-                Sort.by(Sort.Order.desc("releaseDate"), Sort.Order.desc("voteCount")));
+                Sort.by(Sort.Order.desc("releaseDate"),
+                        Sort.Order.desc("voteCount"),
+                        Sort.Order.desc("voteAverage")));
 
         Page<Movie> moviePage = this.movieRepository.getHotMoviesByFilter(movieType, countryId, pageable);
 
@@ -180,6 +184,39 @@ public class MovieUserServiceImpl implements MovieUserService {
 
         resultPaginationDTO.setMeta(meta);
         resultPaginationDTO.setResult(movieUserResponseDTOS);
+
+        return resultPaginationDTO;
+    }
+
+    @Override
+    public ResultPaginationDTO getFeatureMovies(int size) {
+        Pageable pageable = PageRequest.of(0, size,
+                Sort.by(Sort.Order.desc("releaseDate"),
+                        Sort.Order.desc("voteCount"),
+                        Sort.Order.desc("voteAverage")));
+        Page<Movie> moviePage = this.movieRepository.findAll(pageable);
+
+        ResultPaginationDTO resultPaginationDTO = new ResultPaginationDTO();
+
+        Meta meta = new Meta();
+        meta.setCurrentPage(pageable.getPageNumber() + 1);
+        meta.setPageSize(pageable.getPageSize());
+        meta.setTotalPages(moviePage.getTotalPages());
+        meta.setTotalElements(moviePage.getTotalElements());
+
+        List<MovieResponseDTO> movieResponseDTOS = new ArrayList<>();
+
+        for(Movie movie : moviePage.getContent()) {
+            if(movie.getMovieType() == MovieType.STANDALONE) {
+                movieResponseDTOS.add(this.standaloneMovieService.convertToStandaloneMovieResponseDTO(movie));
+            }else{
+                movieResponseDTOS.add(this.seriesMovieService.convertToSeriesResponseDTO(movie));
+
+            }
+        }
+
+        resultPaginationDTO.setMeta(meta);
+        resultPaginationDTO.setResult(movieResponseDTOS);
 
         return resultPaginationDTO;
     }

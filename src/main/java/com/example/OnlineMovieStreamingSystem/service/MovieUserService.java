@@ -13,4 +13,5 @@ public interface MovieUserService {
     List<SubscriptionPlanResponseDTO> getSubscriptionPlansForMovie(long movieId);
     List<MovieUserResponseDTO> getRecommendationsForMovie(RecommendationMovieRequest recommendationMovieRequest);
     ResultPaginationDTO getHotMovieByMovieType(MovieType movieType,String country, int size);
+    ResultPaginationDTO getFeatureMovies(int size);
 }
