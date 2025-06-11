@@ -41,6 +41,8 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
                                      @Param("country") String country,
                                      Pageable pageable);
 
+    long countByMovieType(MovieType movieType);
+
 
 
 }

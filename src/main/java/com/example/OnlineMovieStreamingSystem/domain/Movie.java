@@ -39,6 +39,7 @@ public class Movie {
     private String quality;
     private Instant createAt;
     private Instant updateAt;
+    private long tmdbId;
 
 
     @OneToOne(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
