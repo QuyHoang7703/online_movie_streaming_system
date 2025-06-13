@@ -33,6 +33,7 @@ public class MovieResponseDTO {
     private double voteCount;
     private String quality;
     private int duration;
+    private long tmdbId;
     private List<MovieActorResponseDTO> movieActors;
     private List<GenreSummaryDTO> genres;
     private List<SubscriptionPlanSummaryDTO> subscriptionPlans;

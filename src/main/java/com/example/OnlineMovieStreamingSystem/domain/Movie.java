@@ -17,6 +17,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"id", "movieType"}))
 public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,6 +40,7 @@ public class Movie {
     private String quality;
     private Instant createAt;
     private Instant updateAt;
+    private long tmdbId;
 
 
     @OneToOne(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)

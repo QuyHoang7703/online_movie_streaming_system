@@ -1,6 +1,7 @@
 package com.example.OnlineMovieStreamingSystem.controller;
 
 import com.example.OnlineMovieStreamingSystem.config.VnPayConfig;
+import com.example.OnlineMovieStreamingSystem.dto.ResultPaginationDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.subscriptionOrder.SubscriptionOrderRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionOrder.PaymentUrlResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionOrder.SubscriptionOrderResponseDTO;
@@ -68,6 +69,10 @@ public class SubscriptionOrderController {
         return ResponseEntity.status(HttpStatus.OK).body(this.subscriptionOrderService.getActiveLatestSubscriptionOrderForUser(subscriptionPlanId));
     }
 
-
+    @GetMapping("/subscription-orders")
+    public ResponseEntity<ResultPaginationDTO> getSubscriptionOrders(@RequestParam(name = "size", defaultValue = "10") int size,
+                                                                     @RequestParam(name = "page", defaultValue = "1") int page) {
+        return ResponseEntity.status(HttpStatus.OK).body(this.subscriptionOrderService.getSubscriptionOrders(size, page));
+    }
 
 }

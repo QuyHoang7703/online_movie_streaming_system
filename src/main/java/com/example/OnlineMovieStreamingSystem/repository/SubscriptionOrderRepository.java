@@ -2,7 +2,10 @@ package com.example.OnlineMovieStreamingSystem.repository;
 
 import com.example.OnlineMovieStreamingSystem.domain.SubscriptionOrder;
 import com.example.OnlineMovieStreamingSystem.domain.SubscriptionPlan;
+import com.example.OnlineMovieStreamingSystem.dto.response.statistic.MonthlyRevenueResponseDTO;
+import com.example.OnlineMovieStreamingSystem.dto.response.statistic.YearRevenueDTO;
 import com.example.OnlineMovieStreamingSystem.util.constant.SubscriptionOrderStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -49,5 +52,35 @@ public interface SubscriptionOrderRepository extends JpaRepository<SubscriptionO
                                                                         @Param("subscriptionPlanIds") List<Long> subscriptionPlanIds,
                                                                         @Param("status") SubscriptionOrderStatus status,
                                                                         @Param("parentOrderEndDate") LocalDate parentOrderEndDate);
+
+    @Query("SELECT new com.example.OnlineMovieStreamingSystem.dto.response.statistic.MonthlyRevenueResponseDTO(" +
+            "EXTRACT(MONTH FROM so.createAt), SUM(so.price)) " + // Sử dụng EXTRACT(MONTH FROM ...)
+            "FROM SubscriptionOrder so " +
+            "WHERE EXTRACT(YEAR FROM so.createAt) = :year " +   // Sử dụng EXTRACT(YEAR FROM ...)
+            "GROUP BY EXTRACT(MONTH FROM so.createAt) " +
+            "ORDER BY EXTRACT(MONTH FROM so.createAt)")         // Nên thêm ORDER BY để sắp xếp kết quả
+    List<MonthlyRevenueResponseDTO> getMonthlyRevenue(@Param("year") int year);
+
+    @Query("SELECT SUM(so.price) FROM SubscriptionOrder so " +
+            "WHERE FUNCTION('MONTH', so.createAt) = :month " +
+            "AND FUNCTION('YEAR', so.createAt) = :year")
+    Double getRevenueByMonth(@Param("month") int month, @Param("year") int year);
+
+
+    @Query("SELECT new com.example.OnlineMovieStreamingSystem.dto.response.statistic.YearRevenueDTO(" +
+            "EXTRACT(YEAR FROM so.createAt), SUM(so.price)) " + // SELECT năm và tổng tiền
+            "FROM SubscriptionOrder so " +
+            "WHERE EXTRACT(YEAR FROM so.createAt) BETWEEN :startYear AND :endYear " + // Bao gồm cả năm bắt đầu và kết thúc
+            "GROUP BY EXTRACT(YEAR FROM so.createAt) " + // Nhóm theo NĂM
+            "ORDER BY EXTRACT(YEAR FROM so.createAt) ASC") // Sắp xếp theo NĂM tăng dần
+    List<YearRevenueDTO> getYearRevenue(@Param("startYear") int startYear, @Param("endYear") int endYear);
+
+
+    @Query("SELECT so FROM SubscriptionOrder so " +
+            "JOIN so.user u " +
+            "WHERE u.id = :userId")
+    Page<SubscriptionOrder> findByUserId(@Param("userId") Long userId, Pageable pageable);
+
+
 
 }

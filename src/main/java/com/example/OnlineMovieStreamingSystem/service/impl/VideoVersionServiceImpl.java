@@ -60,7 +60,7 @@ public class VideoVersionServiceImpl implements VideoVersionService {
 
         if(videoVersion.getMovie().getMovieType() == MovieType.STANDALONE) {
             Movie movie = videoVersion.getMovie();
-            videoVersionResponseDTO.setMovieTitle(movie.getTitle());
+            videoVersionResponseDTO.setMovieTitle(movie.getOriginalTitle());
             videoVersionResponseDTO.setBackdropUrl(movie.getBackdropUrl());
             if(videoVersion.getEpisodes() != null && !videoVersion.getEpisodes().isEmpty()) {
                 Episode episodeOfStandaloneMovie = videoVersion.getEpisodes().get(0);
