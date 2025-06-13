@@ -123,16 +123,16 @@ public class MovieUserServiceImpl implements MovieUserService {
             double neumfWeight = 0.0;
 
             if(countRatingsOfUser == 0) {
-                cbfWeight = 1.0;
+                cbfWeight = 0.8;
             } else if (countRatingsOfUser < 10) {
-                cbfWeight = 0.7;
-                neumfWeight = 0.3;
-            } else if (countRatingsOfUser < 50) {
                 cbfWeight = 0.6;
-                neumfWeight = 0.4;
+//                neumfWeight = 0.3;
+            } else if (countRatingsOfUser < 50) {
+                cbfWeight = 0.4;
+//                neumfWeight = 0.4;
             }else{
-                cbfWeight = 0.3;
-                neumfWeight = 0.7;
+                cbfWeight = 0.2;
+//                neumfWeight = 0.7;
             }
 
             recommendationMovieRequest.setCbf_weight(cbfWeight);
@@ -149,8 +149,8 @@ public class MovieUserServiceImpl implements MovieUserService {
             recommendationMovieResponses.forEach(r -> log.info("CBF Score: {}, NeuMF Score: {}, Hybrid Score: {}, Source: {}, TMDB ID: {} ",
                     r.getCbf_score(), r.getNeumf_score(), r.getHybrid_score(), r.getSource(), r.getTmdb_id()));
 
-            List<Long> movieIds = recommendationMovieResponses.stream().map(RecommendationMovieResponse::getTmdb_id).toList();
-            List<Movie> movies = this.movieRepository.findByIdIn(movieIds);
+            List<Long> tmdbIds = recommendationMovieResponses.stream().map(RecommendationMovieResponse::getTmdb_id).toList();
+            List<Movie> movies = this.movieRepository.findByTmdbIdInAndMovieType(tmdbIds, MovieType.STANDALONE);
             log.info("Number of movies: " + movies.size());
 
             List<MovieUserResponseDTO> movieUserResponseDTOS = movies.stream().map(this.movieService::convertToMovieUserResponseDTO).toList();

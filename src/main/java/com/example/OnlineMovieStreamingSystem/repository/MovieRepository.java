@@ -31,7 +31,8 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
             Pageable pageable
     );
 
-    List<Movie> findByIdIn(List<Long> movieIds);
+
+    List<Movie> findByTmdbIdInAndMovieType(List<Long> tmdbIds, MovieType movieType);
 
     @Query("SELECT DISTINCT m FROM Movie m " +
             "LEFT JOIN m.countries c " +

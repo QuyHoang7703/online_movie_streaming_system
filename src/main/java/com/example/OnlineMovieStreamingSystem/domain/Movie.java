@@ -17,6 +17,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"id", "movieType"}))
 public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -26,6 +26,7 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -137,6 +138,7 @@ public class MovieServiceImpl implements MovieService {
             dto.setStatus(movie.getStatus());
             dto.setVoteAverage(movie.getVoteAverage());
             dto.setVoteCount(movie.getVoteCount());
+            dto.setTmdbId(movie.getTmdbId());
             dto.setQuality(movie.getQuality());
             dto.setCreateAt(movie.getCreateAt());
             dto.setUpdateAt(movie.getUpdateAt());
@@ -395,6 +397,13 @@ public class MovieServiceImpl implements MovieService {
             movieUserResponseDTO.setTotalEpisodes(movie.getSeriesMovie().getTotalEpisodes());
         }
 
+        if(movie.getSubscriptionPlans() != null && !movie.getSubscriptionPlans().isEmpty()) {
+            List<SubscriptionPlanSummaryDTO> subscriptionPlanSummaryDTOS = movie.getSubscriptionPlans().stream()
+                    .map(this.subscriptionPlanService::convertToSubscriptionPlanSummaryDTO)
+                    .toList();
+            movieUserResponseDTO.setSubscriptionPlans(subscriptionPlanSummaryDTOS);
+        }
+
         // Set favorite movie
         String email = SecurityUtil.getCurrentLogin().orElse("anonymousUser");
         if(!"anonymousUser".equals(email)) {
@@ -466,7 +475,8 @@ public class MovieServiceImpl implements MovieService {
         if(movieType != null && !movieType.isEmpty()) {
             type = MovieType.valueOf(movieType.toUpperCase());
         }
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.Direction.DESC, "releaseDate");
+
         Page<Movie> moviePage = this.movieRepository.findMoviesByFilter(title, genreNames, type, countries, pageable);
 
         Meta meta = new Meta();

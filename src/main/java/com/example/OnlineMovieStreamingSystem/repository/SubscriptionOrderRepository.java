@@ -5,6 +5,7 @@ import com.example.OnlineMovieStreamingSystem.domain.SubscriptionPlan;
 import com.example.OnlineMovieStreamingSystem.dto.response.statistic.MonthlyRevenueResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.statistic.YearRevenueDTO;
 import com.example.OnlineMovieStreamingSystem.util.constant.SubscriptionOrderStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -73,6 +74,12 @@ public interface SubscriptionOrderRepository extends JpaRepository<SubscriptionO
             "GROUP BY EXTRACT(YEAR FROM so.createAt) " + // Nhóm theo NĂM
             "ORDER BY EXTRACT(YEAR FROM so.createAt) ASC") // Sắp xếp theo NĂM tăng dần
     List<YearRevenueDTO> getYearRevenue(@Param("startYear") int startYear, @Param("endYear") int endYear);
+
+
+    @Query("SELECT so FROM SubscriptionOrder so " +
+            "JOIN so.user u " +
+            "WHERE u.id = :userId")
+    Page<SubscriptionOrder> findByUserId(@Param("userId") Long userId, Pageable pageable);
 
 
 

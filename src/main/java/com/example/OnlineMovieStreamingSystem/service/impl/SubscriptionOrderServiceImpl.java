@@ -5,6 +5,8 @@ import com.example.OnlineMovieStreamingSystem.domain.PlanDuration;
 import com.example.OnlineMovieStreamingSystem.domain.SubscriptionOrder;
 import com.example.OnlineMovieStreamingSystem.domain.SubscriptionPlan;
 import com.example.OnlineMovieStreamingSystem.domain.user.User;
+import com.example.OnlineMovieStreamingSystem.dto.Meta;
+import com.example.OnlineMovieStreamingSystem.dto.ResultPaginationDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.notification.NotificationRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.subscriptionOrder.SubscriptionOrderRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionOrder.PaymentUrlResponseDTO;
@@ -22,8 +24,10 @@ import com.example.OnlineMovieStreamingSystem.util.constant.TargetType;
 import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -146,6 +150,37 @@ public class SubscriptionOrderServiceImpl implements SubscriptionOrderService {
         Optional<SubscriptionOrder> latestOrderOpt = orders.isEmpty() ? Optional.empty() : Optional.of(orders.get(0));
         return latestOrderOpt.map(this::convertToSubscriptionOrderResponseDTO).orElse(null);
 
+    }
+
+    @Override
+    public ResultPaginationDTO getSubscriptionOrders(int size, int page) {
+        String email = SecurityUtil.getLoggedEmail();
+        User user = this.userRepository.findByEmail(email)
+                .orElseThrow(() -> new ApplicationException("Bạn cần đăng nhập đế sử dụng chức năng này"));Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createAt"));
+
+        Page<SubscriptionOrder> subscriptionOrderPage = null;
+
+        if(user.getRole().getName().equals("ADMIN")) {
+            subscriptionOrderPage = this.subscriptionOrderRepository.findAll(pageable);
+        }else{
+            subscriptionOrderPage = this.subscriptionOrderRepository.findByUserId(user.getId(), pageable);
+        }
+
+        ResultPaginationDTO resultPaginationDTO = new ResultPaginationDTO();
+        Meta meta = new Meta();
+        meta.setPageSize(pageable.getPageSize());
+        meta.setCurrentPage(pageable.getPageNumber() + 1);
+        meta.setTotalPages(subscriptionOrderPage.getTotalPages());
+        meta.setTotalElements(subscriptionOrderPage.getTotalElements());
+
+        List<SubscriptionOrderResponseDTO> subscriptionOrderResponseDTOS = subscriptionOrderPage.getContent().stream()
+                .map(this::convertToSubscriptionOrderResponseDTO)
+                .toList();
+
+        resultPaginationDTO.setMeta(meta);
+        resultPaginationDTO.setResult(subscriptionOrderResponseDTOS);
+
+        return resultPaginationDTO;
     }
 
     private PaymentUrlResponseDTO createUrlRequestToVnPay (HttpServletRequest request, Double amount, long planDurationId, String email)  {
