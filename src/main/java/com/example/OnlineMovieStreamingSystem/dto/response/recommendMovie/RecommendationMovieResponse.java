@@ -23,7 +23,7 @@ public class RecommendationMovieResponse {
 
     private double vote_average;
     private double vote_count;
-    private String source;
+    private String method;
 
 
     private int year;

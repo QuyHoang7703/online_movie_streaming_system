@@ -1,6 +1,7 @@
 package com.example.OnlineMovieStreamingSystem.service;
 
 import com.example.OnlineMovieStreamingSystem.dto.ResultPaginationDTO;
+import com.example.OnlineMovieStreamingSystem.dto.request.recommendMovie.NeuMFRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.recommendMovie.RecommendationMovieRequest;
 import com.example.OnlineMovieStreamingSystem.dto.response.movie.MovieUserResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.subscriptionPlan.SubscriptionPlanResponseDTO;
@@ -14,4 +15,5 @@ public interface MovieUserService {
     List<MovieUserResponseDTO> getRecommendationsForMovie(RecommendationMovieRequest recommendationMovieRequest);
     ResultPaginationDTO getHotMovieByMovieType(MovieType movieType,String country, int size);
     ResultPaginationDTO getFeatureMovies(int size);
+    List<MovieUserResponseDTO> getRecommendNeuMfForUser(NeuMFRequestDTO neuMFRequestDTO);
 }

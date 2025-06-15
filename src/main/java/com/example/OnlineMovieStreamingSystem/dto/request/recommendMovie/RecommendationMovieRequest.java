@@ -1,5 +1,6 @@
 package com.example.OnlineMovieStreamingSystem.dto.request.recommendMovie;
 
+import com.example.OnlineMovieStreamingSystem.util.constant.MovieType;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -18,6 +19,7 @@ public class RecommendationMovieRequest {
     private long user_id;
     private long tmdb_id;
     private int num_recommendations;
+    private MovieType movieType;
     private double cbf_weight;
     private double neumf_weight;
 }

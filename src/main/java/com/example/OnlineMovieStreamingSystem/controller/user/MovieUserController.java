@@ -1,6 +1,7 @@
 package com.example.OnlineMovieStreamingSystem.controller.user;
 
 import com.example.OnlineMovieStreamingSystem.dto.ResultPaginationDTO;
+import com.example.OnlineMovieStreamingSystem.dto.request.recommendMovie.NeuMFRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.recommendMovie.RecommendationMovieRequest;
 import com.example.OnlineMovieStreamingSystem.dto.response.movie.MovieResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.movie.MovieUserResponseDTO;
@@ -49,6 +50,12 @@ public class MovieUserController {
     public ResponseEntity<List<MovieUserResponseDTO>> getRecommendMovies(@RequestBody RecommendationMovieRequest recommendationMovieRequest) {
 
         return ResponseEntity.status(HttpStatus.OK).body(this.movieUserService.getRecommendationsForMovie(recommendationMovieRequest));
+    }
+
+    @PostMapping("/recommend-for-user")
+    public ResponseEntity<List<MovieUserResponseDTO>> getRecommendNeuMfForUser(@RequestBody NeuMFRequestDTO neuMFRequestDTO) {
+
+        return ResponseEntity.status(HttpStatus.OK).body(this.movieUserService.getRecommendNeuMfForUser(neuMFRequestDTO));
     }
 
 

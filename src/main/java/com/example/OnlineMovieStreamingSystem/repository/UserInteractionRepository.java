@@ -6,10 +6,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserInteractionRepository extends JpaRepository<UserInteraction, Long> {
     @Query("SELECT COUNT(ui) FROM UserInteraction ui " +
             "WHERE ui.userTemporaryId = :userId")
     long countRatingsOfUser(@Param("userId") long userId);
+
+    Optional<UserInteraction> findByUserIdAndMovieId(long userId, long movieId);
 
 }

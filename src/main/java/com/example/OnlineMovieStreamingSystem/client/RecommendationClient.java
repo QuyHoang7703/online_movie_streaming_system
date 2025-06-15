@@ -1,5 +1,6 @@
 package com.example.OnlineMovieStreamingSystem.client;
 
+import com.example.OnlineMovieStreamingSystem.dto.request.recommendMovie.NeuMFRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.recommendMovie.RecommendationMovieRequest;
 import com.example.OnlineMovieStreamingSystem.dto.response.recommendMovie.RecommendationResponseWrapper;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -11,4 +12,6 @@ public interface RecommendationClient {
     RecommendationResponseWrapper getRecommendationHybridResponse(RecommendationMovieRequest request);
     @PostMapping("/api/recommend")
     RecommendationResponseWrapper getRecommendationCBFResponse(RecommendationMovieRequest request);
+    @PostMapping("/api/recommend/neumf/user")
+    RecommendationResponseWrapper getRecommendationNeuMFResponse(NeuMFRequestDTO neuMFRequestDTO);
 }

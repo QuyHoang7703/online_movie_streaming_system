@@ -227,6 +227,9 @@ public class SubscriptionOrderServiceImpl implements SubscriptionOrderService {
                 .createAt(subscriptionOrder.getCreateAt())
                 .subscriptionPlanName(subscriptionOrder.getPlanDuration().getSubscriptionPlan().getName())
                 .durationInMonths(subscriptionOrder.getPlanDuration().getDurationInMonths())
+                .email(subscriptionOrder.getUser().getEmail())
+                .name(subscriptionOrder.getUser().getUserDetail().getName())
+                .phoneNumber(subscriptionOrder.getUser().getUserDetail().getPhoneNumber())
                 .build();
 
         return subscriptionOrderResponseDTO;

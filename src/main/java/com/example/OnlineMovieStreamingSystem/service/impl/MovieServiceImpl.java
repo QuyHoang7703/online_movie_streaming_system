@@ -27,6 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,6 +54,8 @@ public class MovieServiceImpl implements MovieService {
     private final VideoVersionService videoVersionService;
     private final UserRepository userRepository;
     private final FavoriteMovieRepository favoriteMovieRepository;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final String MOVIE_PREFIX = "movie:";
 
     @Override
     public Movie createMovieFromDTO(MovieRequestDTO movieRequestDTO, MultipartFile poster, MultipartFile backdrop) throws IOException {
@@ -463,6 +466,7 @@ public class MovieServiceImpl implements MovieService {
                                           int page,
                                           int size, Function<Movie, ?> movieMapper) throws BadRequestException {
         MovieType type = null;
+
         if (movieType != null && !movieType.isEmpty()) {
             try {
                 type = MovieType.valueOf(movieType.toUpperCase());
@@ -494,6 +498,12 @@ public class MovieServiceImpl implements MovieService {
                 .toList();
 
         resultPaginationDTO.setResult(mappedResults);
+        StringBuilder key = new StringBuilder(MOVIE_PREFIX);
+        if(title != null && !title.isEmpty()) {
+            key.append(title);
+        }
+        
+//        redisTemplate.opsForValue().set(key)
 
         return resultPaginationDTO;
     }

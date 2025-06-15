@@ -8,6 +8,7 @@ import com.example.OnlineMovieStreamingSystem.domain.SubscriptionPlan;
 import com.example.OnlineMovieStreamingSystem.domain.user.User;
 import com.example.OnlineMovieStreamingSystem.dto.Meta;
 import com.example.OnlineMovieStreamingSystem.dto.ResultPaginationDTO;
+import com.example.OnlineMovieStreamingSystem.dto.request.recommendMovie.NeuMFRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.recommendMovie.RecommendationMovieRequest;
 import com.example.OnlineMovieStreamingSystem.dto.response.movie.MovieResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.movie.MovieUserResponseDTO;
@@ -118,7 +119,7 @@ public class MovieUserServiceImpl implements MovieUserService {
 
         RecommendationResponseWrapper recommendationResponseWrapper = null;
 
-        if(!email.equals("anonymousUser")) {
+        if(!email.equals("anonymousUser") && recommendationMovieRequest.getMovieType() == MovieType.STANDALONE) {
             double cbfWeight = 0.0;
             double neumfWeight = 0.0;
 
@@ -147,10 +148,10 @@ public class MovieUserServiceImpl implements MovieUserService {
             List<RecommendationMovieResponse> recommendationMovieResponses = recommendationResponseWrapper.getData().getRecommendations();
 
             recommendationMovieResponses.forEach(r -> log.info("CBF Score: {}, NeuMF Score: {}, Hybrid Score: {}, Source: {}, TMDB ID: {} ",
-                    r.getCbf_score(), r.getNeumf_score(), r.getHybrid_score(), r.getSource(), r.getTmdb_id()));
+                    r.getCbf_score(), r.getNeumf_score(), r.getHybrid_score(), r.getMethod(), r.getTmdb_id()));
 
             List<Long> tmdbIds = recommendationMovieResponses.stream().map(RecommendationMovieResponse::getTmdb_id).toList();
-            List<Movie> movies = this.movieRepository.findByTmdbIdInAndMovieType(tmdbIds, MovieType.STANDALONE);
+            List<Movie> movies = this.movieRepository.findByTmdbIdInAndMovieType(tmdbIds, recommendationMovieRequest.getMovieType());
             log.info("Number of movies: " + movies.size());
 
             List<MovieUserResponseDTO> movieUserResponseDTOS = movies.stream().map(this.movieService::convertToMovieUserResponseDTO).toList();
@@ -219,6 +220,32 @@ public class MovieUserServiceImpl implements MovieUserService {
         resultPaginationDTO.setResult(movieResponseDTOS);
 
         return resultPaginationDTO;
+    }
+
+    @Override
+    public List<MovieUserResponseDTO> getRecommendNeuMfForUser(NeuMFRequestDTO neuMFRequestDTO) {
+        if(neuMFRequestDTO.getUser_id() == null) {
+            return null;
+        }
+        RecommendationResponseWrapper recommendationResponseWrapper = null;
+        recommendationResponseWrapper = this.recommendationClient.getRecommendationNeuMFResponse(neuMFRequestDTO);
+        if(recommendationResponseWrapper != null) {
+
+            List<RecommendationMovieResponse> recommendationMovieResponses = recommendationResponseWrapper.getData().getRecommendations();
+
+            recommendationMovieResponses.forEach(r -> log.info("CBF Score: {}, NeuMF Score: {}, Hybrid Score: {}, Source: {}, TMDB ID: {} ",
+                    r.getCbf_score(), r.getNeumf_score(), r.getHybrid_score(), r.getMethod(), r.getTmdb_id()));
+
+            List<Long> tmdbIds = recommendationMovieResponses.stream().map(RecommendationMovieResponse::getTmdb_id).toList();
+            List<Movie> movies = this.movieRepository.findByTmdbIdInAndMovieType(tmdbIds, MovieType.STANDALONE);
+            log.info("Number of movies: " + movies.size());
+
+            List<MovieUserResponseDTO> movieUserResponseDTOS = movies.stream().map(this.movieService::convertToMovieUserResponseDTO).toList();
+
+            return movieUserResponseDTOS;
+
+        }
+        return null;
     }
 
 

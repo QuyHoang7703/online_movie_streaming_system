@@ -21,4 +21,7 @@ public class SubscriptionOrderResponseDTO {
     private Instant createAt;
     private String subscriptionPlanName;
     private int durationInMonths;
+    private String name;
+    private String email;
+    private String phoneNumber;
 }
