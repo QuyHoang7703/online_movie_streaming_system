@@ -1,5 +1,6 @@
 package com.example.OnlineMovieStreamingSystem.controller.user;
 
+import com.example.OnlineMovieStreamingSystem.dto.ResultPaginationDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.userInteraction.UserInteractionRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.userInteraction.UserInteractionResponseDTO;
 import com.example.OnlineMovieStreamingSystem.service.UserInteractionService;
@@ -31,4 +32,12 @@ public class UserInteractionController {
     public ResponseEntity<UserInteractionResponseDTO> getRatingOfUserForMovie(@PathVariable("movieId") long movieId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(this.userInteractionService.getUserInteraction(movieId));
     }
+
+    @GetMapping("/history-view")
+    public ResponseEntity<ResultPaginationDTO> getHistoryViewOfUser(@RequestParam(name = "page", defaultValue = "1") int page,
+                                                                    @RequestParam(name = "size", defaultValue = "15") int size) {
+        return ResponseEntity.status(HttpStatus.OK).body(this.userInteractionService.getHistoryViewForUser(page, size));
+    }
+
+
 }

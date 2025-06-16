@@ -45,5 +45,8 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     long countByMovieType(MovieType movieType);
 
 
+    List<Movie> findByTmdbIdIn(List<Long> tmdbIds);
+
+
 
 }

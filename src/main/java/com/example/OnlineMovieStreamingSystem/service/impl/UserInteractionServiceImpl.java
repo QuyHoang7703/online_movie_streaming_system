@@ -3,16 +3,26 @@ package com.example.OnlineMovieStreamingSystem.service.impl;
 import com.example.OnlineMovieStreamingSystem.domain.Movie;
 import com.example.OnlineMovieStreamingSystem.domain.UserInteraction;
 import com.example.OnlineMovieStreamingSystem.domain.user.User;
+import com.example.OnlineMovieStreamingSystem.dto.Meta;
+import com.example.OnlineMovieStreamingSystem.dto.ResultPaginationDTO;
 import com.example.OnlineMovieStreamingSystem.dto.request.userInteraction.UserInteractionRequestDTO;
+import com.example.OnlineMovieStreamingSystem.dto.response.movie.MovieUserResponseDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.userInteraction.UserInteractionResponseDTO;
 import com.example.OnlineMovieStreamingSystem.repository.MovieRepository;
 import com.example.OnlineMovieStreamingSystem.repository.UserInteractionRepository;
 import com.example.OnlineMovieStreamingSystem.repository.UserRepository;
+import com.example.OnlineMovieStreamingSystem.service.MovieService;
 import com.example.OnlineMovieStreamingSystem.service.UserInteractionService;
 import com.example.OnlineMovieStreamingSystem.util.SecurityUtil;
 import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +30,8 @@ public class UserInteractionServiceImpl implements UserInteractionService {
     private final UserInteractionRepository userInteractionRepository;
     private final UserRepository userRepository;
     private final MovieRepository movieRepository;
+    private final MovieService movieService;
+
     @Override
     public UserInteractionResponseDTO addUserInteraction(UserInteractionRequestDTO userInteractionRequestDTO) {
         String email = SecurityUtil.getLoggedEmail();
@@ -64,6 +76,37 @@ public class UserInteractionServiceImpl implements UserInteractionService {
 
         }
         return null;
+    }
+
+    @Override
+    public ResultPaginationDTO getHistoryViewForUser(int page, int size) {
+        String email = SecurityUtil.getLoggedEmail();
+        User user = this.userRepository.findByEmail(email)
+                .orElseThrow(() -> new ApplicationException("Không tìm thấy user với email: " + email));
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC,"updatedAt"));
+        Page<UserInteraction> userInteractionPage = this.userInteractionRepository.findByUserId(user.getId(), pageable);
+
+        ResultPaginationDTO resultPaginationDTO = new ResultPaginationDTO();
+
+        Meta meta = new Meta();
+
+        meta.setCurrentPage(pageable.getPageNumber() + 1);
+        meta.setPageSize(pageable.getPageSize());
+        meta.setTotalPages(userInteractionPage.getTotalPages());
+        meta.setTotalElements(userInteractionPage.getTotalElements());
+
+        // Lấy các tmdb_id (movie_temporaryIds) từ các record user_interaction
+        List<Long> tmdbIds = userInteractionPage.getContent().stream()
+                .map(UserInteraction::getMovieTemporaryId)
+                .toList();
+
+        List<Movie> movies = this.movieRepository.findByTmdbIdIn(tmdbIds);
+        List<MovieUserResponseDTO> movieUserResponseDTOS = movies.stream().map(this.movieService::convertToMovieUserResponseDTO).toList();
+
+        resultPaginationDTO.setMeta(meta);
+        resultPaginationDTO.setResult(movieUserResponseDTOS);
+
+        return resultPaginationDTO;
     }
 
     private UserInteractionResponseDTO convertToUserInteractionResponseDTO(UserInteraction userInteraction) {
