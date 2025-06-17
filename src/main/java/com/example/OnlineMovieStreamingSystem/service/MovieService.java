@@ -19,6 +19,7 @@ public interface MovieService {
                                   List<String> genreNames,
                                   String movieType,
                                   List<String> countries,
+                                          Long subscriptionPlanId,
                                   int page,
                                   int size) throws BadRequestException;
     List<String> getAllCountriesOfMovie();

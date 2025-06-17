@@ -17,4 +17,5 @@ public interface SubscriptionPlanService {
     void deleteSubscriptionPlan(long subscriptionPlanId);
     SubscriptionPlanSummaryDTO convertToSubscriptionPlanSummaryDTO(SubscriptionPlan subscriptionPlan);
     SubscriptionPlanResponseDTO convertToSubscriptionPlanResponseDTO(SubscriptionPlan subscriptionPlan);
+    List<SubscriptionPlanSummaryDTO> getSubscriptionPlansForFilters();
 }

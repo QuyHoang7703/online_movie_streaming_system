@@ -59,6 +59,10 @@ public class SubscriptionPlanController {
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
+    @GetMapping("/filters")
+    public ResponseEntity<List<SubscriptionPlanSummaryDTO>> getSubscriptionPlansForFilter() {
 
+        return ResponseEntity.status(HttpStatus.OK).body(this.subscriptionPlanService.getSubscriptionPlansForFilters());
+    }
 
 }

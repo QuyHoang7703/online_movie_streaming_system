@@ -25,9 +25,10 @@ public class MovieController {
                                                          @RequestParam(name="movieType", required = false) String movieType,
                                                          @RequestParam(name="countries", required = false) List<String> countries,
                                                          @RequestParam(name="page", defaultValue = "1") int page,
+                                                         @RequestParam(name="subscriptionPlanId", required = false) Long subscriptionPlanId,
                                                          @RequestParam(name="size", defaultValue = "10") int size) throws BadRequestException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(this.movieService.getMoviesForAdmin(title, genreNames, movieType, countries, page, size));
+        return ResponseEntity.status(HttpStatus.OK).body(this.movieService.getMoviesForAdmin(title, genreNames, movieType, countries, subscriptionPlanId, page, size));
     }
 
 
@@ -43,6 +44,9 @@ public class MovieController {
         this.movieService.deleteMovie(movieId);
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
+
+//    @GetMapping
+//    public ResponseEntity<ResultPaginationDTO> getMovie
 
 
 

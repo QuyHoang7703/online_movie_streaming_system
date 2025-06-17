@@ -226,21 +226,25 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
         subscriptionPlanResponseDTO.setDescription(subscriptionPlan.getDescription());
         subscriptionPlanResponseDTO.setActive(subscriptionPlan.isActive());
 
-        List<String> features = Arrays.asList(subscriptionPlan.getFeatures().split("!"));
-        subscriptionPlanResponseDTO.setFeatures(features);
+        Set<String> allFeatures = new LinkedHashSet<>(); // LinkedHashSet để giữ thứ tự nếu các đặc trưng gốc quan trọng
+
+
 
         if(subscriptionPlan.getParentPlans() != null) {
             List<SubscriptionPlanSummaryDTO> parentPlans = subscriptionPlan.getParentPlans().stream()
                     .map(this::convertToSubscriptionPlanSummaryDTO)
                     .toList();
             subscriptionPlanResponseDTO.setParentPlans(parentPlans);
+
         }
 
         if(subscriptionPlan.getChildPlans() != null) {
-            List<SubscriptionPlanSummaryDTO> childPlans = subscriptionPlan.getChildPlans().stream()
+            List<SubscriptionPlan> childSubscriptionPlans = subscriptionPlan.getChildPlans();
+            List<SubscriptionPlanSummaryDTO> childPlans = childSubscriptionPlans.stream()
                     .map(this::convertToSubscriptionPlanSummaryDTO)
                     .toList();
             subscriptionPlanResponseDTO.setChildPlans(childPlans);
+            getAllFeaturesFromChild(allFeatures, childSubscriptionPlans);
         }
 
         if(subscriptionPlan.getPlanDurations() != null) {
@@ -251,7 +255,23 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
             subscriptionPlanResponseDTO.setPlanDurations(planDurationResponseDTOS);
         }
 
+        // Thêm đặc trưng của gói cha vào Set
+        if (subscriptionPlan.getFeatures() != null && !subscriptionPlan.getFeatures().isEmpty()) {
+            allFeatures.addAll(Arrays.asList(subscriptionPlan.getFeatures().split("!")));
+        }
+
+        subscriptionPlanResponseDTO.setFeatures(new ArrayList<>(allFeatures));
+
         return subscriptionPlanResponseDTO;
+    }
+
+    @Override
+    public List<SubscriptionPlanSummaryDTO> getSubscriptionPlansForFilters() {
+        List<SubscriptionPlan> subscriptionPlans = subscriptionPlanRepository.findAll();
+        List<SubscriptionPlanSummaryDTO> subscriptionPlanSummaryDTOS = subscriptionPlans.stream()
+                .map(this::convertToSubscriptionPlanSummaryDTO).toList();
+
+        return subscriptionPlanSummaryDTOS;
     }
 
     private PlanDurationResponseDTO convertToPlanDurationResponseDTO(PlanDuration planDuration) {
@@ -263,6 +283,16 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
                 .build();
 
         return planDurationResponseDTO;
+    }
+
+    private void getAllFeaturesFromChild(Set<String> features,  List<SubscriptionPlan> childSubscriptionPlans) {
+        for(SubscriptionPlan subscriptionPlan: childSubscriptionPlans) {
+            features.addAll(Arrays.asList(subscriptionPlan.getFeatures().split("!")));
+            if(subscriptionPlan.getChildPlans() != null && !subscriptionPlan.getChildPlans().isEmpty()) {
+                getAllFeaturesFromChild(features, subscriptionPlan.getChildPlans());
+            }
+        }
+
     }
 
 

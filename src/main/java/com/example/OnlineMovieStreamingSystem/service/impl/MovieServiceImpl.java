@@ -205,7 +205,7 @@ public class MovieServiceImpl implements MovieService {
                                                int page,
                                                int size) throws BadRequestException {
         Function<Movie, MovieUserResponseDTO> userMapper = (movie) -> this.convertToMovieUserResponseDTO(movie);
-        return getMovies(title, genreNames, movieType, countries, page, size, userMapper);
+        return getMovies(title, genreNames, movieType, countries, null, page, size, userMapper);
     }
 
 
@@ -214,10 +214,11 @@ public class MovieServiceImpl implements MovieService {
                                                List<String> genreNames,
                                                String movieType,
                                                List<String> countries,
+                                                 Long subscriptionPlanId,
                                                int page,
                                                int size) throws BadRequestException {
         Function<Movie, MovieSummaryResponseDTO> adminMapper = (movie) -> this.convertToMovieSummaryResponseDTO(movie);
-        return getMovies(title, genreNames, movieType, countries, page, size, adminMapper);
+        return getMovies(title, genreNames, movieType, countries, subscriptionPlanId, page, size, adminMapper);
     }
 
 
@@ -463,6 +464,7 @@ public class MovieServiceImpl implements MovieService {
                                           List<String> genreNames,
                                           String movieType,
                                           List<String> countries,
+                                          Long subscriptionPlanId,
                                           int page,
                                           int size, Function<Movie, ?> movieMapper) throws BadRequestException {
         MovieType type = null;
@@ -476,12 +478,35 @@ public class MovieServiceImpl implements MovieService {
             }
         }
 
+
+
         if(movieType != null && !movieType.isEmpty()) {
             type = MovieType.valueOf(movieType.toUpperCase());
         }
         Pageable pageable = PageRequest.of(page - 1, size, Sort.Direction.DESC, "releaseDate");
+        Page<Movie> moviePage = null;
+        if (subscriptionPlanId != null) {
+            // Lấy tất cả các gói liên quan (bao gồm gói cha và tất cả các gói con)
+            Set<SubscriptionPlan> allRelevantPlans = new HashSet<>();
+            SubscriptionPlan mainPlan = subscriptionPlanRepository.findById(subscriptionPlanId)
+                    .orElseThrow(() -> new ApplicationException("Subscription Plan không tồn tại."));
+            allRelevantPlans.add(mainPlan);
+            findAllChildPlans(mainPlan, allRelevantPlans);
 
-        Page<Movie> moviePage = this.movieRepository.findMoviesByFilter(title, genreNames, type, countries, pageable);
+            List<Long> planIds = allRelevantPlans.stream()
+                    .map(SubscriptionPlan::getId)
+                    .toList();
+
+            // Truy vấn phim dựa trên các tiêu chí lọc VÀ các gói đăng ký liên quan
+            // Bạn cần một phương thức mới trong movieRepository để xử lý điều này
+            moviePage = this.movieRepository.findMoviesByFilterAndSubscriptionPlans(
+                    title, genreNames, type, countries, planIds, pageable);
+
+        } else {
+            // Nếu không có subscriptionPlanId, lọc như bình thường (không theo gói)
+            moviePage = this.movieRepository.findMoviesByFilter(title, genreNames, type, countries, pageable);
+        }
+
 
         Meta meta = new Meta();
         meta.setCurrentPage(pageable.getPageNumber() + 1);
@@ -507,6 +532,22 @@ public class MovieServiceImpl implements MovieService {
 
         return resultPaginationDTO;
     }
+
+
+    private void findAllChildPlans(SubscriptionPlan parentSubscriptionPlan, Set<SubscriptionPlan> collectedPlans ) {
+        if (parentSubscriptionPlan.getChildPlans() != null && !parentSubscriptionPlan.getChildPlans().isEmpty()) {
+            for (SubscriptionPlan child : parentSubscriptionPlan.getChildPlans()) {
+                if (collectedPlans.add(child)) { // Thêm nếu chưa có và tránh vòng lặp vô hạn
+                    findAllChildPlans(child, collectedPlans);
+                }
+            }
+        }
+
+    }
+
+
+
+
 
 
 

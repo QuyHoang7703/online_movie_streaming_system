@@ -32,6 +32,23 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     );
 
 
+    @Query("SELECT m FROM Movie m " +
+            "LEFT JOIN m.genres g " +
+            "LEFT JOIN m.subscriptionPlans sp " +
+            "LEFT join m.countries c " + // Join với subscriptionPlans
+            "WHERE (:title IS NULL OR LOWER(m.title) LIKE LOWER(CONCAT('%', :title, '%'))) " +
+            "AND (:genreNames IS NULL OR g.name IN :genreNames) " +
+            "AND (:movieType IS NULL OR m.movieType = :movieType) " +
+            "AND (:countries IS NULL OR c.name IN :countries) " +
+            "AND (:planIds IS NULL OR sp.id IN :planIds) " + // Thêm điều kiện lọc theo planIds
+            "GROUP BY m.id") // Đảm bảo không trùng lặp phim nếu có nhiều genre hoặc plan
+    Page<Movie> findMoviesByFilterAndSubscriptionPlans(@Param("title") String title,
+                                                       @Param("genreNames") List<String> genreNames,
+                                                       @Param("movieType") MovieType movieType,
+                                                       @Param("countries") List<String> countries,
+                                                       @Param("planIds") List<Long> planIds, // Tham số mới
+                                                       Pageable pageable);
+
     List<Movie> findByTmdbIdInAndMovieType(List<Long> tmdbIds, MovieType movieType);
 
     @Query("SELECT DISTINCT m FROM Movie m " +
