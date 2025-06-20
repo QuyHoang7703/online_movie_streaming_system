@@ -87,29 +87,29 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-
-      - name: Wait for MySQL
-        run: |
-          for i in {1..15}; do
-            if mysqladmin ping -h mysql --silent; then
-              echo "✅ MySQL is ready!"
-              break
-            fi
-            echo "⏳ Waiting for MySQL..."
-            sleep 4
-          done
-
-      - name: Wait for Redis
-        run: |
-          for i in {1..15}; do
-            if redis-cli -h redis ping | grep PONG > /dev/null; then
-              echo "✅ Redis is ready!"
-              break
-            fi
-            echo "⏳ Waiting for Redis..."
-            sleep 4
-          done
-
+#
+#      - name: Wait for MySQL
+#        run: |
+#          for i in {1..15}; do
+#            if mysqladmin ping -h mysql --silent; then
+#              echo "✅ MySQL is ready!"
+#              break
+#            fi
+#            echo "⏳ Waiting for MySQL..."
+#            sleep 4
+#          done
+#
+#      - name: Wait for Redis
+#        run: |
+#          for i in {1..15}; do
+#            if redis-cli -h redis ping | grep PONG > /dev/null; then
+#              echo "✅ Redis is ready!"
+#              break
+#            fi
+#            echo "⏳ Waiting for Redis..."
+#            sleep 4
+#          done
+#
       - name: Run Tests
         run: mvn clean verify
 
@@ -181,7 +181,7 @@ jobs:
           platforms: linux/amd64
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/omss-api:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/omss-api:${{ steps.extract_version.outputs.VERSION }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/omss-api:0.0.2
           build-args: |
             PROFILE=dev
             APP_VERSION=${{ steps.extract_version.outputs.VERSION }}
