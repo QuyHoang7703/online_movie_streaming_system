@@ -14,12 +14,42 @@ jobs:
     name: Compile and Unit Test
     runs-on: ubuntu-latest
     env:
+      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/online_movie_streaming_system_v2
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_PROFILES_ACTIVE: dev
       AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
       AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
       GG_Client_ID: ${{ secrets.GG_Client_ID }}
       GG_Client_Secret: ${{ secrets.GG_Client_Secret }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
+      REDIS_HOST: localhost
+      REDIS_PORT: 6379
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: online_movie_streaming_system_v2
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,12 +59,24 @@ jobs:
         with:
           java-version: '17'
           distribution: 'corretto'
+
       - name: Debug folder tree
         run: |
           echo "Current directory:"
           pwd
           echo "List files:"
           ls -la
+
+      - name: Wait for MySQL to be healthy
+        run: |
+          echo "Waiting for MySQL to be ready..."
+          for i in {1..30}; do
+            if mysqladmin ping -h "127.0.0.1" -uroot -proot --silent; then
+              echo "MySQL is ready!"
+              break
+            fi
+            sleep 2
+          done
 
       - name: Run compile + test
         run: mvn clean verify
