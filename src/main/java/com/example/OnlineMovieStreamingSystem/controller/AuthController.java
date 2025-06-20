@@ -42,6 +42,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
+        log.info("Login successfully");
         AuthResponseDTO authResponseDTO = this.authService.loginAuthToken(loginRequestDTO);
 
         String accessToken = authResponseDTO.getAccessToken();
