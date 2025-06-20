@@ -386,6 +386,7 @@ public class MovieServiceImpl implements MovieService {
                     .map(this.videoVersionService::convertToVideoVersionDetailResponseDTO)
                     .toList();
             movieUserResponseDTO.setVideoVersions(videoVersionDetailResponseDTOS);
+            movieUserResponseDTO.setDuration(videoVersions.get(0).getEpisodes().get(0).getDuration());
         }
 
         // Set attribute for standaloneMovie

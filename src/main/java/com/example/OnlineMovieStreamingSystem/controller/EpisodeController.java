@@ -31,7 +31,7 @@ public class EpisodeController {
     @GetMapping("/video-versions/{videoVersionId}/episodes")
     public ResponseEntity<ResultPaginationDTO> getEpisodeOfSeriesMovie(@PathVariable("videoVersionId") long videoVersionId,
                                                                        @RequestParam(name = "page", defaultValue = "1") int page,
-                                                                       @RequestParam(name = "size", defaultValue = "5") int size) {
+                                                                       @RequestParam(name = "size", defaultValue = "50") int size) {
         return ResponseEntity.status(HttpStatus.OK).body(this.episodeService.getEpisodeList(videoVersionId, page,size));
     }
 
