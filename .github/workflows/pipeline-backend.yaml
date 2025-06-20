@@ -1,6 +1,5 @@
 name: OMSS Backend API Pipeline
-  
-  Add commentMore actions
+
 on:
   push:
     branches:
@@ -39,7 +38,6 @@ jobs:
       - name: Compile Project
         run: mvn clean compile
 
-
   unit-test:
     runs-on: ubuntu-latest
     name: Unit & Integration Test
@@ -70,10 +68,10 @@ jobs:
           --health-retries=10
 
     env:
-      SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/online_movie_streaming_system_v2
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/online_movie_streaming_system_v2
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
-      REDIS_HOST: 127.0.0.1
+      REDIS_HOST: redis
       REDIS_PORT: 6379
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
@@ -92,23 +90,33 @@ jobs:
           java-version: '17'
           distribution: 'corretto'
 
+      - name: Install redis-cli
+        run: sudo apt-get update && sudo apt-get install -y redis-tools
+
       - name: Wait for MySQL
         run: |
-          until mysqladmin ping -h 127.0.0.1 --silent; do
+          for i in {1..15}; do
+            if mysqladmin ping -h mysql --silent; then
+              echo "MySQL is ready!"
+              break
+            fi
             echo "Waiting for MySQL..."
-            sleep 5
+            sleep 4
           done
 
       - name: Wait for Redis
         run: |
-          until redis-cli -h 127.0.0.1 ping | grep PONG > /dev/null; do
+          for i in {1..15}; do
+            if redis-cli -h redis ping | grep PONG > /dev/null; then
+              echo "Redis is ready!"
+              break
+            fi
             echo "Waiting for Redis..."
-            sleep 5
+            sleep 4
           done
 
       - name: Run Tests
         run: mvn clean verify
-
 
   build:
     runs-on: ubuntu-latest
@@ -127,7 +135,6 @@ jobs:
 
       - name: Build Project
         run: mvn clean package -DskipTests
-
 
   build-push-image:
     name: Build & Push Docker Image
