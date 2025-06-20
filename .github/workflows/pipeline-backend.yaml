@@ -1,12 +1,14 @@
 name: OMSS Backend API Pipeline
-
+  
+  Add commentMore actions
 on:
   push:
     branches:
-      - main
-  pull_request:
-    branches:
-      - main
+      - ci/pipeline
+    paths:
+      - src/**
+      - .github/workflows/**
+      - 'Dockerfile'
 
 env:
   PROFILE: dev
