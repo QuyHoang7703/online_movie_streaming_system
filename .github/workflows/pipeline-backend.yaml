@@ -30,8 +30,7 @@ jobs:
           ls -la
 
       - name: Run compile + test
-        run: |
-          ./mvnw clean verify
+        run: mvnw clean verify
 
   build-push-image:
     name: Build & Push Docker Image
@@ -57,8 +56,7 @@ jobs:
 
       - name: Extract project version from pom.xml
         id: extract_version
-        run: |
-          echo "VERSION=$(./mvnw -q -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
+        run: echo "VERSION=$(mvnw -q -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
 
       - name: Login to DockerHub
         uses: docker/login-action@v3
