@@ -50,8 +50,7 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: online_movie_streaming_system_v2
-          MYSQL_USER: root
-          MYSQL_PASSWORD: root
+          MYSQL_ROOT_HOST: "%"
         ports:
           - 3306:3306
         options: >-
