@@ -31,7 +31,6 @@ jobs:
 
       - name: Run compile + test
         run: |
-#          cd OnlineMovieStreamingSystem
           ./mvnw clean verify
 
   build-push-image:
@@ -59,7 +58,6 @@ jobs:
       - name: Extract project version from pom.xml
         id: extract_version
         run: |
-#          cd OnlineMovieStreamingSystem
           echo "VERSION=$(./mvnw -q -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
 
       - name: Login to DockerHub
