@@ -26,7 +26,7 @@ public class VideoVersion {
     @JoinColumn(name="movie_id")
     private Movie movie;
 
-    @OneToMany(mappedBy = "videoVersion")
+    @OneToMany(mappedBy = "videoVersion",  cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Episode> episodes;
 
 

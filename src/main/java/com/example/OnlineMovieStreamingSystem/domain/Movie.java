@@ -66,7 +66,7 @@ public class Movie {
     @JoinTable(name="movie_country", joinColumns = @JoinColumn(name="movie_id"), inverseJoinColumns = @JoinColumn(name="country_id"))
     private List<Country> countries;
 
-    @OneToMany(mappedBy = "movie")
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VideoVersion> videoVersions;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)

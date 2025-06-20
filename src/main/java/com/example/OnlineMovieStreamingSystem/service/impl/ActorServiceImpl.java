@@ -147,12 +147,14 @@ public class ActorServiceImpl implements ActorService {
         actorDetailResponseDTO.setOtherName(actor.getOtherName());
         actorDetailResponseDTO.setPlaceOfBirth(actor.getPlaceOfBirth());
         actorDetailResponseDTO.setGender(actor.getGender());
-        
-        List<Movie> movies = actor.getMovieActors().stream().map(MovieActor::getMovie).toList();
-        List<MovieUserResponseDTO> movieUserResponseDTOS = movies.stream()
-                .map(this.movieService::convertToMovieUserResponseDTO)
-                .toList();
-        actorDetailResponseDTO.setMovies(movieUserResponseDTOS);
+        if(actor.getMovieActors() != null && !actor.getMovieActors().isEmpty()) {
+            List<Movie> movies = actor.getMovieActors().stream().map(MovieActor::getMovie).toList();
+            List<MovieUserResponseDTO> movieUserResponseDTOS = movies.stream()
+                    .map(this.movieService::convertToMovieUserResponseDTO)
+                    .toList();
+            actorDetailResponseDTO.setMovies(movieUserResponseDTOS);
+        }
+
 
         return actorDetailResponseDTO;
     }
