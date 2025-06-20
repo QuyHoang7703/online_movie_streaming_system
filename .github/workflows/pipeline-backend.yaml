@@ -3,32 +3,29 @@ name: OMSS Backend API Pipeline
 on:
   push:
     branches:
-      - ci/pipeline
-    paths:
-      - src/**
-      - .github/workflows/**
-      - 'Dockerfile'
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  PROFILE: dev
 
 jobs:
-  test:
-    name: Compile and Unit Test
+  compile:
     runs-on: ubuntu-latest
-    env:
-      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/online_movie_streaming_system_v2
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
-      REDIS_HOST: localhost
-      REDIS_PORT: 6379
+    name: Compile Project
 
+    env:
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
-      GG_CLIENT_ID: ${{ secrets.GG_Client_ID }}
-      GG_CLIENT_SECRET: ${{ secrets.GG_Client_Secret }}
+      GG_Client_ID: ${{ secrets.GG_Client_ID }}
+      GG_Client_Secret: ${{ secrets.GG_Client_Secret }}
       AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
       AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Setup JDK 17
@@ -37,52 +34,126 @@ jobs:
           java-version: '17'
           distribution: 'corretto'
 
-      - name: Start MySQL and Redis
+      - name: Compile Project
+        run: mvn clean compile
+
+
+  unit-test:
+    runs-on: ubuntu-latest
+    name: Unit & Integration Test
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: online_movie_streaming_system_v2
+          MYSQL_USER: root
+          MYSQL_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/online_movie_streaming_system_v2
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: 6379
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
+      GG_CLIENT_ID: ${{ secrets.GG_Client_ID }}
+      GG_CLIENT_SECRET: ${{ secrets.GG_Client_Secret }}
+      AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+      AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+
+      - name: Wait for MySQL
         run: |
-          docker run -d --name mysql-datn \
-            -e MYSQL_ROOT_PASSWORD=root \
-            -e MYSQL_DATABASE=online_movie_streaming_system_v2 \
-            -p 3306:3306 \
-            --health-cmd="mysqladmin ping -h localhost -uroot -proot" \
-            --health-interval=10s --health-timeout=5s --health-retries=10 \
-            mysql:8 --default-authentication-plugin=mysql_native_password
+          until mysqladmin ping -h 127.0.0.1 --silent; do
+            echo "Waiting for MySQL..."
+            sleep 5
+          done
 
-          docker run -d --name redis \
-            --health-cmd="redis-cli ping" \
-            --health-interval=5s --health-timeout=3s --health-retries=10 \
-            -p 6379:6379 redis
+      - name: Wait for Redis
+        run: |
+          until redis-cli -h 127.0.0.1 ping | grep PONG > /dev/null; do
+            echo "Waiting for Redis..."
+            sleep 5
+          done
 
-          echo "⏳ Waiting for MySQL and Redis to be healthy..."
-          sleep 30
-
-      - name: Run compile + test
+      - name: Run Tests
         run: mvn clean verify
+
+
+  build:
+    runs-on: ubuntu-latest
+    name: Build Project
+    needs: [compile, unit-test]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+
+      - name: Build Project
+        run: mvn clean package -DskipTests
+
 
   build-push-image:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
-    needs: test
+    needs: build
+
     env:
-      AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
-      AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
-      GG_CLIENT_ID: ${{ secrets.GG_Client_ID }}
-      GG_CLIENT_SECRET: ${{ secrets.GG_Client_Secret }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
+      GG_CLIENT_ID: ${{ secrets.GG_Client_ID }}
+      GG_CLIENT_SECRET: ${{ secrets.GG_Client_Secret }}
+      AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+      AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup JDK 17
+      - name: Setup JDK
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'corretto'
 
-      - name: Extract project version from pom.xml
+      - name: Extract version from pom.xml
         id: extract_version
-        run: echo "VERSION=$(mvn -q -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
+        run: echo "VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
 
       - name: Login to DockerHub
         uses: docker/login-action@v3
@@ -90,11 +161,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build & Push Docker Image
+      - name: Build & Push Image
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile
+          file: Dockerfile
           push: true
           platforms: linux/amd64
           tags: |
