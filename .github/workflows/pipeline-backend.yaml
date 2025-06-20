@@ -13,6 +13,13 @@ jobs:
   test:
     name: Compile and Unit Test
     runs-on: ubuntu-latest
+    env:
+      AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+      AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+      GG_Client_ID: ${{ secrets.GG_Client_ID }}
+      GG_Client_Secret: ${{ secrets.GG_Client_Secret }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
