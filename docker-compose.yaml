@@ -1,0 +1,111 @@
+version: "3.8"
+
+services:
+  mysql-datn:
+    image: mysql:8.0
+    container_name: mysql-datn
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: online_movie_streaming_system_v2
+      MYSQL_ROOT_HOST: "%"
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - omss-network
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  omss-api:
+    image: quyy2003/omss-api:latest
+    container_name: omss-api
+    depends_on:
+      mysql-datn:
+        condition: service_healthy
+
+      redis:
+        condition: service_healthy
+
+    ports:
+      - "8080:8080"
+    environment:
+      TZ: Asia/Ho_Chi_Minh
+      # DB (trong app.properties có spring.datasource.*)
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_PROFILES_ACTIVE: dev
+
+      # JWT
+      JWT_SECRET: ${JWT_SECRET}
+
+      # Mail (spring.mail.*)
+      APP_PASSWORD: ${APP_PASSWORD}
+
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+      # Google OAuth
+      GG_CLIENT_ID: ${GG_CLIENT_ID}
+      GG_CLIENT_SECRET: ${GG_CLIENT_SECRET}
+
+      # Azure
+      AZURE_STORAGE_ACCOUNT_NAME: ${AZURE_STORAGE_ACCOUNT_NAME}
+      AZURE_STORAGE_ACCOUNT_KEY: ${AZURE_STORAGE_ACCOUNT_KEY}
+
+    networks:
+      - omss-network
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - 6381:6379
+    volumes:
+      - redis-data:/data
+    networks:
+      - omss-network
+    command: >
+      sh -c "redis-server --appendonly yes --notify-keyspace-events KEA"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redisInsight:
+    image: redis/redisinsight:latest
+    container_name: redis-insight
+    restart: always
+    ports:
+      - 5540:5540
+    volumes:
+      - redis_insight_volumes_data:/db
+    networks:
+      - omss-network
+
+  omss-fe:
+    image: quyy2003/omss-fe:latest
+    container_name: omss-fe
+    ports:
+      - 80:80
+    depends_on:
+      - omss-api
+    networks:
+      - omss-network
+
+networks:
+  omss-network:
+    driver: bridge
+
+volumes:
+  redis-data:
+  redis_insight_volumes_data:
+  mysql_data:

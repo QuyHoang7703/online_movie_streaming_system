@@ -158,7 +158,34 @@ jobs:
           platforms: linux/amd64
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/omss-api:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/omss-api:0.0.3
+            ${{ secrets.DOCKERHUB_USERNAME }}/omss-api:0.0.4
           build-args: |
             PROFILE=dev
             APP_VERSION=${{ steps.extract_version.outputs.VERSION }}
+
+#    deploy:
+#      runs-on: ubuntu-latest
+#
+#      steps:
+#        - name: Checkout code
+#          uses: actions/checkout@v3
+#
+#        - name: Copy docker-compose file to VM
+#          uses: appleboy/scp-action@master
+#          with:
+#            host: ${{ secrets.AZURE_HOST }}
+#            username: ${{ secrets.AZURE_USER }}
+#            key: ${{ secrets.AZURE_PRIVATE_KEY }}
+#            source: "docker-compose.yaml"
+#            target: "~/"
+#
+#        - name: SSH and run Docker Compose
+#          uses: appleboy/ssh-action@master
+#          with:
+#            host: ${{ secrets.AZURE_HOST }}
+#            username: ${{ secrets.AZURE_USER }}
+#            key: ${{ secrets.AZURE_PRIVATE_KEY }}
+#            script: |
+#              cd ~
+#              docker compose pull
+#              docker compose up -d
