@@ -60,7 +60,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
                 .addInterceptors(authHandshakeInterceptor)
-                .setAllowedOrigins("http://localhost:5173")
+                .setAllowedOrigins("http://localhost:5173", "http://20.196.73.166:5173")
                 .withSockJS();
 //                .setSessionCookieNeeded(true); // <<< Cần dòng nà
     }
