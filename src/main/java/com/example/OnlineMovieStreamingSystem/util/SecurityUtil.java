@@ -96,7 +96,7 @@ public class SecurityUtil {
     public ResponseCookie createTokenCookie(String name, String value, long maxAge) {
         return ResponseCookie.from(name, value)
                 .httpOnly(true)   // HTTP-only for security
-//                .secure(false)     // Secure flag
+                .secure(false)     // Secure flag
                 .path("/")        // Cookie valid for entire site
                 .maxAge(maxAge)   // Expiration time\
 //                .domain("localhost")
