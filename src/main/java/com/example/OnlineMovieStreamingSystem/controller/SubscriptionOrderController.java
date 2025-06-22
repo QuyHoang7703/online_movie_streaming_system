@@ -45,13 +45,15 @@ public class SubscriptionOrderController {
             log.info("PAYMENT SUCCESSFULLY");
             this.subscriptionOrderService.handlePaymentSuccess(transactionCode);
             return ResponseEntity.status(HttpStatus.FOUND)
-                    .header(HttpHeaders.LOCATION, "http://localhost:5173/payment-success?transactionCode=" + transactionCode)
+//                    .header(HttpHeaders.LOCATION, "http://localhost:5173/payment-success?transactionCode=" + transactionCode)
+                    .header(HttpHeaders.LOCATION, "https://emovie.io.vn/payment-success?transactionCode=" + transactionCode)
                     .build();
 
         } else {
             log.info("PAYMENT UNSUCCESSFULLY");
             return ResponseEntity.status(HttpStatus.FOUND)
-                    .header(HttpHeaders.LOCATION, "http://localhost:5173/payment-failure?transactionCode=" + transactionCode)
+//                    .header(HttpHeaders.LOCATION, "http://localhost:5173/payment-failure?transactionCode=" + transactionCode)
+                    .header(HttpHeaders.LOCATION, "https://emovie.io.vn/payment-failure?transactionCode=" + transactionCode)
                     .build();
         }
 
