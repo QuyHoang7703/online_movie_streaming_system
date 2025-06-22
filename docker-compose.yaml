@@ -98,6 +98,9 @@ services:
       - omss-api
     networks:
       - omss-network
+    volumes:
+      - /home/datn/SSL/emovie.io.vn.crt:/etc/nginx/ssl/emovie.io.vn.crt:ro
+      - /home/datn/SSL/emovie.io.vn.key:/etc/nginx/ssl/emovie.io.vn.key:ro
 
 
 networks:
