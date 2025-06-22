@@ -17,7 +17,8 @@ public class CorsConfig {
 
         // cho phép các URL nào có thể kết nối tới backend
         configuration.setAllowedOrigins(
-                Arrays.asList("http://localhost:5173", "http://localhost", "http://20.196.73.166:5173", "http://20.196.73.166"));
+                Arrays.asList("http://localhost:5173", "http://localhost", "http://20.196.73.166:5173", "http://20.196.73.166",
+                        "https://emovie.io.vn/api"));
 //        configuration.setAllowedOrigins(
 //                Arrays.asList("*"));
 

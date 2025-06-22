@@ -159,7 +159,7 @@ jobs:
           platforms: linux/amd64
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/omss-api:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/omss-api:0.0.4
+            ${{ secrets.DOCKERHUB_USERNAME }}/omss-api:1.0.0
           build-args: |
             PROFILE=dev
             APP_VERSION=${{ steps.extract_version.outputs.VERSION }}
