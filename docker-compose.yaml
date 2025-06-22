@@ -92,7 +92,7 @@ services:
   omss-fe:
     image: quyy2003/omss-fe:latest
     ports:
-      - 80:80
+      - 443:443
     container_name: omss-fe
     depends_on:
       - omss-api
