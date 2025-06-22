@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - ci/pipeline
+      - main
     paths:
       - src/**
       - .github/workflows/**
