@@ -310,7 +310,8 @@ public class AuthServiceImpl implements AuthService {
         String subject = "Đặt lại mật khẩu";
 
         // Tạo liên kết chứa token để người dùng nhấn vào => chuyển đến fe xử lý
-        String resetPasswordLink = "http://localhost:5173/reset-password?token=" + token;
+//        String resetPasswordLink = "http://localhost:5173/reset-password?token=" + token;
+        String resetPasswordLink = "https://emovie.io.vn/reset-password?token=" + token;
 
         // Tạo nội dung email từ template HTML
         Context context = new Context();
