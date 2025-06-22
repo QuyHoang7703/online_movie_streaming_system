@@ -59,7 +59,6 @@ services:
 
     networks:
       - omss-network
-      - nginx-proxy
 
   redis:
     image: redis:latest
@@ -92,22 +91,18 @@ services:
 
   omss-fe:
     image: quyy2003/omss-fe:latest
+    ports:
+      - 80:80
     container_name: omss-fe
     depends_on:
       - omss-api
-    environment:
-      - VIRTUAL_HOST=emovie.io.vn
-      - LETSENCRYPT_HOST=emovie.io.vn
-      - LETSENCRYPT_EMAIL=hoangvanquy772003@gmail.com
     networks:
       - omss-network
-      - nginx-proxy
+
 
 networks:
   omss-network:
     driver: bridge
-  nginx-proxy: # <-- khai báo thêm network proxy
-    external: true
 
 volumes:
   redis-data:
