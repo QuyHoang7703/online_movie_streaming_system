@@ -6,7 +6,7 @@ import com.example.OnlineMovieStreamingSystem.dto.response.recommendMovie.Recomm
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 
-@FeignClient(name="get-recommendation-movie", url="http://localhost:5001")
+@FeignClient(name="get-recommendation-movie", url="http://flask-recommendation:5001")
 public interface RecommendationClient {
     @PostMapping("/api/recommend/hybrid")
     RecommendationResponseWrapper getRecommendationHybridResponse(RecommendationMovieRequest request);
