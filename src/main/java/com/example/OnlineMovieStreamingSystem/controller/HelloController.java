@@ -16,7 +16,7 @@ public class HelloController {
     @GetMapping("/hello")
     @PreAuthorize("hasRole('ADMIN')")
     public String helloWorld() {
-        return "Hello World";
+        return "Hello World 123";
     }
 
     @PostMapping("/images")
