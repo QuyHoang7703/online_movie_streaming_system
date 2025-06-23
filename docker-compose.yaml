@@ -102,18 +102,18 @@ services:
       - /home/emovie_key/SSL/emovie.io.vn.crt:/etc/nginx/ssl/emovie.io.vn.crt:ro
       - /home/emovie_key/SSL/emovie.io.vn.key:/etc/nginx/ssl/emovie.io.vn.key:ro
 
-  flask-recommendation:
-    image: quyy2003/flask-recommendation:latest
-    container_name: flask-recommendation
-    ports:
-      - 5002:5001
-    networks:
-      - omss-network
-    environment:
-      - APP_VERSION=v2
-      - DATA_FOLDER_ID=1vcR0v7vF5s20rPoeaa6Mv2mUTejeDOn7
-      - MODEL_FOLDER_ID=1xLNj4xXLJQahUH2ldVCRABvscHIJ6D8W
-    restart: unless-stopped
+#  flask-recommendation:
+#    image: quyy2003/flask-recommendation:latest
+#    container_name: flask-recommendation
+#    ports:
+#      - 5002:5001
+#    networks:
+#      - omss-network
+#    environment:
+#      - APP_VERSION=v2
+#      - DATA_FOLDER_ID=1vcR0v7vF5s20rPoeaa6Mv2mUTejeDOn7
+#      - MODEL_FOLDER_ID=1xLNj4xXLJQahUH2ldVCRABvscHIJ6D8W
+#    restart: unless-stopped
 
 
 networks:
