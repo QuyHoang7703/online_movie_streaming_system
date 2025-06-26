@@ -94,6 +94,4 @@ public class VnPayUtil {
         return calculatedHash.equalsIgnoreCase(receivedHash);
     }
 
-
-
 }
