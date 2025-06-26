@@ -17,5 +17,6 @@ public class UserResponseDTO {
     private String phoneNumber;
     private String address;
     private String avatarUrl;
+    private String role;
     private GenderEnum gender;
 }

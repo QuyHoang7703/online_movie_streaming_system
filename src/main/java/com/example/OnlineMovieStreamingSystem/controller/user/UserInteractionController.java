@@ -39,5 +39,10 @@ public class UserInteractionController {
         return ResponseEntity.status(HttpStatus.OK).body(this.userInteractionService.getHistoryViewForUser(page, size));
     }
 
+    @PostMapping("/history-view")
+    public ResponseEntity<UserInteractionResponseDTO> addHistoryViewOfUser(@RequestBody UserInteractionRequestDTO userInteractionRequestDTO) {
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.userInteractionService.addHistoryViewForUser(userInteractionRequestDTO));
+    }
 
 }

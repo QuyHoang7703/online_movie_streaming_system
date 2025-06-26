@@ -14,6 +14,7 @@ import com.example.OnlineMovieStreamingSystem.repository.UserRepository;
 import com.example.OnlineMovieStreamingSystem.service.MovieService;
 import com.example.OnlineMovieStreamingSystem.service.UserInteractionService;
 import com.example.OnlineMovieStreamingSystem.util.SecurityUtil;
+import com.example.OnlineMovieStreamingSystem.util.constant.InteractionType;
 import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -44,7 +45,26 @@ public class UserInteractionServiceImpl implements UserInteractionService {
         userInteraction.setRating(userInteractionRequestDTO.getRatingValue());
         userInteraction.setUser(user);
         userInteraction.setMovie(movie);
+        userInteraction.setMovieTemporaryId(movie.getTmdbId());
 
+        UserInteraction savedUserInteraction = this.userInteractionRepository.save(userInteraction);
+        return this.convertToUserInteractionResponseDTO(savedUserInteraction);
+    }
+
+    @Override
+    public UserInteractionResponseDTO addHistoryViewForUser(UserInteractionRequestDTO userInteractionRequestDTO) {
+        String email = SecurityUtil.getLoggedEmail();
+        User user = this.userRepository.findByEmail(email)
+                .orElseThrow(() -> new ApplicationException("Không tìm thấy user với email: " + email));
+        Movie movie = this.movieRepository.findById(userInteractionRequestDTO.getMovieId())
+                .orElseThrow(() -> new ApplicationException("Không tìm thấy phim với id: " + userInteractionRequestDTO.getMovieId()));
+
+        UserInteraction userInteraction = new UserInteraction();
+        userInteraction.setRating(userInteractionRequestDTO.getRatingValue());
+        userInteraction.setUser(user);
+        userInteraction.setMovie(movie);
+        userInteraction.setInteractionType(InteractionType.VIEW);
+        userInteraction.setMovieTemporaryId(movie.getTmdbId());
         UserInteraction savedUserInteraction = this.userInteractionRepository.save(userInteraction);
         return this.convertToUserInteractionResponseDTO(savedUserInteraction);
     }
@@ -109,12 +129,15 @@ public class UserInteractionServiceImpl implements UserInteractionService {
         return resultPaginationDTO;
     }
 
+
+
     private UserInteractionResponseDTO convertToUserInteractionResponseDTO(UserInteraction userInteraction) {
-        return UserInteractionResponseDTO.builder()
+        UserInteractionResponseDTO userInteractionResponseDTO = UserInteractionResponseDTO.builder()
                 .userId(userInteraction.getUser().getId())
                 .email(userInteraction.getUser().getEmail())
                 .ratingValue(userInteraction.getRating())
                 .movieId(userInteraction.getMovie().getId())
                 .build();
+        return userInteractionResponseDTO;
     }
 }

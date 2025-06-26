@@ -167,6 +167,7 @@ public class UserServiceImpl implements UserService {
                 .gender(userDetail.getGender())
                 .address(userDetail.getAddress())
                 .avatarUrl(userDetail.getAvatarUrl())
+                .role(userDetail.getUser().getRole().getName())
                 .build();
 
         return userResponseDTO;

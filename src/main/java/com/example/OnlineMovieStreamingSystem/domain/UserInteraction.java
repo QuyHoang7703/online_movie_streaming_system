@@ -1,6 +1,7 @@
 package com.example.OnlineMovieStreamingSystem.domain;
 
 import com.example.OnlineMovieStreamingSystem.domain.user.User;
+import com.example.OnlineMovieStreamingSystem.util.constant.InteractionType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +20,10 @@ public class UserInteraction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private double rating;
+    private Instant createAt;
     private Instant updatedAt;  // lưu timestamp dạng số nguyên (epoch seconds)
+    @Enumerated(EnumType.STRING)
+    private InteractionType interactionType;
 
     @ManyToOne
     @JoinColumn(name="user_id")
@@ -32,10 +36,15 @@ public class UserInteraction {
     private long userTemporaryId;
     private long movieTemporaryId;
 
-    @PrePersist
+
     @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = Instant.now();
+    }
+
+    @PrePersist
     protected void onCreate() {
-        updatedAt = Instant.now();
+        this.createAt = Instant.now();
     }
 
 

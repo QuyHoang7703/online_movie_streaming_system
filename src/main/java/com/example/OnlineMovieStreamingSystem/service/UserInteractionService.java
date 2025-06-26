@@ -9,4 +9,5 @@ public interface UserInteractionService {
     UserInteractionResponseDTO updateUserInteraction(UserInteractionRequestDTO userInteractionRequestDTO);
     UserInteractionResponseDTO getUserInteraction(long movieId);
     ResultPaginationDTO getHistoryViewForUser(int page, int size);
+    UserInteractionResponseDTO addHistoryViewForUser(UserInteractionRequestDTO userInteractionRequestDTO);
 }

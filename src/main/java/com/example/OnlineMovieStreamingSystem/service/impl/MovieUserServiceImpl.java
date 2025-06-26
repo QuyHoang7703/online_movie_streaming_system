@@ -124,15 +124,15 @@ public class MovieUserServiceImpl implements MovieUserService {
             double neumfWeight = 0.0;
 
             if(countRatingsOfUser == 0) {
-                cbfWeight = 0.8;
+                cbfWeight = 0.79;
             } else if (countRatingsOfUser < 10) {
-                cbfWeight = 0.6;
+                cbfWeight = 0.65;
 //                neumfWeight = 0.3;
-            } else if (countRatingsOfUser < 50) {
-                cbfWeight = 0.4;
-//                neumfWeight = 0.4;
+//            } else if (countRatingsOfUser < 50) {
+//                cbfWeight = 0.6;
+////                neumfWeight = 0.4;
             }else{
-                cbfWeight = 0.2;
+                cbfWeight = 0.6;
 //                neumfWeight = 0.7;
             }
 

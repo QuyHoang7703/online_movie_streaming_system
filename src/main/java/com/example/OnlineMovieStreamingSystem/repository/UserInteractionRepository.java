@@ -18,7 +18,7 @@ public interface UserInteractionRepository extends JpaRepository<UserInteraction
     Optional<UserInteraction> findByUserIdAndMovieId(long userId, long movieId);
 
     @Query("SELECT ui FROM UserInteraction ui " +
-            "WHERE ui.userTemporaryId = :userId")
+            "WHERE ui.user.id = :userId")
     Page<UserInteraction> findByUserId(@Param("userId") Long userId, Pageable pageable);
 
 }
