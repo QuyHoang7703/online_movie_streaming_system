@@ -13,6 +13,7 @@ import com.example.OnlineMovieStreamingSystem.repository.ActorRepository;
 import com.example.OnlineMovieStreamingSystem.service.ActorService;
 import com.example.OnlineMovieStreamingSystem.service.ImageStorageService;
 import com.example.OnlineMovieStreamingSystem.service.MovieService;
+import com.example.OnlineMovieStreamingSystem.util.constant.GenderEnum;
 import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -59,24 +61,34 @@ public class ActorServiceImpl implements ActorService {
                 .orElseThrow(() ->  new ApplicationException("Actor not found"));
 
         // Objects.equals(a, b) <=> (a==b) || (a != null && a.equals(b))
-        if(!Objects.equals(actorRequestDTO.getName(), actorDB.getName())) {
-            actorDB.setName(actorRequestDTO.getName());
-        }
-        if (!Objects.equals(actorRequestDTO.getBiography(), actorDB.getBiography())) {
-            actorDB.setBirthDate(actorRequestDTO.getBirthDate());
-        }
-        if(!Objects.equals(actorRequestDTO.getBiography(), actorDB.getBiography())) {
-            actorDB.setBiography(actorRequestDTO.getBiography());
-        }
-        if(!Objects.equals(actorRequestDTO.getOtherName(), actorDB.getOtherName())) {
-            actorDB.setOtherName(actorRequestDTO.getOtherName());
-        }
-        if(!Objects.equals(actorRequestDTO.getGender(), actorDB.getGender())) {
-            actorDB.setGender(actorRequestDTO.getGender());
+        String newActorName = actorRequestDTO.getName();
+        if(newActorName != null && !Objects.equals(actorRequestDTO.getName(), actorDB.getName())) {
+            actorDB.setName(newActorName);
         }
 
-        if(!Objects.equals(actorRequestDTO.getPlaceOfBirth(), actorDB.getPlaceOfBirth())) {
-            actorDB.setPlaceOfBirth(actorRequestDTO.getPlaceOfBirth());
+        LocalDate newBirthDate = actorRequestDTO.getBirthDate();
+        if (newBirthDate != null &&!Objects.equals(actorRequestDTO.getBirthDate(), actorDB.getBirthDate())) {
+            actorDB.setBirthDate(newBirthDate);
+        }
+
+        String newBiography = actorRequestDTO.getBiography();
+        if(newBiography != null && !Objects.equals(actorRequestDTO.getBiography(), actorDB.getBiography())) {
+            actorDB.setBiography(newBiography);
+        }
+
+        String newOtherName = actorRequestDTO.getOtherName();
+        if(newOtherName != null && !Objects.equals(actorRequestDTO.getOtherName(), actorDB.getOtherName())) {
+            actorDB.setOtherName(newOtherName);
+        }
+
+        GenderEnum newGender = actorRequestDTO.getGender();
+        if(newGender != null && !Objects.equals(actorRequestDTO.getGender(), actorDB.getGender())) {
+            actorDB.setGender(newGender);
+        }
+
+        String newPlaceOfBirth = actorRequestDTO.getPlaceOfBirth();
+        if(newPlaceOfBirth != null && !Objects.equals(actorRequestDTO.getPlaceOfBirth(), actorDB.getPlaceOfBirth())) {
+            actorDB.setPlaceOfBirth(newPlaceOfBirth);
         }
 
         String avatarUrl = actorDB.getAvatarUrl();

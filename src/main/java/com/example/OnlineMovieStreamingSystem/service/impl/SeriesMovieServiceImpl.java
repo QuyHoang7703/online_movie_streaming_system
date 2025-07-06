@@ -6,12 +6,14 @@ import com.example.OnlineMovieStreamingSystem.domain.StandaloneMovie;
 import com.example.OnlineMovieStreamingSystem.dto.request.movie.SeriesMovieRequestDTO;
 import com.example.OnlineMovieStreamingSystem.dto.response.movie.SeriesMovieResponseDTO;
 import com.example.OnlineMovieStreamingSystem.repository.MovieRepository;
+import com.example.OnlineMovieStreamingSystem.service.MovieRedisService;
 import com.example.OnlineMovieStreamingSystem.service.MovieService;
 import com.example.OnlineMovieStreamingSystem.service.SeriesMovieService;
 import com.example.OnlineMovieStreamingSystem.util.constant.MovieType;
 import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -22,6 +24,9 @@ import java.util.Objects;
 public class SeriesMovieServiceImpl implements SeriesMovieService {
     private final MovieRepository movieRepository;
     private final MovieService movieService;
+    private final MovieRedisService movieRedisService;
+
+    @Transactional
     @Override
     public SeriesMovieResponseDTO createSeriesMovie(SeriesMovieRequestDTO seriesMovieRequestDTO, MultipartFile poster, MultipartFile backdrop) throws IOException {
         Movie movie = this.movieService.createMovieFromDTO(seriesMovieRequestDTO, poster, backdrop);
@@ -34,22 +39,29 @@ public class SeriesMovieServiceImpl implements SeriesMovieService {
         movie.setSeriesMovie(seriesMovie);
 
         Movie savedMovie = this.movieRepository.save(movie);
+        this.movieRedisService.clearMovieInRedis();
 
         return this.convertToSeriesResponseDTO(savedMovie);
     }
 
+    @Transactional
     @Override
     public SeriesMovieResponseDTO updateStandaloneMovie(long movieId, SeriesMovieRequestDTO seriesMovieRequestDTO, MultipartFile poster, MultipartFile backdrop) throws IOException {
         Movie updateMovie = this.movieService.updateMovieFromDTO(movieId, seriesMovieRequestDTO, poster, backdrop);
         SeriesMovie seriesMovie = updateMovie.getSeriesMovie();
-        if(!Objects.equals(seriesMovie.getSeason(), seriesMovieRequestDTO.getSeason())){
+
+        Integer newSeason = seriesMovieRequestDTO.getSeason();
+        if(newSeason != null && !Objects.equals(newSeason, seriesMovie.getSeason())) {
             seriesMovie.setSeason(seriesMovieRequestDTO.getSeason());
         }
-        if(!Objects.equals(seriesMovie.getTotalEpisodes(), seriesMovieRequestDTO.getTotalEpisodes())){
+
+        Integer newTotalEpisodes = seriesMovieRequestDTO.getTotalEpisodes();
+        if(newTotalEpisodes != null && !Objects.equals(newTotalEpisodes, seriesMovie.getTotalEpisodes())) {
             seriesMovie.setTotalEpisodes(seriesMovieRequestDTO.getTotalEpisodes());
         }
         updateMovie.setSeriesMovie(seriesMovie);
         Movie updatedMovie = this.movieRepository.save(updateMovie);
+        this.movieRedisService.clearMovieInRedis();
 
         return this.convertToSeriesResponseDTO(updatedMovie);
     }

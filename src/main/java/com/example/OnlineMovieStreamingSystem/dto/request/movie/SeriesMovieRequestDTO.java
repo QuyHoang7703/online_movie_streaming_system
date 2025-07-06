@@ -10,6 +10,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SeriesMovieRequestDTO extends MovieRequestDTO {
-    private int season;
-    private int totalEpisodes;
+    private Integer season;
+    private Integer totalEpisodes;
 }
