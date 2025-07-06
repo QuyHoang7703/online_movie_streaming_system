@@ -20,7 +20,7 @@ public class MovieRequestDTO {
     private String director;
 //    private String country;
     private LocalDate releaseDate;
-    private boolean free;
+    private Boolean free;
     private String trailerUrl;
     @Enumerated(EnumType.STRING)
     private MovieType movieType;

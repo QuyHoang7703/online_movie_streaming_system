@@ -18,8 +18,8 @@ import com.example.OnlineMovieStreamingSystem.repository.*;
 import com.example.OnlineMovieStreamingSystem.service.*;
 import com.example.OnlineMovieStreamingSystem.util.SecurityUtil;
 import com.example.OnlineMovieStreamingSystem.util.constant.MovieType;
-import com.example.OnlineMovieStreamingSystem.util.constant.VideoType;
 import com.example.OnlineMovieStreamingSystem.util.exception.ApplicationException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
@@ -33,6 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -54,8 +56,10 @@ public class MovieServiceImpl implements MovieService {
     private final VideoVersionService videoVersionService;
     private final UserRepository userRepository;
     private final FavoriteMovieRepository favoriteMovieRepository;
-    private final RedisTemplate<String, String> redisTemplate;
-    private final String MOVIE_PREFIX = "movie:";
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final ObjectMapper objectMapper;
+//    private final String MOVIE_PREFIX = "movie:";
+    private final MovieRedisService movieRedisService;
 
     @Override
     public Movie createMovieFromDTO(MovieRequestDTO movieRequestDTO, MultipartFile poster, MultipartFile backdrop) throws IOException {
@@ -65,9 +69,8 @@ public class MovieServiceImpl implements MovieService {
         movie.setOriginalTitle(movieRequestDTO.getOriginalTitle());
         movie.setDescription(movieRequestDTO.getDescription());
         movie.setDirector(movieRequestDTO.getDirector());
-//        movie.setCountry(movieRequestDTO.getCountry());
         movie.setReleaseDate(movieRequestDTO.getReleaseDate());
-        movie.setFree(movieRequestDTO.isFree());
+        movie.setFree(movieRequestDTO.getFree());
         movie.setTrailerUrl(movieRequestDTO.getTrailerUrl());
         movie.setMovieType(movieRequestDTO.getMovieType());
         movie.setStatus(movieRequestDTO.getStatus());
@@ -90,7 +93,7 @@ public class MovieServiceImpl implements MovieService {
 
         // Set subscription plan for movie
         List<Long> subscriptionPlanIds = movieRequestDTO.getSubscriptionPlanIds();
-        if(!movieRequestDTO.isFree() && subscriptionPlanIds != null && !subscriptionPlanIds.isEmpty()) {
+        if(!movieRequestDTO.getFree() && subscriptionPlanIds != null && !subscriptionPlanIds.isEmpty()) {
             List<SubscriptionPlan> subscriptionPlans = this.subscriptionPlanRepository.findByIdIn(subscriptionPlanIds);
             movie.setSubscriptionPlans(subscriptionPlans);
         }
@@ -205,7 +208,7 @@ public class MovieServiceImpl implements MovieService {
                                                int page,
                                                int size) throws BadRequestException {
         Function<Movie, MovieUserResponseDTO> userMapper = (movie) -> this.convertToMovieUserResponseDTO(movie);
-        return getMovies(title, genreNames, movieType, countries, null, page, size, userMapper);
+        return getMovies(title, genreNames, movieType, countries, null, page, size, userMapper, false);
     }
 
 
@@ -218,7 +221,7 @@ public class MovieServiceImpl implements MovieService {
                                                int page,
                                                int size) throws BadRequestException {
         Function<Movie, MovieSummaryResponseDTO> adminMapper = (movie) -> this.convertToMovieSummaryResponseDTO(movie);
-        return getMovies(title, genreNames, movieType, countries, subscriptionPlanId, page, size, adminMapper);
+        return getMovies(title, genreNames, movieType, countries, subscriptionPlanId, page, size, adminMapper, true);
     }
 
 
@@ -233,29 +236,44 @@ public class MovieServiceImpl implements MovieService {
     public Movie updateMovieFromDTO(long movieId, MovieRequestDTO movieRequestDTO, MultipartFile poster, MultipartFile backdrop) throws IOException {
         Movie movieDB = this.movieRepository.findById(movieId)
                 .orElseThrow(() -> new ApplicationException("Không tìm thấy phim"));
-        if(!Objects.equals(movieRequestDTO.getTitle(), movieDB.getTitle())) {
-            movieDB.setTitle(movieRequestDTO.getTitle());
+        String newTitle = movieRequestDTO.getTitle();
+        if (newTitle != null && !Objects.equals(newTitle, movieDB.getTitle())) {
+            movieDB.setTitle(newTitle);
         }
-        if(!Objects.equals(movieRequestDTO.getDescription(), movieDB.getDescription())) {
-            movieDB.setDescription(movieRequestDTO.getDescription());
+
+        String newDescription = movieRequestDTO.getDescription();
+        if (newDescription != null && !Objects.equals(newDescription, movieDB.getDescription())) {
+            movieDB.setDescription(newDescription);
         }
-        if(!Objects.equals(movieRequestDTO.getDirector(), movieDB.getDirector())) {
-            movieDB.setDirector(movieRequestDTO.getDirector());
+
+        String newDirector = movieRequestDTO.getDirector();
+        if (newDirector != null && !Objects.equals(newDirector, movieDB.getDirector())) {
+            movieDB.setDirector(newDirector);
         }
-        if(!Objects.equals(movieRequestDTO.getReleaseDate(), movieDB.getReleaseDate())) {
-            movieDB.setReleaseDate(movieRequestDTO.getReleaseDate());
+
+        LocalDate newReleaseDate = movieRequestDTO.getReleaseDate();
+        if (newReleaseDate != null && !Objects.equals(newReleaseDate, movieDB.getReleaseDate())) {
+            movieDB.setReleaseDate(newReleaseDate);
         }
-        if(!Objects.equals(movieRequestDTO.isFree(), movieDB.isFree())) {
-            movieDB.setFree(movieRequestDTO.isFree());
+
+        Boolean newIsFree = movieRequestDTO.getFree();
+        if (newIsFree != null && !Objects.equals(newIsFree, movieDB.isFree())) {
+            movieDB.setFree(newIsFree);
         }
-        if(!Objects.equals(movieRequestDTO.getTrailerUrl(), movieDB.getTrailerUrl())) {
-            movieDB.setTrailerUrl(movieRequestDTO.getTrailerUrl());
+
+        String newTrailerUrl = movieRequestDTO.getTrailerUrl();
+        if (newTrailerUrl != null && !Objects.equals(newTrailerUrl, movieDB.getTrailerUrl())) {
+            movieDB.setTrailerUrl(newTrailerUrl);
         }
-        if(!Objects.equals(movieRequestDTO.getQuality(), movieDB.getQuality())) {
-            movieDB.setQuality(movieRequestDTO.getQuality());
+
+        String newQuality = movieRequestDTO.getQuality();
+        if (newQuality != null && !Objects.equals(newQuality, movieDB.getQuality())) {
+            movieDB.setQuality(newQuality);
         }
-        if(!Objects.equals(movieRequestDTO.getStatus(), movieDB.getStatus())) {
-            movieDB.setStatus(movieRequestDTO.getStatus());
+
+        String newStatus = movieRequestDTO.getStatus();
+        if (newStatus != null && !Objects.equals(newStatus, movieDB.getStatus())) {
+            movieDB.setStatus(newStatus);
         }
 
         // Update genre for movie
@@ -279,13 +297,14 @@ public class MovieServiceImpl implements MovieService {
         }
 
         // Update subscription plan for movie
-        if(movieRequestDTO.getSubscriptionPlanIds() != null) {
+        if(movieRequestDTO.getSubscriptionPlanIds() != null && !movieRequestDTO.getSubscriptionPlanIds().isEmpty()) {
             List<Long> currentSubscriptionPlanIds = movieDB.getSubscriptionPlans().stream().map(SubscriptionPlan::getId).toList();
             List<Long> updateSubscriptionPlanIds = movieRequestDTO.getSubscriptionPlanIds();
             if(!currentSubscriptionPlanIds.equals(updateSubscriptionPlanIds)) {
                 List<SubscriptionPlan> subscriptionPlans = this.subscriptionPlanRepository.findByIdIn(updateSubscriptionPlanIds);
                 movieDB.setSubscriptionPlans(subscriptionPlans);
             }
+            movieDB.setFree(false);
         }
 
         // Update actor for movie
@@ -357,6 +376,7 @@ public class MovieServiceImpl implements MovieService {
         Movie movie = this.movieRepository.findById(movieId)
                 .orElseThrow(() -> new ApplicationException("Không tồn tại phim với id " + movieId));
         this.movieRepository.delete(movie);
+        this.movieRedisService.clearMovieInRedis();
     }
 
     @Override
@@ -467,7 +487,8 @@ public class MovieServiceImpl implements MovieService {
                                           List<String> countries,
                                           Long subscriptionPlanId,
                                           int page,
-                                          int size, Function<Movie, ?> movieMapper) throws BadRequestException {
+                                          int size, Function<Movie, ?> movieMapper,
+                                          boolean isAdmin) throws BadRequestException {
         MovieType type = null;
 
         if (movieType != null && !movieType.isEmpty()) {
@@ -479,6 +500,14 @@ public class MovieServiceImpl implements MovieService {
             }
         }
 
+        // Key được tạo từ filters
+        String key = this.movieRedisService.getKey(genreNames, movieType, countries, subscriptionPlanId, page, size, isAdmin);
+
+        // Nếu có data movie trong redis thì lấy trong redis theo key
+        Object cached = this.redisTemplate.opsForValue().get(key);
+        if(cached != null) {
+            return this.objectMapper.convertValue(cached, ResultPaginationDTO.class);
+        }
 
 
         if(movieType != null && !movieType.isEmpty()) {
@@ -524,12 +553,8 @@ public class MovieServiceImpl implements MovieService {
                 .toList();
 
         resultPaginationDTO.setResult(mappedResults);
-        StringBuilder key = new StringBuilder(MOVIE_PREFIX);
-        if(title != null && !title.isEmpty()) {
-            key.append(title);
-        }
-        
-//        redisTemplate.opsForValue().set(key)
+
+        redisTemplate.opsForValue().set(key, resultPaginationDTO, Duration.ofMinutes(5));
 
         return resultPaginationDTO;
     }
