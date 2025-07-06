@@ -63,7 +63,8 @@ public class SecurityConfiguration {
             "/api/v1/user/movies/**",
             "/ws/**",
             "/api/v1/home-page/**",
-            "/api/v1/retrain-model/**"
+            "/api/v1/retrain-model/**",
+            "/api/v1/subscription-plans/{subscriptionPlanId}"
 
     };
 

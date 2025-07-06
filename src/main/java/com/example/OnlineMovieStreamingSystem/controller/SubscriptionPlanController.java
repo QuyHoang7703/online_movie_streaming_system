@@ -61,7 +61,6 @@ public class SubscriptionPlanController {
 
     @GetMapping("/filters")
     public ResponseEntity<List<SubscriptionPlanSummaryDTO>> getSubscriptionPlansForFilter() {
-
         return ResponseEntity.status(HttpStatus.OK).body(this.subscriptionPlanService.getSubscriptionPlansForFilters());
     }
 
